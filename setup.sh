@@ -6,7 +6,7 @@ export CEPCENV_VERSION
 
 _cepcenv_python_run()
 {
-    PYTHONPATH=$CEPCENV_PATH/pypkg:$PYTHONPATH python -m cepcenv $*
+    PYTHONPATH=$CEPCENV_PATH/core:$PYTHONPATH python $CEPCENV_PATH/script/run.py $*
 }
 
 cepcenv()
