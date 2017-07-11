@@ -1,2 +1,1 @@
 include cepcenv/VERSION
-recursive-include cepcenv/script *

@@ -27,9 +27,9 @@ def init(ctx, shell):
 @click.option('--shell', '-s', type=str, default='sh')
 @click.argument('version')
 @click.pass_context
-def use(ctx, shell):
+def use(ctx, shell, version):
     from cepcenv.command.use import run as run_use
-    run_use(verbose=ctx.obj['verbose'], shell_name=shell)
+    run_use(verbose=ctx.obj['verbose'], shell_name=shell, version=version)
 
 
 def main():
