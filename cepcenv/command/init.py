@@ -1,11 +1,20 @@
 import os
 import click
 
-from cepcenv import CEPCENV_ROOT_DIR
+from cepcenv import CEPCENV_HOME
 
-def run(verbose, shell):
-    shell_file = os.path.join(CEPCENV_ROOT_DIR, 'script', 'setup.'+shell)
-    if not os.path.isfile(shell_file):
-        click.echo('Shell "%s" init script not found' % shell, err=True)
-        return 2
-    click.echo(shell_file)
+from cepcenv.shell  import load_shell
+
+from cepcenv.loader import LoadError
+
+def run(verbose, shell_name):
+    try:
+        shell = load_shell(shell_name)()
+    except LoadError as e:
+        raise click.BadParameter('Unknown shell "%s"' % shell_name)
+
+    script = ''
+    script += shell.set_env('CEPCENV_HOME', CEPCENV_HOME)
+    script += shell.define_cepcenv()
+
+    click.echo(script, nl=False)

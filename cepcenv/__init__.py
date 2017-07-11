@@ -1,11 +1,11 @@
 import os
 
 
-CEPCENV_ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
+CEPCENV_HOME = os.path.dirname(os.path.realpath(__file__))
 
 
 def version():
-    with open(os.path.join(CEPCENV_ROOT_DIR, 'VERSION'), 'r') as f:
+    with open(os.path.join(CEPCENV_HOME, 'VERSION'), 'r') as f:
         ver = f.read()
     return ver.strip()
 

@@ -3,7 +3,7 @@ import click
 
 
 @click.group()
-@click.option('--verbose', default=False, help='Verbose mode')
+@click.option('--verbose', '-v', is_flag=True, help='Verbose mode')
 @click.pass_context
 def cli(ctx, verbose):
     ctx.obj['verbose'] = verbose
@@ -16,15 +16,21 @@ def version():
 
 
 @cli.command()
-@click.option('--shell', default='sh', type=str)
+@click.option('--shell', '-s', type=str, default='sh')
 @click.pass_context
 def init(ctx, shell):
-    from cepcenv.command.init import run as init_run
-    init_run(verbose=ctx.obj['verbose'], shell=shell)
+    from cepcenv.command.init import run as run_init
+    run_init(verbose=ctx.obj['verbose'], shell_name=shell)
+
+
+@cli.command()
+@click.option('--shell', '-s', type=str, default='sh')
+@click.argument('version')
+@click.pass_context
+def use(ctx, shell):
+    from cepcenv.command.use import run as run_use
+    run_use(verbose=ctx.obj['verbose'], shell_name=shell)
 
 
 def main():
     cli(obj={})
-
-if __name__ == '__main__':
-    main()
