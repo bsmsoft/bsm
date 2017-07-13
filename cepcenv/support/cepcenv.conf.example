@@ -1,0 +1,10 @@
+verbose: false
+
+cepcsoft_root: ~/cepcsoft
+workarea: ~/myarea
+
+scenario:
+  312:
+    cepcsoft_root: ~/cepcsoft3
+    version: 3.1.2
+    workarea: ~/myarea3

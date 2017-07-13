@@ -21,14 +21,14 @@ cepcenv() {
 
   case $command in
     use|setup|cleanup)
-      script=$(%(python_exe)s -c 'from cepcenv.command import main;main()' $*)
+      script=$(%(python_exe)s -c 'from cepcenv.cmd import main;main()' $*)
       exit_code=$?
 #      [ $exit_code -eq 0 ] && eval "$script"
       [ $exit_code -eq 0 ] && echo "script:\\n$script"
       ;;
 
     *)
-      %(python_exe)s -c 'from cepcenv.command import main;main()' $*
+      %(python_exe)s -c 'from cepcenv.cmd import main;main()' $*
       exit_code=$?
       ;;
   esac

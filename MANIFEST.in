@@ -1,1 +1,2 @@
 include cepcenv/VERSION
+include cepcenv/support/cepcenv.conf.example

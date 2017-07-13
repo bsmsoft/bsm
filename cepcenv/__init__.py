@@ -4,6 +4,10 @@ import os
 CEPCENV_HOME = os.path.dirname(os.path.realpath(__file__))
 
 
+class CepcEnvError(Exception):
+    pass
+
+
 def version():
     with open(os.path.join(CEPCENV_HOME, 'VERSION'), 'r') as f:
         ver = f.read()
