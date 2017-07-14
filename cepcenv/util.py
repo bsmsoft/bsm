@@ -1,12 +1,14 @@
 import os
+import re
 import shutil
+import subprocess
 
-def camel_to_snake(name):
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
-    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+def camel_to_snake(name, delim='_'):
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1%s\2'%delim, name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1%s\2'%delim, s1).lower()
 
-def snake_to_camel(name):
-    return name.title().replace('_', '')
+def snake_to_camel(name, delim='_'):
+    return name.title().replace(delim, '')
 
 
 def safe_rmdir(directory):
@@ -25,7 +27,9 @@ def safe_copy(src, dst):
 
 
 def expand_path(path):
-    return os.path.expanduser(os.path.expandvars(path))
+    temp_path = os.path.expanduser(path)
+    temp_path = os.path.expandvars(temp_path)
+    return os.path.normpath(temp_path)
 
 
 def ensure_list(item):
@@ -37,3 +41,8 @@ def unique_list(seq):
         if item not in unique:
             unique.append(item)
     return unique
+
+
+def call(args):
+    p = subprocess.Popen(args, stdout=subprocess.PIPE)
+    return p.communicate()[0].decode()

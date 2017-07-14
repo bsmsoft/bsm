@@ -1,2 +1,3 @@
 class Package(object):
-    pass
+    def __init__(self):
+        self.__package_root = ''

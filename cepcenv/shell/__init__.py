@@ -1,6 +1,7 @@
 from cepcenv.loader import load_class
 from cepcenv.loader import LoadError
-from cepcenv.util   import snake_to_camel
+
+from cepcenv.util import snake_to_camel
 
 
 class ShellError(Exception):
@@ -17,3 +18,10 @@ def load_shell(shell_name):
         raise ShellError('Load shell "%s" error: %s' % (shell_name, e))
 
     return c
+
+
+class Shell(object):
+    def comment(self, content):
+        lines = content.split('\n')
+        newlines = map(lambda x:'# '+x, lines)
+        return '\n'.join(newlines)

@@ -1,5 +1,7 @@
 verbose: false
 
+#os: ttt
+
 cepcsoft_root: ~/cepcsoft
 workarea: ~/myarea
 
