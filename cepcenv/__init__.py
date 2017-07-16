@@ -38,7 +38,7 @@ def version():
 @cli.command()
 @click.pass_context
 def platform(ctx):
-    cmd = Cmd('platform')
+    cmd = Cmd('platform-cmd')
     cmd.execute(ctx.obj)
 
 

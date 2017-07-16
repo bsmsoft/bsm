@@ -14,14 +14,13 @@ class Sh(Shell):
 
         cepcenv_func = '''
 cepcenv() {
-  check_shell=$(%(python_exe)s -c 'from cepcenv import main;main(check_shell=True)' $*)
+  check_shell=$(%(python_exe)s -c 'from cepcenv import main;main(check_shell=True)' $* 2>/dev/null)
   check_shell_exit_code=$?
 
   if [ $check_shell_exit_code = 0 -a "$check_shell" = 'CEPCENV:OUTPUT_IS_SHELL' ]; then
     script=$(%(python_exe)s -c 'from cepcenv import main;main()' --shell=sh $*)
     exit_code=$?
-#    [ $exit_code -eq 0 ] && eval "$script"
-#    [ $exit_code -eq 0 ] && echo "script:\\n$script"
+    [ $exit_code -eq 0 ] && eval "$script"
   else
     %(python_exe)s -c 'from cepcenv import main;main()' $*
     exit_code=$?
@@ -31,7 +30,7 @@ cepcenv() {
 }
 
 cepcenv_script() {
-  check_shell=$(%(python_exe)s -c 'from cepcenv import main;main(check_shell=True)' $*)
+  check_shell=$(%(python_exe)s -c 'from cepcenv import main;main(check_shell=True)' $* 2>/dev/null)
   check_shell_exit_code=$?
 
   if [ $check_shell_exit_code = 0 -a "$check_shell" = 'CEPCENV:OUTPUT_IS_SHELL' ]; then

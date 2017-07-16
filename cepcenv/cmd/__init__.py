@@ -49,9 +49,9 @@ class Cmd(object):
                 click.echo('CEPCENV:OUTPUT_IS_NOT_SHELL')
         else:
             if self.__cmd_output_shell:
-                self.__cmd.execute(self.__shell, **kwargs)
+                self.__cmd.execute(self.__config, self.__shell, **kwargs)
             else:
-                self.__cmd.execute(**kwargs)
+                self.__cmd.execute(self.__config, **kwargs)
 
 
     def __load_cmd(self, cmd_name):
