@@ -1,8 +1,10 @@
 import sys
 import inspect
 
+from cepcenv.error import CepcenvError
 
-class LoadError(Exception):
+
+class LoadError(CepcenvError):
     pass
 
 class ModuleNotFoundError(LoadError):

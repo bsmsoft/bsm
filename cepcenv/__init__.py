@@ -1,21 +1,10 @@
 import os
 import click
 
-
-CEPCENV_HOME = os.path.dirname(os.path.realpath(__file__))
-
-
-class CepcenvError(Exception):
-    pass
-
-
 from cepcenv.cmd import Cmd
 
 
-def version():
-    with open(os.path.join(CEPCENV_HOME, 'VERSION'), 'r') as f:
-        ver = f.read()
-    return ver.strip()
+CEPCENV_HOME = os.path.dirname(os.path.realpath(__file__))
 
 
 @click.group()
@@ -30,15 +19,9 @@ def cli(ctx, config, verbose, shell):
 
 
 @cli.command()
-def version():
-    cmd = Cmd('version')
-    cmd.execute(ctx.obj)
-
-
-@cli.command()
 @click.pass_context
-def platform(ctx):
-    cmd = Cmd('platform-cmd')
+def version(ctx):
+    cmd = Cmd('version')
     cmd.execute(ctx.obj)
 
 
@@ -46,6 +29,13 @@ def platform(ctx):
 @click.pass_context
 def init(ctx):
     cmd = Cmd('init')
+    cmd.execute(ctx.obj)
+
+
+@cli.command()
+@click.pass_context
+def platform(ctx):
+    cmd = Cmd('platform-cmd')
     cmd.execute(ctx.obj)
 
 

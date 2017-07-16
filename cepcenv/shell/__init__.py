@@ -1,10 +1,12 @@
+from cepcenv.error import CepcenvError
+
 from cepcenv.loader import load_class
 from cepcenv.loader import LoadError
 
 from cepcenv.util import snake_to_camel
 
 
-class ShellError(Exception):
+class ShellError(CepcenvError):
     pass
 
 

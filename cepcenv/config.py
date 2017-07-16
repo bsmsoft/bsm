@@ -1,7 +1,9 @@
 import yaml
 
+from cepcenv.error import CepcenvError
 
-class ConfigError(Exception):
+
+class ConfigError(CepcenvError):
     pass
 
 

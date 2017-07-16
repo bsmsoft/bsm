@@ -2,7 +2,7 @@ import inspect
 
 import click
 
-from cepcenv import CepcenvError
+from cepcenv.error import CepcenvError
 
 from cepcenv.loader import load_class
 from cepcenv.loader import LoadError
@@ -17,7 +17,7 @@ from cepcenv.shell import load_shell
 from cepcenv.shell import ShellError
 
 
-class CmdError(Exception):
+class CmdError(CepcenvError):
     pass
 
 
