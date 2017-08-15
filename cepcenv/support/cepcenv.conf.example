@@ -2,11 +2,17 @@ verbose: false
 
 #os: ttt
 
-cepcsoft_root: ~/cepcsoft
+release_repo: https://github.com/xianghuzhao/cepcsoft
+
+install_root: ~/cepcsoft
 workarea: ~/myarea
 
 scenario:
   312:
     cepcsoft_root: ~/cepcsoft3
-    version: 3.1.2
+    release_version: 3.1.2
+    workarea: ~/myarea3
+  test:
+    cepcsoft_root: ~/cepcsoft_test
+    release_config: ~/test.yml
     workarea: ~/myarea3

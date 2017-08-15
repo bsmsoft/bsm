@@ -1,7 +1,7 @@
 import platform
 import re
 
-from cepcenv.util import call
+from cepcenv.util import check_output
 
 
 def _detect_arch():
@@ -11,11 +11,11 @@ def _detect_os():
     return 'sl6'
 
 def _detect_compiler(compiler='gcc'):
-    output = call(['gcc', '--version'])
+    output = check_output(['gcc', '--version'])
     m = re.match('gcc \(GCC\) (\d+)\.(\d+)', output)
     version_major = m.group(1)
     version_minor = m.group(2)
-    return 'gcc%s%s' % (version_major, version_minor)
+    return 'gcc{0}{1}'.format(version_major, version_minor)
 
 
 class SoftwarePlatform(object):

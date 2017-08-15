@@ -59,8 +59,9 @@ setup(
     keywords = 'CEPC',
     packages = find_packages(exclude=[]),
     install_requires = [
-        'click>=6.0,<7.0',
-        'PyYAML>=3.0,<4.0',
+        'paradag',
+        'click~=6.0',
+        'PyYAML~=3.0',
 #        'schema>=0.6,<0.7',
     ],
     include_package_data = True,

@@ -7,4 +7,4 @@ class Version(object):
     def execute(self, config):
         with open(os.path.join(CEPCENV_HOME, 'VERSION'), 'r') as f:
             ver = f.read()
-        click.echo('cepcenv %s' % ver.strip())
+        click.echo('cepcenv {0}'.format(ver.strip()))
