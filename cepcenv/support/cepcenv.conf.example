@@ -1,6 +1,6 @@
 verbose: false
 
-#os: ttt
+os: ttt
 
 release_repo: https://github.com/xianghuzhao/cepcsoft
 
@@ -8,7 +8,8 @@ install_root: ~/cepcsoft
 workarea: ~/myarea
 
 scenario:
-  312:
+  '312':
+    arch: xxx
     cepcsoft_root: ~/cepcsoft3
     release_version: 3.1.2
     workarea: ~/myarea3
@@ -16,3 +17,4 @@ scenario:
     cepcsoft_root: ~/cepcsoft_test
     release_config: ~/test.yml
     workarea: ~/myarea3
+    platform: hehe

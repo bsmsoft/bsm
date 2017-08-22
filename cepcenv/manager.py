@@ -1,10 +1,28 @@
+from util import expand_path
+
+class ReleaseVersionMismatchError(Exception):
+    pass
+
+
 class Manager(object):
     def __init__(self, config):
         self.__config = config
-        self.__platform = SoftwarePlatform(self.__config).all()
 
-    def install(self, scenario_name):
-        self.__scenario = Scenario(self.__config).load(scenario_name)
+    def install(self, scenario_config):
+        if 'release_config' in scenario_config and scenario_config['release_config']:
+            release_config = load_config(expand_path(scenario_config['release_config']))
+
+            if 'release_version' in release_config:
+                version_in_release = release_config['release_version']
+
+                if 'release_version' in scenario_config:
+                    version_in_scenario = scenario_config['release_version']
+                    if version_in_scenario != version_in_release:
+                        raise ReleaseVersionMismatchError('Version "{0}" and "{1}" do not match'.format(version_in_scenario, version_in_release))
+                else:
+                    scenario_config['release_version'] = version_in_scenario
+
+        release_config = None
 
         get_scenario()
         download_release_info()

@@ -19,23 +19,23 @@ def _detect_compiler(compiler='gcc'):
 
 
 class SoftwarePlatform(object):
-    def __init__(self, config):
-        self.__config = config
+    def __init__(self, arch=None, os=None, compiler=None):
+        self.__arch = (arch or _detect_arch())
+        self.__os = (os or _detect_os())
+        self.__compiler = (compiler or _detect_compiler())
 
+    @property
     def arch(self):
-        if 'arch' in self.__config:
-            return self.__config['arch']
-        return _detect_arch()
+        return self.__arch
 
+    @property
     def os(self):
-        if 'os' in self.__config:
-            return self.__config['os']
-        return _detect_os()
+        return self.__os
 
+    @property
     def compiler(self):
-        if 'compiler' in self.__config:
-            return self.__config['compiler']
-        return _detect_compiler()
+        return self.__compiler
 
-    def all(self):
-        return '-'.join([self.arch(), self.os(), self.compiler()])
+    @property
+    def platform(self):
+        return '-'.join([self.__arch, self.__os, self.__compiler])

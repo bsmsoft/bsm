@@ -5,8 +5,8 @@ from cepcenv import CEPCENV_HOME
 from cepcenv.config import dump_config_str
 
 class Config(object):
-    def execute(self, config, example):
-        if example:
+    def execute(self, config, output_example):
+        if output_example:
             click.echo(self.__load_example(), nl=False)
         else:
             click.echo(dump_config_str(config), nl=False)

@@ -1,27 +1,36 @@
 from cepcenv.util import is_str
+from cepcenv.software_platform import SoftwarePlatform
 
-class Scenario(object):
-    def __init__(self, config):
-        self.__config = config
+__scenario_items = ('release_root', 'release_version', 'release_config', 'workarea', 'platform', 'os', 'arch', 'compiler')
 
-    def __default_scenario_config(self):
-        scenario_config = {}
+def __filter_scenario_config(config):
+    scenario_config = {}
 
-        if 'release_root' in self.__config:
-            scenario_config['release_root'] = self.__config['release_root']
+    for k, v in config.items():
+        if k in __scenario_items and v is not None:
+            scenario_config[k] = v
 
-        if 'workarea' in self.__config:
-            scenario_config['workarea'] = self.__config['workarea']
+    return scenario_config
 
-        return scenario_config
+def __scenario_config_specific(config, scenario_name):
+    scenario_config = {}
 
-    def load(self, scenario_name):
-        scenario_config = self.__default_scenario_config()
+    if is_str(scenario_name):
+        if 'scenario' in config and scenario_name in config['scenario']:
+            scenario_config = __filter_scenario_config(config['scenario'][scenario_name])
+        else:
+            scenario_config['release_version'] = scenario_name
 
-        if is_str(scenario_name):
-            if 'scenario' in self.__config and scenario_name in self.__config['scenario']:
-                scenario_config.update(self.__config['scenario'])
-            else:
-                scenario_config['release_version'] = scenario_name
+    return scenario_config
 
-        return scenario_config
+
+def load_scenario(config, scenario_name=None, scenario_config_cmd={}):
+    scenario_config = __filter_scenario_config(config)
+    scenario_config.update(__scenario_config_specific(config, scenario_name))
+    scenario_config.update(__filter_scenario_config(scenario_config_cmd))
+
+    if 'platform' not in scenario_config or not scenario_config['platform']:
+        sp = SoftwarePlatform(scenario_config.get('arch'), scenario_config.get('os'), scenario_config.get('compiler'))
+        scenario_config['platform'] = sp.platform
+
+    return scenario_config
