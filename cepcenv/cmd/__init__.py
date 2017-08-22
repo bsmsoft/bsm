@@ -31,11 +31,7 @@ class Cmd(object):
 
         if 'scenario_name' in kwargs:
             self.__cmd_with_scenario = True
-            print(self.__config)
-            print(kwargs)
-            print(options_common)
             self.__scenario_config = load_scenario(self.__config, kwargs['scenario_name'], options_common)
-            print(self.__scenario_config)
 
         self.__load_shell(options_common['shell_name'])
 

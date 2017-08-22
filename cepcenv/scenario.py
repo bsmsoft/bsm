@@ -29,8 +29,14 @@ def load_scenario(config, scenario_name=None, scenario_config_cmd={}):
     scenario_config.update(__scenario_config_specific(config, scenario_name))
     scenario_config.update(__filter_scenario_config(scenario_config_cmd))
 
+    sp = SoftwarePlatform(scenario_config.get('arch'), scenario_config.get('os'), scenario_config.get('compiler'))
+    if 'arch' not in scenario_config or not scenario_config['arch']:
+        scenario_config['arch'] = sp.arch
+    if 'os' not in scenario_config or not scenario_config['os']:
+        scenario_config['os'] = sp.os
+    if 'compiler' not in scenario_config or not scenario_config['compiler']:
+        scenario_config['compiler'] = sp.compiler
     if 'platform' not in scenario_config or not scenario_config['platform']:
-        sp = SoftwarePlatform(scenario_config.get('arch'), scenario_config.get('os'), scenario_config.get('compiler'))
         scenario_config['platform'] = sp.platform
 
     return scenario_config
