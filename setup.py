@@ -19,7 +19,7 @@ class PyTest(TestCommand):
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(here, 'cepcenv', 'VERSION')) as version_file:
+with open(os.path.join(here, 'cepcenv', 'CEPCENV_VERSION')) as version_file:
     version = version_file.read().strip()
 
 with open(os.path.join(here, 'README.rst')) as f:

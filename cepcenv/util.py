@@ -4,6 +4,7 @@ import re
 import shutil
 import subprocess
 
+
 def camel_to_snake(name, delim='_'):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1{0}\2'.format(delim), name)
     return re.sub('([a-z0-9])([A-Z])', r'\1{0}\2'.format(delim), s1).lower()

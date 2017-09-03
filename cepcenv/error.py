@@ -1,2 +1,0 @@
-class CepcenvError(Exception):
-    pass

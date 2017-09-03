@@ -4,10 +4,10 @@ os: ttt
 
 release_repo: https://github.com/xianghuzhao/cepcsoft
 
-install_root: ~/cepcsoft
+release_root: ~/cepcsoft
 workarea: ~/myarea
 
-scenario:
+versions:
   '312':
     arch: xxx
     cepcsoft_root: ~/cepcsoft3
@@ -15,6 +15,6 @@ scenario:
     workarea: ~/myarea3
   test:
     cepcsoft_root: ~/cepcsoft_test
-    release_config: ~/test.yml
+    release_info: ~/pro/python/cepc/cepcsoft
     workarea: ~/myarea3
     platform: hehe

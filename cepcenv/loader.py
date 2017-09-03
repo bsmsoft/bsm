@@ -3,10 +3,8 @@ import inspect
 
 from cepcenv.util import snake_to_camel
 
-from cepcenv.error import CepcenvError
 
-
-class LoadError(CepcenvError):
+class LoadError(Exception):
     pass
 
 class LoadModuleError(LoadError):

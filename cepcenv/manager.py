@@ -1,43 +1,28 @@
-from util import expand_path
+from cepcenv.util import ensure_list
 
-class ReleaseVersionMismatchError(Exception):
-    pass
+from cepcenv.release import Release
+
+from cepcenv.install import Install
 
 
 class Manager(object):
-    def __init__(self, config):
+    def __init__(self, config, version_config):
         self.__config = config
+        self.__version_config = version_config
 
-    def install(self, scenario_config):
-        if 'release_config' in scenario_config and scenario_config['release_config']:
-            release_config = load_config(expand_path(scenario_config['release_config']))
+    def install(self):
+        release = Release(self.__version_config)
 
-            if 'release_version' in release_config:
-                version_in_release = release_config['release_version']
+        install = Install(self.__config, release.config)
 
-                if 'release_version' in scenario_config:
-                    version_in_scenario = scenario_config['release_version']
-                    if version_in_scenario != version_in_release:
-                        raise ReleaseVersionMismatchError('Version "{0}" and "{1}" do not match'.format(version_in_scenario, version_in_release))
-                else:
-                    scenario_config['release_version'] = version_in_scenario
+        install.run()
 
-        release_config = None
-
-        get_scenario()
-        download_release_info()
-        parse_release_info()
-        topo_sorted_pacakge_list = build_dag()
-
-        download_packages()
-        compile_packages()
-
-    def __load_bundle(self, scenario_name):
+    def __load_bundle(self, version_name):
         self.__bundle_list = ['workarea', 'cepcsoft', 'external_release', 'external_common']
 
-        install_root = self.__scenario['install_root']
-        release_version = self.__scenario['release_version']
-        workarea_root = self.__scenario['workarea']
+        install_root = self.__version['install_root']
+        release_version = self.__version['release_version']
+        workarea_root = self.__version['workarea']
 
         platform_root = os.path.join(install_root, self.__platform)
         external_common_root = os.path.join(platform_root, 'external')
