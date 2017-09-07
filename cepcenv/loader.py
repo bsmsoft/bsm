@@ -10,6 +10,12 @@ class LoadError(Exception):
 class LoadModuleError(LoadError):
     pass
 
+class FunctionNotFoundError(LoadError):
+    pass
+
+class NotCallableError(LoadError):
+    pass
+
 class ClassNotFoundError(LoadError):
     pass
 
@@ -24,6 +30,19 @@ def load_module(module_name):
         raise LoadModuleError('Load module "{0}" error: {1}'.format(module_name, e))
     return sys.modules[module_name]
 
+
+def load_func(module_name, func_name):
+    m = load_module(module_name)
+
+    try:
+        f = getattr(m, func_name)
+    except AttributeError as e:
+        raise FunctionNotFoundError('Function "{0}" not found in module "{1}": {2}'.format(func_name, module_name, e))
+
+    if not callable(f):
+        raise NotCallableError('"{0}" in module "{1}" is not callable'.format(func_name, module_name))
+
+    return f
 
 def load_class(module_name, class_name):
     m = load_module(module_name)

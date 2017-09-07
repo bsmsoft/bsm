@@ -2,7 +2,7 @@ import os
 import click
 
 from cepcenv import CEPCENV_HOME
-from cepcenv.config import dump_config_str
+from cepcenv.config.util import dump_config_str
 
 class Config(object):
     def execute(self, config, output_example):

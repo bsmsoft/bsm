@@ -1,19 +1,16 @@
 from cepcenv.util import ensure_list
 
-from cepcenv.release import Release
-
 from cepcenv.install import Install
 
 
 class Manager(object):
-    def __init__(self, config, version_config):
+    def __init__(self, config, version_config, release_config):
         self.__config = config
         self.__version_config = version_config
+        self.__release_config = release_config
 
     def install(self):
-        release = Release(self.__version_config)
-
-        install = Install(self.__config, release.config)
+        install = Install(self.__config, self.__version_config, self.__release_config)
 
         install.run()
 
@@ -21,7 +18,7 @@ class Manager(object):
         self.__bundle_list = ['workarea', 'cepcsoft', 'external_release', 'external_common']
 
         install_root = self.__version['install_root']
-        release_version = self.__version['release_version']
+        release_version = self.__version['version']
         workarea_root = self.__version['workarea']
 
         platform_root = os.path.join(install_root, self.__platform)

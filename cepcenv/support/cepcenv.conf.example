@@ -5,16 +5,16 @@ os: ttt
 release_repo: https://github.com/xianghuzhao/cepcsoft
 
 release_root: ~/cepcsoft
-workarea: ~/myarea
+work_root: ~/myarea
 
 versions:
   '312':
     arch: xxx
     cepcsoft_root: ~/cepcsoft3
-    release_version: 3.1.2
-    workarea: ~/myarea3
+    version: 3.1.2
+    work_root: ~/mywork2
   test:
     cepcsoft_root: ~/cepcsoft_test
     release_info: ~/pro/python/cepc/cepcsoft
-    workarea: ~/myarea3
+    work_root: ~/mywork3
     platform: hehe

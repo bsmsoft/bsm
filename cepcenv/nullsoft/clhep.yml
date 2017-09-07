@@ -1,10 +1,10 @@
-downloader:
-  type: http
+download:
+  handler: http
   param:
     url: https://proj-clhep.web.cern.ch/proj-clhep/DISTRIBUTION/tarFiles/clhep-{version}.tgz
 
-extractor:
-  type: tar
+extract:
+  handler: tar
 
-compiler:
-  type: cmake
+install:
+  handler: cmake

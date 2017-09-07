@@ -39,10 +39,18 @@ def safe_mkdir(directory):
         os.makedirs(directory)
 
 def safe_copy(src, dst):
-    if not os.path.exists(dst):
-        directory = os.path.dirname(dst)
+    directory = os.path.dirname(dst)
+    if not os.path.exists(directory):
         safe_mkdir(directory)
     shutil.copy2(src, dst)
+
+def safe_cpdir(src, dst):
+    directory = os.path.dirname(dst)
+    if not os.path.exists(directory):
+        safe_mkdir(directory)
+    if os.path.exists(dst):
+        safe_rmdir(dst)
+    shutil.copytree(src, dst)
 
 
 def expand_path(path):
@@ -54,3 +62,11 @@ def expand_path(path):
 def check_output(args):
     p = subprocess.Popen(args, stdout=subprocess.PIPE)
     return p.communicate()[0].decode()
+
+def call(args, cwd=None):
+    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd)
+    out, err = p.communicate()
+    out = out.decode()
+    err = err.decode()
+    ret = p.returncode
+    return (ret, out, err)

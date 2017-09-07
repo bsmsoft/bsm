@@ -6,11 +6,10 @@ from cepcenv.loader import load_common
 
 from cepcenv.util import expand_path
 
-from cepcenv.config import load_config
+from cepcenv.config import load_main
+from cepcenv.config import load_version
 
 from cepcenv.shell import load_shell
-
-from cepcenv.version import load_version
 
 
 class CmdError(Exception):
@@ -21,6 +20,7 @@ class Cmd(object):
     def __init__(self, cmd_name):
         self.__config = {}
         self.__version_config = {}
+        self.__release_config = {}
         self.__shell = None
 
         self.__cmd_output_shell = False
@@ -33,7 +33,7 @@ class Cmd(object):
 
         if 'version_name' in kwargs:
             self.__cmd_with_version = True
-            self.__version_config = load_version(self.__config, kwargs['version_name'], options_common)
+            self.__version_config, self.__release_config = load_version(self.__config, kwargs['version_name'], options_common)
 
         self.__load_shell(options_common['shell_name'])
 
@@ -48,6 +48,7 @@ class Cmd(object):
             if self.__cmd_with_version:
                 del kwargs['version_name']
                 kwargs['version_config'] = self.__version_config
+                kwargs['release_config'] = self.__release_config
             self.__cmd.execute(config=self.__config, **kwargs)
 
 
@@ -56,23 +57,12 @@ class Cmd(object):
         try:
             self.__cmd = load_common(cmd_name, 'cepcenv.cmd')()
         except Exception as e:
-            raise CmdError('Can not load command: {0}'.format(e))
+            raise CmdError('Can not load command "{0}": {1}'.format(cmd_name, e))
 
         self.__cmd_output_shell = 'shell' in inspect.getargspec(self.__cmd.execute)[0]
 
     def __load_config(self, options_common):
-        self.__config = {}
-
-        config_file = options_common['config_file']
-        if config_file:
-            try:
-                self.__config.update(load_config(expand_path(config_file)))
-            except Exception as e:
-                raise CmdError('Can not load config: {0}'.format(e))
-
-        # The final verbose value: self._config['verbose'] || verbose
-        if ('verbose' not in self.__config) or (not self.__config['verbose']):
-            self.__config['verbose'] = options_common['verbose']
+        self.__config = load_main(options_common)
 
     def __load_shell(self, shell_name):
         self.__shell = None

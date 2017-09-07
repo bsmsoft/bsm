@@ -8,7 +8,7 @@ CEPCENV_HOME = os.path.dirname(os.path.realpath(__file__))
 
 
 @click.group()
-@click.option('--config', '-c', type=str, default='~/.cepcenv.conf', help='The configuration file path. Default to "~/.cepcenv.conf"')
+@click.option('--config', '-c', type=str, default='~/.cepcenv.conf', help='Configuration file path. Default to "~/.cepcenv.conf"')
 @click.option('--verbose', '-v', is_flag=True, help='Verbose mode')
 @click.option('--shell', '-s', type=str, default='sh', help='Type of the generated shell script. Default to "sh"')
 @click.option('--arch', '-m', type=str, help='Architecture of the machine. e.g. "x86_64"')
@@ -18,9 +18,9 @@ CEPCENV_HOME = os.path.dirname(os.path.realpath(__file__))
 @click.option('--release-root', '-r', type=str)
 @click.option('--release-info', '-i', type=str)
 @click.option('--release-repo', '-t', type=str)
-@click.option('--workarea', '-w', type=str)
+@click.option('--work-root', '-w', type=str)
 @click.pass_context
-def cli(ctx, config, verbose, shell, arch, os, compiler, platform, release_root, release_info, release_repo, workarea):
+def cli(ctx, config, verbose, shell, arch, os, compiler, platform, release_root, release_info, release_repo, work_root):
     ctx.obj['config_file'] = config
     ctx.obj['verbose'] = verbose
     ctx.obj['shell_name'] = shell
@@ -33,7 +33,7 @@ def cli(ctx, config, verbose, shell, arch, os, compiler, platform, release_root,
     ctx.obj['release_root'] = release_root
     ctx.obj['release_info'] = release_info
     ctx.obj['release_repo'] = release_repo
-    ctx.obj['workarea'] = workarea
+    ctx.obj['work_root'] = work_root
 
 
 @cli.command()
@@ -56,6 +56,14 @@ def init(ctx):
 def config(ctx, example):
     cmd = Cmd('config')
     cmd.execute(ctx.obj, output_example=example)
+
+
+@cli.command(name='config-version')
+@click.argument('version', type=str, required=False)
+@click.pass_context
+def config_version(ctx, version):
+    cmd = Cmd('config_version')
+    cmd.execute(ctx.obj, version_name=version)
 
 
 @cli.command()
