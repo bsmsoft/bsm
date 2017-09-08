@@ -42,7 +42,7 @@ def load_main(options_common):
 
 def __temp_version():
     return __TEMP_VERSION_PREFIX \
-            + datetime.datetime.utcnow().strftime('%Y%m%d_%H.%M.%S_%f') + '_'\
+            + datetime.datetime.utcnow().strftime('%Y%m%d_%H.%M.%S_%f') + '_' \
             + ''.join(random.SystemRandom().choice(string.ascii_lowercase + string.digits) for _ in range(__TEMP_VERSION_LENGTH))
 
 

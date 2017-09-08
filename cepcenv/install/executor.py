@@ -48,12 +48,11 @@ class Executor(object):
     def execute(self, param):
         f = load_func('cepcenv_handler_run_avoid_conflict.{0}'.format(param['action_handler']), param['action'])
         result = f(param)
-        print(result)
         if result and 'log' in result:
             with open(os.path.join(param['pkg_config']['log_dir'], param['action']+'.out'), 'w') as f:
-                f.write(result['log']['out'])
+                f.write(result['log']['stdout'])
             with open(os.path.join(param['pkg_config']['log_dir'], param['action']+'.err'), 'w') as f:
-                f.write(result['log']['err'])
+                f.write(result['log']['stderr'])
         return None
 
     def report(self, vertex, result):

@@ -3,6 +3,7 @@ import sys
 
 from paradag import Dag
 from paradag import dag_run
+from paradag.sequential_processor import SequentialProcessor
 from paradag.multi_thread_processor import MultiThreadProcessor
 
 from cepcenv.install.selector import Selector as InstallSelector
