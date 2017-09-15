@@ -1,5 +1,4 @@
 from cepcenv.util import is_str
-from cepcenv.software_platform import SoftwarePlatform
 
 __VERSION_ITEMS = ('release_root', 'release_status_root',
         'external_common_root', 'external_release_root', 'cepcsoft_root', 'work_root',

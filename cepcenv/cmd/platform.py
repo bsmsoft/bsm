@@ -1,8 +1,6 @@
 import click
 
-from cepcenv.software_platform import SoftwarePlatform
-
-class PlatformCmd(object):
+class Platform(object):
     def execute(self, config, version_config, release_config, output_all,
             output_arch, output_os, output_compiler, output_platform):
         if output_all:

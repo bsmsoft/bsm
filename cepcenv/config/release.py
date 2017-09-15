@@ -42,7 +42,7 @@ def __load_from_repo(release_repo, release_version):
 def __load_release_from_dir(dir_name):
     release_config = {}
 
-    for k in ['version', 'package', 'install']:
+    for k in ['version', 'package', 'attribute', 'install']:
         try:
             release_config[k] = load_config(os.path.join(dir_name, k+'.yml'))
         except ConfigError as e:

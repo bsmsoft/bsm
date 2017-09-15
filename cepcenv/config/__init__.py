@@ -4,7 +4,7 @@ import datetime
 
 from cepcenv.util import expand_path
 
-from cepcenv.software_platform import SoftwarePlatform
+from cepcenv.sw import Platform
 
 from cepcenv.config.util import load_config
 from cepcenv.config.version import load_version_config
@@ -12,15 +12,17 @@ from cepcenv.config.release import load_release_config
 from cepcenv.config.release import ReleaseVersionMismatchError
 
 
-__TEMP_VERSION_PREFIX = 'v_'
+__TEMP_VERSION_PREFIX = ''
 __TEMP_VERSION_LENGTH = 6
 
 __DEFAULT_RELEASE_REPO = 'https://github.com/cepc/cepcsoft'
 
-__DEFAULT_EXTERNAL_COMMON_ROOT = '{release_root}/{platform}/external'
-__DEFAULT_EXTERNAL_RELEASE_ROOT = '{release_root}/{platform}/release/{version}/external'
-__DEFAULT_CEPCSOFT_ROOT = '{release_root}/{platform}/release/{version}/cepcsoft'
-__DEFAULT_RELEASE_STATUS_ROOT = '{release_root}/{platform}/release/{version}/.cepcenv'
+__DEFAULT_ROOT = {
+        'external_common_root': '{release_root}/{platform}/external',
+        'external_release_root': '{release_root}/{platform}/release/{version}/external',
+        'cepcsoft_root': '{release_root}/{platform}/release/{version}/cepcsoft',
+        'release_status_root': '{release_root}/{platform}/release/{version}/_cepcenv',
+}
 
 
 def load_main(options_common):
@@ -63,7 +65,7 @@ def __validate_release_version(version_config, release_config):
         version_config['version'] = release_config['version']
 
 def __process_platform(version_config):
-    sp = SoftwarePlatform(version_config.get('arch'), version_config.get('os'), version_config.get('compiler'))
+    sp = Platform(version_config.get('arch'), version_config.get('os'), version_config.get('compiler'))
     if 'arch' not in version_config or not version_config['arch']:
         version_config['arch'] = sp.arch
     if 'os' not in version_config or not version_config['os']:
@@ -74,20 +76,12 @@ def __process_platform(version_config):
         version_config['platform'] = sp.platform
 
 def __process_release_root(version_config):
-    if 'external_common_root' not in version_config:
-        version_config['external_common_root'] = __DEFAULT_EXTERNAL_COMMON_ROOT
-
-    if 'external_release_root' not in version_config:
-        version_config['external_release_root'] = __DEFAULT_EXTERNAL_RELEASE_ROOT
-
-    if 'cepcsoft_root' not in version_config:
-        version_config['cepcsoft_root'] = __DEFAULT_CEPCSOFT_ROOT
-
-    if 'release_status_root' not in version_config:
-        version_config['release_status_root'] = __DEFAULT_RELEASE_STATUS_ROOT
+    for k, v in __DEFAULT_ROOT.items():
+        if k not in version_config:
+            version_config[k] = v
 
 def __format_release_root(version_config):
-    for r in ['external_common_root', 'external_release_root', 'cepcsoft_root', 'release_status_root']:
+    for r in __DEFAULT_ROOT:
         version_config[r] = expand_path(version_config[r].format(**version_config))
 
 def __process_config(version_config, release_config):

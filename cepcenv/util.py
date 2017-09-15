@@ -48,9 +48,15 @@ def safe_cpdir(src, dst):
     directory = os.path.dirname(dst)
     if not os.path.exists(directory):
         safe_mkdir(directory)
-    if os.path.exists(dst):
-        safe_rmdir(dst)
+    safe_rmdir(dst)
     shutil.copytree(src, dst)
+
+def safe_mvdir(src, dst):
+    directory = os.path.dirname(dst)
+    if not os.path.exists(directory):
+        safe_mkdir(directory)
+    safe_rmdir(dst)
+    shutil.move(src, dst)
 
 
 def expand_path(path):

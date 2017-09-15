@@ -76,7 +76,7 @@ def config_version(ctx, version):
 @click.pass_context
 def platform(ctx, all, arch, os, compiler, platform, version):
     # Use this name to avoid conflict with python library
-    cmd = Cmd('platform-cmd')
+    cmd = Cmd('platform')
     cmd.execute(ctx.obj, output_all=all, output_arch=arch, output_os=os, output_compiler=compiler,
             output_platform=platform, version_name=version)
 

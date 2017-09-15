@@ -18,7 +18,7 @@ def _detect_compiler(compiler='gcc'):
     return 'gcc{0}{1}'.format(version_major, version_minor)
 
 
-class SoftwarePlatform(object):
+class Platform(object):
     def __init__(self, arch=None, os=None, compiler=None):
         self.__arch = (arch or _detect_arch())
         self.__os = (os or _detect_os())
