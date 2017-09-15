@@ -6,6 +6,12 @@ class Sh(Shell):
     def set_env(self, env_name, env_value):
         return 'export {0}="{1}"\n'.format(env_name, env_value)
 
+    def unset_env(self, env_name):
+        return 'unset {0}\n'.format(env_name)
+
+    def unset_func(self, func_name):
+        return 'unset -f {0}\n'.format(func_name)
+
     def source(self, script_path):
         return '. {0}\n'.format(script_path)
 
@@ -43,3 +49,6 @@ cepcenv_script() {{
 '''.format(python_exe=python_exe)
 
         return cepcenv_func
+
+    def undefine_cepcenv(self):
+        return self.unset_func('cepcenv') + self.unset_func('cepcenv_script')

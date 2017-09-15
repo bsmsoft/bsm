@@ -51,6 +51,13 @@ def init(ctx):
 
 
 @cli.command()
+@click.pass_context
+def exit(ctx):
+    cmd = Cmd('exit')
+    cmd.execute(ctx.obj)
+
+
+@cli.command()
 @click.option('--example', '-e', is_flag=True)
 @click.pass_context
 def config(ctx, example):
@@ -76,7 +83,7 @@ def config_version(ctx, version):
 @click.pass_context
 def platform(ctx, all, arch, os, compiler, platform, version):
     # Use this name to avoid conflict with python library
-    cmd = Cmd('platform')
+    cmd = Cmd('platform_cmd')
     cmd.execute(ctx.obj, output_all=all, output_arch=arch, output_os=os, output_compiler=compiler,
             output_platform=platform, version_name=version)
 
