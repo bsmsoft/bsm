@@ -4,7 +4,7 @@ pypy_url='https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.8-1-linux
 git_repo='https://github.com/xianghuzhao/cepcenv.git'
 
 download_http() {
-  if which curlll >/dev/null 2>&1; then
+  if which curl >/dev/null 2>&1; then
     curl -L $1
   elif which wget >/dev/null 2>&1; then
     wget -O - $1
