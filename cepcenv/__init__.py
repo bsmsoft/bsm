@@ -58,6 +58,13 @@ def exit(ctx):
 
 
 @cli.command()
+@click.pass_context
+def upgrade(ctx):
+    cmd = Cmd('upgrade')
+    cmd.execute(ctx.obj)
+
+
+@cli.command()
 @click.option('--example', '-e', is_flag=True)
 @click.pass_context
 def config(ctx, example):
