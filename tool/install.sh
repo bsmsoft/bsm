@@ -22,7 +22,6 @@ main() {
 
   if [ $# -eq 0 ]; then
     install_dir='.'
-    echo >&2 "Install cepcenv in the current directory..."
   else
     install_dir="$1"
   fi
@@ -31,7 +30,8 @@ main() {
 
   cd "$install_dir"
   install_full_dir="$(pwd)"
-  echo $install_full_dir
+
+  echo >&2 "Install cepcenv in the directory: \"$install_full_dir\""
 
   rm -rf pypy*
 
