@@ -14,4 +14,8 @@ class Csh(Shell):
         raise Exception('cepcenv() not implemented')
 
     def undefine_cepcenv(self):
-        raise Exception('cepcenv() not implemented')
+        cepcenv_exit = '''\
+unalias cepcenv_script
+unalias cepcenv
+'''
+        return cepcenv_exit

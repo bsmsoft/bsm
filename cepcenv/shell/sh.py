@@ -9,16 +9,13 @@ class Sh(Shell):
     def unset_env(self, env_name):
         return 'unset {0}\n'.format(env_name)
 
-    def unset_func(self, func_name):
-        return 'unset -f {0}\n'.format(func_name)
-
     def source(self, script_path):
         return '. {0}\n'.format(script_path)
 
     def define_cepcenv(self):
         python_exe = sys.executable or 'python'
 
-        cepcenv_func = '''
+        cepcenv_func = '''\
 cepcenv() {{
   check_shell=$({python_exe} -c 'from cepcenv import main;main(check_shell=True)' $* 2>/dev/null)
   check_shell_exit_code=$?
@@ -51,4 +48,8 @@ cepcenv_script() {{
         return cepcenv_func
 
     def undefine_cepcenv(self):
-        return self.unset_func('cepcenv') + self.unset_func('cepcenv_script')
+        cepcenv_exit = '''\
+unset -f cepcenv_script
+unset -f cepcenv
+'''
+        return cepcenv_exit

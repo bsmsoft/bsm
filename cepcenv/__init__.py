@@ -52,6 +52,13 @@ def init(ctx):
 
 @cli.command()
 @click.pass_context
+def home(ctx):
+    cmd = Cmd('home')
+    cmd.execute(ctx.obj)
+
+
+@cli.command()
+@click.pass_context
 def exit(ctx):
     cmd = Cmd('exit')
     cmd.execute(ctx.obj)
