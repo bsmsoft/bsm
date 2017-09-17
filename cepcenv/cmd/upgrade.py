@@ -4,5 +4,5 @@ from pip import main
 
 class Upgrade(object):
     def execute(self, config):
-        arguments = ['install', '--upgrade', 'cepcenv']
-        main(arguments)
+        main(['install', '--upgrade', 'pip'])
+        main(['install', '--upgrade', 'cepcenv'])
