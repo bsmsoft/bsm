@@ -89,16 +89,17 @@ def config_version(ctx, version):
 
 @cli.command()
 @click.option('--all', '-a', is_flag=True, help='Output all of the following')
+@click.option('--title', '-d', is_flag=True, help='Output title for each line')
 @click.option('--arch', '-m', is_flag=True, help='Output the architecture')
 @click.option('--os', '-o', is_flag=True, help='Output the OS type and version')
 @click.option('--compiler', '-i', is_flag=True, help='Output the compiler type and version')
 @click.option('--platform', '-p', is_flag=True, help='Output the platform')
 @click.argument('version', type=str, required=False)
 @click.pass_context
-def platform(ctx, all, arch, os, compiler, platform, version):
+def platform(ctx, all, title, arch, os, compiler, platform, version):
     # Use this name to avoid conflict with python library
     cmd = Cmd('platform_cmd')
-    cmd.execute(ctx.obj, output_all=all, output_arch=arch, output_os=os, output_compiler=compiler,
+    cmd.execute(ctx.obj, output_all=all, output_title=title, output_arch=arch, output_os=os, output_compiler=compiler,
             output_platform=platform, version_name=version)
 
 

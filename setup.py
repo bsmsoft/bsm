@@ -61,7 +61,7 @@ setup(
     install_requires = [
         'paradag',
         'click>=6.0,<7.0',
-        'PyYAML>=3.0,<7.0',
+        'PyYAML>=3.0,<4.0',
 #        'schema>=0.6,<0.7',
     ],
     include_package_data = True,

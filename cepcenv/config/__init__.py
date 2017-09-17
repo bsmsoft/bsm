@@ -31,7 +31,10 @@ def load_main(options_common):
     config_file = options_common['config_file']
     if config_file:
         try:
-            config.update(load_config(expand_path(config_file)))
+            c = load_config(expand_path(config_file))
+            if not isinstance(c, dict):
+                c = {}
+            config.update(c)
         except Exception as e:
             print('Can not load config: {0}'.format(e))
 

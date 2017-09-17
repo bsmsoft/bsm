@@ -1,7 +1,7 @@
 import click
 
 class PlatformCmd(object):
-    def execute(self, config, version_config, release_config, output_all,
+    def execute(self, config, version_config, release_config, output_all, output_title,
             output_arch, output_os, output_compiler, output_platform):
         if output_all:
             output_arch = True
@@ -15,7 +15,7 @@ class PlatformCmd(object):
         output_items = ((output_arch, 'arch'), (output_os, 'os'), (output_compiler, 'compiler'), (output_platform, 'platform'))
         for o, v in output_items:
             if o:
-                if config['verbose']:
+                if output_title:
                     output_final += '{0:8} : '.format(v)
                 output_final += version_config[v]
                 output_final += '\n'
