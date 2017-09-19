@@ -36,7 +36,8 @@ def load_main(options_common):
                 c = {}
             config.update(c)
         except Exception as e:
-            print('Can not load config: {0}'.format(e))
+#            print('Can not load config: {0}'.format(e))
+            pass
 
     # The final verbose value: config['verbose'] || verbose
     if ('verbose' not in config) or (not config['verbose']):
