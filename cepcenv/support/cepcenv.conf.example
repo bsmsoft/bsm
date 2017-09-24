@@ -14,3 +14,6 @@ verbose: false
 #    work_root: ~/mywork2
 #    arch: xxx
 #    platform: hehe
+#  'test':
+#    version: 1.2.1
+#    work_root: ~/mywork_test

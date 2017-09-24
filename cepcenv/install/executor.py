@@ -46,9 +46,9 @@ class Executor(object):
                 exe_config['log_dir'] = os.path.join(package_root, '_cepcenv', package_version, 'log')
                 exe_config['download_dir'] = os.path.join(package_root, '_cepcenv', package_version, 'download')
                 exe_config['extract_dir'] = os.path.join(package_root, '_cepcenv', package_version, 'extract')
-                exe_config['source_dir'] = os.path.join(package_root, package_version, location['source'])
-                exe_config['build_dir'] = os.path.join(package_root, package_version, location['build'])
-                exe_config['install_dir'] = os.path.join(package_root, package_version, location['install'])
+                exe_config['source_dir'] = os.path.join(package_root, package_version, location['source']).rstrip(os.sep)
+                exe_config['build_dir'] = os.path.join(package_root, package_version, location['build']).rstrip(os.sep)
+                exe_config['install_dir'] = os.path.join(package_root, package_version, location['install']).rstrip(os.sep)
 
                 safe_mkdir(exe_config['package_root'])
                 safe_mkdir(exe_config['log_dir'])

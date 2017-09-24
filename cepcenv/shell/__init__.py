@@ -10,3 +10,8 @@ class Shell(object):
         lines = content.rstrip().split('\n')
         newlines = map(lambda x:'# '+x, lines)
         return '\n'.join(newlines) + '\n'
+
+    def echo(self, content):
+        lines = content.rstrip().split('\n')
+        newlines = map(lambda x:'echo \''+x+'\'', lines)
+        return '\n'.join(newlines) + '\n'
