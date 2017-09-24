@@ -44,9 +44,19 @@ class Install(object):
             self.__dag.add_edge((pkg, 'pre_check'), (pkg, 'install'))
             self.__dag.add_edge((pkg, 'install'), (pkg, 'post_check'))
 
+        basic_pkgs = []
         for pkg, cfg in attribute_config.items():
-            if pkg in package_config and 'dep' in cfg:
-                pkgs_dep = ensure_list(cfg['dep'])
+            if pkg in package_config:
+                if 'basic' in cfg and cfg['basic']:
+                    basic_pkgs.append(pkg)
+
+        for pkg in package_config:
+            if pkg not in basic_pkgs:
+                for bp in basic_pkgs:
+                    self.__dag.add_edge((bp, 'post_check'), (pkg, 'download'))
+
+            if pkg in attribute_config and 'dep' in attribute_config[pkg]:
+                pkgs_dep = ensure_list(attribute_config[pkg]['dep'])
                 for pkg_dep in pkgs_dep:
                     self.__dag.add_edge((pkg_dep, 'post_check'), (pkg, 'pre_check'))
 

@@ -16,7 +16,19 @@ class Executor(object):
         self.__version_config = version_config
         self.__release_config = release_config
 
+        self.__load_status_info()
         self.__prepare_packages()
+        self.__package_path()
+
+        self.__extra_path = {}
+        self.__extra_env = {}
+
+    def __load_status_info(self):
+        status_file = os.path.join(self.__version_config['release_status_root'], 'status.yml')
+        try:
+            self.__status_info = load_config(status_file)
+        except:
+            self.__status_info = {}
 
     def __prepare_packages(self):
         self.__exe_config = {}
@@ -48,6 +60,19 @@ class Executor(object):
 
             self.__exe_config[pkg] = exe_config
 
+    def __package_path(self):
+        self.__pkg_path = {}
+        for pkg in self.__release_config['package']:
+            if pkg not in self.__release_config['attribute']:
+                continue
+            if 'path' not in self.__release_config['attribute'][pkg]:
+                continue
+            for k, v in self.__release_config['attribute'][pkg]['path'].items():
+                if k not in ['bin', 'inc', 'lib']:
+                    continue
+                path_key = pkg.lower() + '_' + k
+                self.__pkg_path[path_key] = v.format(**self.__exe_config[pkg])
+
     def param(self, vertex):
         pkg, action = vertex
 
@@ -62,30 +87,42 @@ class Executor(object):
             par['action_handler'] = 'default'
             par['action_param'] = {}
 
+        par['config'] = self.__config
+
         par['pkg_config'] = self.__exe_config[pkg]
+
+        par['pkg_path'] = self.__pkg_path
+
+        # Make a copy in order to avoid change of extra_env when action executing
+        env_final = os.environ.copy()
+        env_final.update(self.__extra_env)
+        for k, v in self.__extra_path.items():
+            env_final[k] = os.pathsep.join(v)
+            if k in os.environ:
+                env_final[k] += (os.pathsep + os.environ[k])
+        par['env'] = env_final
+
+        par['finished'] = False
+        if pkg in self.__status_info and action in self.__status_info[pkg] and \
+                'finished' in self.__status_info[pkg][action] and self.__status_info[pkg][action]['finished']:
+            par['finished'] = True
 
         return par
 
+    # Do NOT access or modify any variables outside this function (global and member variables)
     def execute(self, param):
-        status_file = os.path.join(self.__version_config['release_status_root'], 'status.yml')
-        try:
-            status_info = load_config(status_file)
-        except:
-            status_info = {}
-
         pkg = param['package']
         action = param['action']
-        if pkg in status_info and action in status_info[pkg] and \
-                'finished' in status_info[pkg][action] and status_info[pkg][action]['finished']:
-            print('::::::::::: not doing: {0} {1}'.format(pkg, action))
-            return None
 
+        if param['finished']:
+            print('Skip doing: {0} {1}'.format(pkg, action))
+            return None
 
         result = {}
 
         result['start'] = datetime.datetime.utcnow()
 
-        f = load_func('cepcenv_handler_run_avoid_conflict.{0}'.format(param['action_handler']), param['action'])
+        f = load_func('cepcenv_handler_run_avoid_conflict.'+param['action_handler'], param['action'])
         result['action'] = f(param)
 
         result['end'] = datetime.datetime.utcnow()
@@ -95,12 +132,35 @@ class Executor(object):
     def report_start(self, vertice):
         pass
 
+    def __setup_env(self, pkg):
+        if pkg not in self.__release_config['attribute']:
+            return
+
+        PATH_NAME = {'bin': 'PATH', 'lib': 'LD_LIBRARY_PATH', 'man': 'MANPATH', 'info': 'INFOPATH'}
+        if 'path' in self.__release_config['attribute'][pkg]:
+            for k, v in self.__release_config['attribute'][pkg]['path'].items():
+                if k in PATH_NAME:
+                    path_env_name = PATH_NAME[k]
+                    if path_env_name not in self.__extra_path:
+                        self.__extra_path[path_env_name] = []
+                    full_path = v.format(**self.__exe_config[pkg])
+                    if full_path not in self.__extra_path[path_env_name]:
+                        self.__extra_path[path_env_name].append(full_path)
+
+        if 'env' in self.__release_config['attribute'][pkg]:
+            for k, v in self.__release_config['attribute'][pkg]['env'].items():
+                self.__extra_env[k] = v.format(**self.__exe_config[pkg])
+
     def report_finish(self, vertice_result):
         for vertex, result in vertice_result:
             pkg, action = vertex
 
+            # TODO: post_check may be absent, find out a secure way
+            if action == 'post_check':
+                self.__setup_env(pkg)
+
             if result and result['action']:
-                print('Package "{0}" {1} finished with result'.format(pkg, action))
+                print('Package "{0}" {1} finished'.format(pkg, action))
 
                 if 'log' in result['action']:
                     log_dir = self.__exe_config[pkg]['log_dir']
@@ -110,21 +170,22 @@ class Executor(object):
                         f.write(result['action']['log']['stderr'])
 
 
+            if result:
                 status_file = os.path.join(self.__version_config['release_status_root'], 'status.yml')
                 try:
-                    status_info = load_config(status_file)
+                    self.__status_info = load_config(status_file)
                 except:
-                    status_info = {}
+                    self.__status_info = {}
 
-                if pkg not in status_info:
-                    status_info[pkg] = {}
-                if action not in status_info[pkg]:
-                    status_info[pkg][action] = {}
-                status_info[pkg][action]['finished'] = True
-                status_info[pkg][action]['start'] = result['start']
-                status_info[pkg][action]['end'] = result['end']
+                if pkg not in self.__status_info:
+                    self.__status_info[pkg] = {}
+                if action not in self.__status_info[pkg]:
+                    self.__status_info[pkg][action] = {}
+                self.__status_info[pkg][action]['finished'] = True
+                self.__status_info[pkg][action]['start'] = result['start']
+                self.__status_info[pkg][action]['end'] = result['end']
 
-                dump_config(status_info, status_file)
+                dump_config(self.__status_info, status_file)
 
     def report_running(self, vertice):
         if not vertice:

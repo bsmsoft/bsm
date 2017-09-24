@@ -1,20 +1,16 @@
 verbose: false
 
-os: ttt
+#release_repo: https://github.com/xianghuzhao/cepcsoft
 
-release_repo: https://github.com/xianghuzhao/cepcsoft
+#release_root: ~/cepcsoft
+#work_root: ~/myarea
 
-release_root: ~/cepcsoft
-work_root: ~/myarea
+#make_opt: -j16
 
-versions:
-  '312':
-    arch: xxx
-    cepcsoft_root: ~/cepcsoft3
-    version: 3.1.2
-    work_root: ~/mywork2
-  test:
-    cepcsoft_root: ~/cepcsoft_test
-    release_info: ~/pro/python/cepc/cepcsoft
-    work_root: ~/mywork3
-    platform: hehe
+#versions:
+#  '312':
+#    version: 3.1.2
+#    cepcsoft_root: ~/cepcsoft3
+#    work_root: ~/mywork2
+#    arch: xxx
+#    platform: hehe

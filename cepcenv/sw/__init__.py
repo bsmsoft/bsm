@@ -38,4 +38,4 @@ class Platform(object):
 
     @property
     def platform(self):
-        return '-'.join([self.__arch, self.__os, self.__compiler])
+        return '-'.join([self.__arch, self.__os])
