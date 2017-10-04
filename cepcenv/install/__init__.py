@@ -35,14 +35,14 @@ class Install(object):
             self.__dag.add_vertex((pkg, 'extract'))
             self.__dag.add_vertex((pkg, 'source'))
             self.__dag.add_vertex((pkg, 'pre_check'))
-            self.__dag.add_vertex((pkg, 'install'))
+            self.__dag.add_vertex((pkg, 'compile'))
             self.__dag.add_vertex((pkg, 'post_check'))
 
             self.__dag.add_edge((pkg, 'download'), (pkg, 'extract'))
             self.__dag.add_edge((pkg, 'extract'), (pkg, 'source'))
             self.__dag.add_edge((pkg, 'source'), (pkg, 'pre_check'))
-            self.__dag.add_edge((pkg, 'pre_check'), (pkg, 'install'))
-            self.__dag.add_edge((pkg, 'install'), (pkg, 'post_check'))
+            self.__dag.add_edge((pkg, 'pre_check'), (pkg, 'compile'))
+            self.__dag.add_edge((pkg, 'compile'), (pkg, 'post_check'))
 
         basic_pkgs = []
         for pkg, cfg in attribute_config.items():
@@ -82,5 +82,6 @@ class Install(object):
         safe_mkdir(release_status_root)
 
         dump_config(self.__release_config, os.path.join(release_status_root, 'release.yml'))
+        dump_config(self.__version_config, os.path.join(release_status_root, 'version.yml'))
 
         copy_release_handler(self.__version_config, release_status_root)

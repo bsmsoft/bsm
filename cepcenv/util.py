@@ -69,9 +69,11 @@ def check_output(args):
     p = subprocess.Popen(args, stdout=subprocess.PIPE)
     return p.communicate()[0].decode()
 
-def call(args, cwd=None, env=None):
-    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd, env=env)
-    out, err = p.communicate()
+def call(args, cwd=None, env=None, input=None):
+    p = subprocess.Popen(args,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE,
+            cwd=cwd, env=env)
+    out, err = p.communicate(input=input)
 #    out = out.decode('utf-8')
 #    err = err.decode('utf-8')
     ret = p.returncode

@@ -10,13 +10,16 @@ class LoadError(Exception):
 class LoadModuleError(LoadError):
     pass
 
-class FunctionNotFoundError(LoadError):
+class AttributeNotFoundError(LoadError):
+    pass
+
+class FunctionNotFoundError(AttributeNotFoundError):
     pass
 
 class NotCallableError(LoadError):
     pass
 
-class ClassNotFoundError(LoadError):
+class ClassNotFoundError(AttributeNotFoundError):
     pass
 
 class NotAClassError(LoadError):
@@ -66,5 +69,21 @@ def load_common(name, module_prefix):
         c = load_class(module_name, class_name)
     except LoadError as e:
         raise LoadError('Load "{0}:{1}" error: {2}'.format(module_prefix, name, e))
+
+    return c
+
+def load_relative(module_name, attr_name):
+    caller = inspect.stack()[1]
+    caller_module = inspect.getmodule(caller[0])
+    caller_module_name = caller_module.__name__
+    parent_module_seq = caller_module_name.split('.')[:-1]
+    full_module_name = '.'.join(parent_module_seq + [module_name])
+
+    m = load_module(full_module_name)
+
+    try:
+        c = getattr(m, attr_name)
+    except AttributeError as e:
+        raise AttributeNotFoundError('Attribute "{0}" not found in module "{1}": {2}'.format(attr_name, module_name, e))
 
     return c

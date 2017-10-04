@@ -28,7 +28,6 @@ class Use(object):
                             old_path[k].remove(v)
 
                     if old_path[k]:
-                        print(old_path[k])
                         script += shell.set_env(k, os.pathsep.join(old_path[k]))
                     else:
                         script += shell.unset_env(k)

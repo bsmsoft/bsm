@@ -27,6 +27,8 @@ class Executor(object):
         status_file = os.path.join(self.__version_config['release_status_root'], 'status.yml')
         try:
             self.__status_info = load_config(status_file)
+            if not isinstance(self.__status_info, dict):
+                self.__status_info = {}
         except:
             self.__status_info = {}
 
@@ -65,12 +67,16 @@ class Executor(object):
         for pkg in self.__release_config['package']:
             if pkg not in self.__release_config['attribute']:
                 continue
+
+            pkg_root_key = pkg.lower() + '_root_dir'
+            self.__pkg_path[pkg_root_key] = self.__exe_config[pkg]['install_dir']
+
             if 'path' not in self.__release_config['attribute'][pkg]:
                 continue
             for k, v in self.__release_config['attribute'][pkg]['path'].items():
                 if k not in ['bin', 'inc', 'lib']:
                     continue
-                path_key = pkg.lower() + '_' + k
+                path_key = '{0}_{1}_dir'.format(pkg.lower(), k)
                 self.__pkg_path[path_key] = v.format(**self.__exe_config[pkg])
 
     def param(self, vertex):
@@ -136,7 +142,7 @@ class Executor(object):
         if pkg not in self.__release_config['attribute']:
             return
 
-        PATH_NAME = {'bin': 'PATH', 'lib': 'LD_LIBRARY_PATH', 'man': 'MANPATH', 'info': 'INFOPATH'}
+        PATH_NAME = {'bin': 'PATH', 'lib': 'LD_LIBRARY_PATH', 'man': 'MANPATH', 'info': 'INFOPATH', 'cmake': 'CMAKE_PREFIX_PATH'}
         if 'path' in self.__release_config['attribute'][pkg]:
             for k, v in self.__release_config['attribute'][pkg]['path'].items():
                 if k in PATH_NAME:
@@ -171,12 +177,6 @@ class Executor(object):
 
 
             if result:
-                status_file = os.path.join(self.__version_config['release_status_root'], 'status.yml')
-                try:
-                    self.__status_info = load_config(status_file)
-                except:
-                    self.__status_info = {}
-
                 if pkg not in self.__status_info:
                     self.__status_info[pkg] = {}
                 if action not in self.__status_info[pkg]:
@@ -185,6 +185,7 @@ class Executor(object):
                 self.__status_info[pkg][action]['start'] = result['start']
                 self.__status_info[pkg][action]['end'] = result['end']
 
+                status_file = os.path.join(self.__version_config['release_status_root'], 'status.yml')
                 dump_config(self.__status_info, status_file)
 
     def report_running(self, vertice):
