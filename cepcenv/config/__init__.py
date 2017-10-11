@@ -21,7 +21,7 @@ __DEFAULT_ROOT = {
         'external_common_root': '{release_root}/{platform}/external',
         'external_release_root': '{release_root}/{platform}/release/{version}/external',
         'cepcsoft_root': '{release_root}/{platform}/release/{version}/cepcsoft',
-        'release_status_root': '{release_root}/{platform}/release/{version}/_cepcenv',
+        'release_status_root': '{release_root}/_cepcenv/{version}',
 }
 
 

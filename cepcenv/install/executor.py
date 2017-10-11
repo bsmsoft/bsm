@@ -128,7 +128,7 @@ class Executor(object):
 
         result['start'] = datetime.datetime.utcnow()
 
-        f = load_func('cepcenv_handler_run_avoid_conflict.'+param['action_handler'], param['action'])
+        f = load_func('_cepcenv_handler_run_avoid_conflict.'+param['action_handler'], param['action'])
         result['action'] = f(param)
 
         result['end'] = datetime.datetime.utcnow()

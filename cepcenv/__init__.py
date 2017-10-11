@@ -13,27 +13,27 @@ CEPCENV_HOME = os.path.dirname(os.path.realpath(__file__))
 @click.option('--shell', '-s', type=str, default='sh', help='Type of the generated shell script. Default to "sh"')
 @click.option('--arch', '-m', type=str, help='Architecture of the machine. e.g. "x86_64"')
 @click.option('--os', '-o', type=str, help='OS of the machine. e.g. "sl6"')
-@click.option('--compiler', '-l', type=str, help='Compiler type and version. e.g. "gcc49"')
-@click.option('--platform', '-p', type=str, help='Platform (combination of arch, os and compiler). e.g. "x86_64-sl6-gcc49"')
+#@click.option('--compiler', '-l', type=str, help='Compiler type and version. e.g. "gcc49"')
+@click.option('--platform', '-p', type=str, help='Platform (combination of arch and os). e.g. "x86_64-sl6"')
 @click.option('--release-root', '-r', type=str)
 @click.option('--release-info', '-i', type=str)
 @click.option('--release-repo', '-t', type=str)
-@click.option('--work-root', '-w', type=str)
+#@click.option('--work-root', '-w', type=str)
 @click.pass_context
-def cli(ctx, config, verbose, shell, arch, os, compiler, platform, release_root, release_info, release_repo, work_root):
+def cli(ctx, config, verbose, shell, arch, os, platform, release_root, release_info, release_repo):
     ctx.obj['config_file'] = config
     ctx.obj['verbose'] = verbose
     ctx.obj['shell_name'] = shell
 
     ctx.obj['arch'] = arch
     ctx.obj['os'] = os
-    ctx.obj['compiler'] = compiler
+#    ctx.obj['compiler'] = compiler
     ctx.obj['platform'] = platform
 
     ctx.obj['release_root'] = release_root
     ctx.obj['release_info'] = release_info
     ctx.obj['release_repo'] = release_repo
-    ctx.obj['work_root'] = work_root
+#    ctx.obj['work_root'] = work_root
 
 
 @cli.command()
@@ -108,6 +108,14 @@ def platform(ctx, all, title, arch, os, compiler, platform, version):
 @click.pass_context
 def install(ctx, version):
     cmd = Cmd('install')
+    cmd.execute(ctx.obj, version_name=version)
+
+
+@cli.command(name='ls-remote')
+@click.argument('version', type=str, required=False)
+@click.pass_context
+def ls_remote(ctx, version):
+    cmd = Cmd('ls_remote')
     cmd.execute(ctx.obj, version_name=version)
 
 

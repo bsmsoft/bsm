@@ -44,7 +44,7 @@ def __load_release_from_dir(dir_name):
 
     for k in ['version', 'package', 'attribute', 'install']:
         try:
-            release_config[k] = load_config(os.path.join(dir_name, k+'.yml'))
+            release_config[k] = load_config(os.path.join(dir_name, 'config', k+'.yml'))
         except ConfigError as e:
             print(e)
             pass
@@ -81,9 +81,12 @@ def __copy_from_repo(release_repo, release_version, dst_dir):
         safe_rmdir(repo_dir)
 
 def __copy_release_handler_from_dir(dir_name, dst_dir):
-    safe_cpdir(os.path.join(dir_name, 'handler'), os.path.join(dst_dir, 'handler', 'cepcenv_handler_run_avoid_conflict'))
-    with open(os.path.join(dst_dir, 'handler', 'cepcenv_handler_run_avoid_conflict', '__init__.py'), 'w'):
-        pass
+    safe_cpdir(os.path.join(dir_name, 'handler'), os.path.join(dst_dir, 'handler', '_cepcenv_handler_run_avoid_conflict'))
+
+    handler_init = os.path.join(dst_dir, 'handler', '_cepcenv_handler_run_avoid_conflict', '__init__.py')
+    if not os.path.exists(handler_init):
+        with open(handler_init, 'w'):
+            pass
 
 
 def copy_release_handler(version_config, dst_dir):

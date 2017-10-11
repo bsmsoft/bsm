@@ -13,5 +13,9 @@ class Shell(object):
 
     def echo(self, content):
         lines = content.rstrip().split('\n')
-        newlines = map(lambda x:'echo \''+x+'\'', lines)
+
+        # "\" should be escaped
+        # "'" will be converted into four chars "'\''"
+        newlines = map(lambda x:'echo \'' + x.replace('\\', '\\\\').replace('\'', '\'\\\'\'') + '\'', lines)
+
         return '\n'.join(newlines) + '\n'
