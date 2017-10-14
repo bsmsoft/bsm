@@ -16,11 +16,11 @@ CEPCENV_HOME = os.path.dirname(os.path.realpath(__file__))
 #@click.option('--compiler', '-l', type=str, help='Compiler type and version. e.g. "gcc49"')
 @click.option('--platform', '-p', type=str, help='Platform (combination of arch and os). e.g. "x86_64-sl6"')
 @click.option('--release-root', '-r', type=str)
-@click.option('--release-info', '-i', type=str)
-@click.option('--release-repo', '-t', type=str)
+@click.option('--version-repo', '-t', type=str)
+@click.option('--version-dir', '-i', type=str)
 #@click.option('--work-root', '-w', type=str)
 @click.pass_context
-def cli(ctx, config, verbose, shell, arch, os, platform, release_root, release_info, release_repo):
+def cli(ctx, config, verbose, shell, arch, os, platform, release_root, version_repo, version_dir):
     ctx.obj['config_file'] = config
     ctx.obj['verbose'] = verbose
     ctx.obj['shell_name'] = shell
@@ -31,8 +31,8 @@ def cli(ctx, config, verbose, shell, arch, os, platform, release_root, release_i
     ctx.obj['platform'] = platform
 
     ctx.obj['release_root'] = release_root
-    ctx.obj['release_info'] = release_info
-    ctx.obj['release_repo'] = release_repo
+    ctx.obj['version_repo'] = version_repo
+    ctx.obj['version_dir'] = version_dir
 #    ctx.obj['work_root'] = work_root
 
 

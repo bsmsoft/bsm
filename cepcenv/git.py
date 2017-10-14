@@ -1,4 +1,7 @@
+import os
 import subprocess
+
+from cepcenv.util import safe_rmdir
 
 
 class GitError(Exception):
@@ -49,6 +52,9 @@ class Git(object):
 
     def checkout(self, branch):
         out = __git_cmd(self.__repo_path, 'checkout', branch)
+
+    def clear_git_info(self):
+        safe_rmdir(os.path.join(self.__repo_path, '.git'))
 
 
     def __list_ref(self, ref):

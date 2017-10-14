@@ -1,6 +1,7 @@
 import os
 import tempfile
 
+from cepcenv.git import list_remote_tag
 from cepcenv.git import Git
 
 from cepcenv.config.util import load_config
@@ -28,11 +29,12 @@ def __load_from_repo(release_repo, release_version):
     repo_dir = tempfile.mkdtemp(prefix='cepcsoft_tmp_')
 
     try:
+        release_tag = 'v'+release_version
+        if release_tag not in list_remote_tag(release_repo):
+            raise ReleaseVersionNotExistError('Release version "{0}" does not exist in repo {1}'.format(release_version, release_repo))
+
         git = Git(repo_dir)
         git.clone(release_repo)
-        release_tag = 'v'+release_version
-        if release_tag not in git.list_tag():
-            raise ReleaseVersionNotExistError('Release version "{0}" does not exist in repo {1}'.format(release_version, release_repo))
         git.checkout(release_tag)
 
         return __load_release_from_dir(repo_dir)
@@ -42,7 +44,7 @@ def __load_from_repo(release_repo, release_version):
 def __load_release_from_dir(dir_name):
     release_config = {}
 
-    for k in ['version', 'package', 'attribute', 'install']:
+    for k in ['version', 'info', 'package', 'attribute', 'install']:
         try:
             release_config[k] = load_config(os.path.join(dir_name, 'config', k+'.yml'))
         except ConfigError as e:
@@ -53,10 +55,10 @@ def __load_release_from_dir(dir_name):
 
 
 def load_release_config(version_config):
-    if 'release_info' in version_config and version_config['release_info']:
-        return __load_from_info(version_config['release_info'])
+    if 'release_source_dir' in version_config and version_config['release_source_dir']:
+        return __load_from_info(version_config['release_source_dir'])
     elif 'version' in version_config and version_config['version']:
-        return __load_from_repo(version_config['release_repo'], version_config['version'])
+        return __load_from_repo(version_config['release_source_repo'], version_config['version'])
 
     return {}
 

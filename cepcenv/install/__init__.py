@@ -61,7 +61,8 @@ class Install(object):
                     self.__dag.add_edge((pkg_dep, 'post_check'), (pkg, 'pre_check'))
 
     def run(self):
-        self.__save_release_config()
+        self.__install_release()
+        self.__install_handler()
 
         sys.path.insert(0, os.path.join(self.__version_config['release_status_root'], 'handler'))
         self.__dag_run()
@@ -74,7 +75,7 @@ class Install(object):
 
         dag_run(self.__dag, selector=selector, processor=processor, executor=executor)
 
-    def __save_release_config(self):
+    def __install_release(self):
         if 'release_status_root' not in self.__version_config:
             raise Exception('release_status_root not found in version_config')
 
@@ -84,4 +85,7 @@ class Install(object):
         dump_config(self.__release_config, os.path.join(release_status_root, 'release.yml'))
         dump_config(self.__version_config, os.path.join(release_status_root, 'version.yml'))
 
+
+    def __install_handler(self):
+        pass
         copy_release_handler(self.__version_config, release_status_root)

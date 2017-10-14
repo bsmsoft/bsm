@@ -4,8 +4,6 @@ import click
 
 from cepcenv.loader import load_common
 
-from cepcenv.util import expand_path
-
 from cepcenv.config import load_main
 from cepcenv.config import load_version
 
