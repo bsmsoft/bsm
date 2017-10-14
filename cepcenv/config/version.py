@@ -84,6 +84,9 @@ class Version(object):
             self.__version_config['version'] = __temp_version()
 
 
+    def __config_global(self):
+        return __filter_version_config(self.__config)
+
     def __config_specific(self):
         config_temp = {}
 
@@ -95,14 +98,17 @@ class Version(object):
 
         return config_temp
 
+    def __config_cmd(self):
+        return __filter_version_config(self.__version_config_cmd)
+
 
     def __load_config(self):
-        self.__version_config = __filter_version_config(self.__config)
+        self.__version_config = self.__config_global()
 
         if self.__version_name is not None:
             self.__version_config.update(self.__config_specific())
 
-        self.__version_config.update(__filter_version_config(self.__version_config_cmd))
+        self.__version_config.update(self.__config_cmd())
 
         self.__process_config()
 
