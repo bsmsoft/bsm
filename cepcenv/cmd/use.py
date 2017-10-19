@@ -1,10 +1,10 @@
 import os
 import click
 
-from cepcenv.manager import Manager
+from cepcenv.use import Use as CepcenvUse
 
 class Use(object):
-    def execute(self, config, version_config, release_config, shell):
+    def execute(self, config, config_version, config_release, shell):
         script = ''
 
 
@@ -37,8 +37,9 @@ class Use(object):
             script += shell.unset_env('CEPCENV_PATH_LIST')
 
 
-        manager = Manager(config, version_config, release_config)
-        path, env = manager.use()
+        obj = CepcenvUse(config, config_version, config_release)
+        path, env = obj.run()
+
 
         path_list = []
         env_list = []

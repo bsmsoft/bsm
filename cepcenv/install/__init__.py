@@ -6,29 +6,37 @@ from paradag import dag_run
 from paradag.sequential_processor import SequentialProcessor
 from paradag.multi_thread_processor import MultiThreadProcessor
 
+from cepcenv.install.release import install_definition
+from cepcenv.install.release import install_handler
+
 from cepcenv.install.selector import Selector as InstallSelector
 from cepcenv.install.executor import Executor as InstallExecutor
 
-from cepcenv.config.util import dump_config
-from cepcenv.config.release import copy_release_handler
+from cepcenv.config.config_release import ConfigRelease
 
-from cepcenv.util import safe_mkdir
 from cepcenv.util import ensure_list
 
 
 class Install(object):
-    def __init__(self, config, version_config, release_config):
+    def __init__(self, config, config_version):
         self.__config = config
-        self.__version_config = version_config
-        self.__release_config = release_config
+        self.__config_version = config_version
+
+    def run(self):
+        install_definition(self.__config_version)
+        install_handler(self.__config_version)
+
+        self.__config_release = ConfigRelease(self.__config_version)
 
         self.__build_dag()
+        sys.path.insert(0, self.__config_version.handler_dir)
+        self.__dag_run()
 
     def __build_dag(self):
         self.__dag = Dag()
 
-        package_config = self.__release_config.get('package', {})
-        attribute_config = self.__release_config.get('attribute', {})
+        package_config = self.__config_release.get('package', {})
+        attribute_config = self.__config_release.get('attribute', {})
 
         for pkg, cfg in package_config.items():
             self.__dag.add_vertex((pkg, 'download'))
@@ -60,32 +68,10 @@ class Install(object):
                 for pkg_dep in pkgs_dep:
                     self.__dag.add_edge((pkg_dep, 'post_check'), (pkg, 'pre_check'))
 
-    def run(self):
-        self.__install_release()
-        self.__install_handler()
-
-        sys.path.insert(0, os.path.join(self.__version_config['release_status_root'], 'handler'))
-        self.__dag_run()
-
     def __dag_run(self):
-        selector = InstallSelector(self.__config, self.__release_config)
+        selector = InstallSelector(self.__config, self.__config_release)
         processor = MultiThreadProcessor()
 #        processor = SequentialProcessor()
-        executor = InstallExecutor(self.__config, self.__version_config, self.__release_config)
+        executor = InstallExecutor(self.__config, self.__config_version, self.__config_release)
 
         dag_run(self.__dag, selector=selector, processor=processor, executor=executor)
-
-    def __install_release(self):
-        if 'release_status_root' not in self.__version_config:
-            raise Exception('release_status_root not found in version_config')
-
-        release_status_root = self.__version_config['release_status_root']
-        safe_mkdir(release_status_root)
-
-        dump_config(self.__release_config, os.path.join(release_status_root, 'release.yml'))
-        dump_config(self.__version_config, os.path.join(release_status_root, 'version.yml'))
-
-
-    def __install_handler(self):
-        pass
-        copy_release_handler(self.__version_config, release_status_root)

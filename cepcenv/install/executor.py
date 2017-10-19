@@ -5,16 +5,16 @@ import datetime
 
 from cepcenv.loader import load_func
 
-from cepcenv.config.util import load_config
-from cepcenv.config.util import dump_config
+from cepcenv.config import load_config
+from cepcenv.config import dump_config
 
 from cepcenv.util import safe_mkdir
 
 class Executor(object):
-    def __init__(self, config, version_config, release_config):
+    def __init__(self, config, config_version, config_release):
         self.__config = config
-        self.__version_config = version_config
-        self.__release_config = release_config
+        self.__config_version = config_version
+        self.__config_release = config_release
 
         self.__load_status_info()
         self.__prepare_packages()
@@ -24,7 +24,7 @@ class Executor(object):
         self.__extra_env = {}
 
     def __load_status_info(self):
-        status_file = os.path.join(self.__version_config['release_status_root'], 'status.yml')
+        status_file = self.__config_version.status_file
         try:
             self.__status_info = load_config(status_file)
             if not isinstance(self.__status_info, dict):
@@ -34,17 +34,19 @@ class Executor(object):
 
     def __prepare_packages(self):
         self.__exe_config = {}
-        for pkg, cfg in self.__release_config['package'].items():
+
+        for pkg, cfg in self.__config_release.config['package'].items():
             exe_config = {}
 
             package_version = cfg.get('version')
             exe_config['version'] = package_version
 
-            if (cfg['category']+'_root') in self.__version_config:
-                package_root = os.path.join(self.__version_config[cfg['category']+'_root'], cfg['path'], pkg)
+            category_root = self.__config_release.config['info']['category_root']
+            if cfg['category'] in category_root:
+                package_root = os.path.join(category_root[cfg['category']], cfg['path'], pkg)
                 exe_config['package_root'] = package_root
 
-                location = self.__release_config['attribute'][pkg]['location']
+                location = self.__config_release.config['attribute'][pkg]['location']
                 exe_config['log_dir'] = os.path.join(package_root, '_cepcenv', package_version, 'log')
                 exe_config['download_dir'] = os.path.join(package_root, '_cepcenv', package_version, 'download')
                 exe_config['extract_dir'] = os.path.join(package_root, '_cepcenv', package_version, 'extract')
@@ -64,16 +66,16 @@ class Executor(object):
 
     def __package_path(self):
         self.__pkg_path = {}
-        for pkg in self.__release_config['package']:
-            if pkg not in self.__release_config['attribute']:
+        for pkg in self.__config_release.config['package']:
+            if pkg not in self.__config_release.config['attribute']:
                 continue
 
             pkg_root_key = pkg.lower() + '_root_dir'
             self.__pkg_path[pkg_root_key] = self.__exe_config[pkg]['install_dir']
 
-            if 'path' not in self.__release_config['attribute'][pkg]:
+            if 'path' not in self.__config_release.config['attribute'][pkg]:
                 continue
-            for k, v in self.__release_config['attribute'][pkg]['path'].items():
+            for k, v in self.__config_release.config['attribute'][pkg]['path'].items():
                 if k not in ['bin', 'inc', 'lib']:
                     continue
                 path_key = '{0}_{1}_dir'.format(pkg.lower(), k)
@@ -86,9 +88,9 @@ class Executor(object):
 
         par['package'] = pkg
         par['action'] = action
-        if action in self.__release_config['install'][pkg]:
-            par['action_handler'] = self.__release_config['install'][pkg][action].get('handler', 'default')
-            par['action_param'] = self.__release_config['install'][pkg][action].get('param', {})
+        if action in self.__config_release.config['install'][pkg]:
+            par['action_handler'] = self.__config_release.config['install'][pkg][action].get('handler', 'default')
+            par['action_param'] = self.__config_release.config['install'][pkg][action].get('param', {})
         else:
             par['action_handler'] = 'default'
             par['action_param'] = {}
@@ -139,12 +141,12 @@ class Executor(object):
         pass
 
     def __setup_env(self, pkg):
-        if pkg not in self.__release_config['attribute']:
+        if pkg not in self.__config_release.config['attribute']:
             return
 
         PATH_NAME = {'bin': 'PATH', 'lib': 'LD_LIBRARY_PATH', 'man': 'MANPATH', 'info': 'INFOPATH', 'cmake': 'CMAKE_PREFIX_PATH'}
-        if 'path' in self.__release_config['attribute'][pkg]:
-            for k, v in self.__release_config['attribute'][pkg]['path'].items():
+        if 'path' in self.__config_release.config['attribute'][pkg]:
+            for k, v in self.__config_release.config['attribute'][pkg]['path'].items():
                 if k in PATH_NAME:
                     path_env_name = PATH_NAME[k]
                     if path_env_name not in self.__extra_path:
@@ -153,8 +155,8 @@ class Executor(object):
                     if full_path not in self.__extra_path[path_env_name]:
                         self.__extra_path[path_env_name].append(full_path)
 
-        if 'env' in self.__release_config['attribute'][pkg]:
-            for k, v in self.__release_config['attribute'][pkg]['env'].items():
+        if 'env' in self.__config_release.config['attribute'][pkg]:
+            for k, v in self.__config_release.config['attribute'][pkg]['env'].items():
                 self.__extra_env[k] = v.format(**self.__exe_config[pkg])
 
     def report_finish(self, vertice_result):
@@ -185,7 +187,7 @@ class Executor(object):
                 self.__status_info[pkg][action]['start'] = result['start']
                 self.__status_info[pkg][action]['end'] = result['end']
 
-                status_file = os.path.join(self.__version_config['release_status_root'], 'status.yml')
+                status_file = self.__config_version.status_file
                 dump_config(self.__status_info, status_file)
 
     def report_running(self, vertice):

@@ -1,6 +1,6 @@
-from cepcenv.manager import Manager
+from cepcenv.install import Install as CepcenvInstall
 
 class Install(object):
-    def execute(self, config, version_config, release_config):
-        manager = Manager(config, version_config, release_config)
-        manager.install()
+    def execute(self, config, config_version):
+        obj = CepcenvInstall(config, config_version)
+        obj.run()

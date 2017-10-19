@@ -1,34 +1,32 @@
-from cepcenv.util import expand_path
-
-from cepcenv.config.util import load_config
-from cepcenv.config.version import load_version_config
-from cepcenv.config.release import load_release_config
-from cepcenv.config.release import ReleaseVersionMismatchError
+import yaml
 
 
-def load_main(options_common):
-    config = {}
-
-    config_file = options_common['config_file']
-    if config_file:
-        try:
-            c = load_config(expand_path(config_file))
-            if not isinstance(c, dict):
-                c = {}
-            config.update(c)
-        except Exception as e:
-#            print('Can not load config: {0}'.format(e))
-            pass
-
-    # The final verbose value: config['verbose'] || verbose
-    if ('verbose' not in config) or (not config['verbose']):
-        config['verbose'] = options_common['verbose']
-
-    return config
+class ConfigError(Exception):
+    pass
 
 
-def load_version(config, version_name=None, version_config_cmd={}):
-    version_config = load_version_config(config, version_name, version_config_cmd)
-    release_config = load_release_config(version_config)
-    __process_config(version_config, release_config)
-    return version_config, release_config
+def load_config(fn):
+    try:
+        with open(fn, 'r') as f:
+            return yaml.load(f)
+    except Exception as e:
+        raise ConfigError('Load config "{0}" error ({1})'.format(fn, e))
+
+def dump_config(data, fn):
+    try:
+        with open(fn, 'w') as f:
+            yaml.dump(data, f, default_flow_style=False)
+    except Exception as e:
+        raise ConfigError('Dump config "{0}" error ({1})'.format(fn, e))
+
+def load_config_str(config_str):
+    try:
+        return yaml.load(config_str)
+    except Exception as e:
+        raise ConfigError('Load config from string error ({0})'.format(e))
+
+def dump_config_str(data):
+    try:
+        return yaml.dump(data, default_flow_style=False)
+    except Exception as e:
+        raise ConfigError('Dump config error ({0})'.format(e))

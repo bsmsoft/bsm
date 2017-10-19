@@ -16,11 +16,9 @@ CEPCENV_HOME = os.path.dirname(os.path.realpath(__file__))
 #@click.option('--compiler', '-l', type=str, help='Compiler type and version. e.g. "gcc49"')
 @click.option('--platform', '-p', type=str, help='Platform (combination of arch and os). e.g. "x86_64-sl6"')
 @click.option('--release-root', '-r', type=str)
-@click.option('--version-repo', '-t', type=str)
-@click.option('--version-dir', '-i', type=str)
 #@click.option('--work-root', '-w', type=str)
 @click.pass_context
-def cli(ctx, config, verbose, shell, arch, os, platform, release_root, version_repo, version_dir):
+def cli(ctx, config, verbose, shell, arch, os, platform, release_root):
     ctx.obj['config_file'] = config
     ctx.obj['verbose'] = verbose
     ctx.obj['shell_name'] = shell
@@ -31,8 +29,6 @@ def cli(ctx, config, verbose, shell, arch, os, platform, release_root, version_r
     ctx.obj['platform'] = platform
 
     ctx.obj['release_root'] = release_root
-    ctx.obj['version_repo'] = version_repo
-    ctx.obj['version_dir'] = version_dir
 #    ctx.obj['work_root'] = work_root
 
 
@@ -87,6 +83,14 @@ def config_version(ctx, version):
     cmd.execute(ctx.obj, version_name=version)
 
 
+@cli.command(name='config-release')
+@click.argument('version', type=str)
+@click.pass_context
+def config_release(ctx, version):
+    cmd = Cmd('config_release')
+    cmd.execute(ctx.obj, version_name=version)
+
+
 @cli.command()
 @click.option('--all', '-a', is_flag=True, help='Output all of the following')
 @click.option('--title', '-d', is_flag=True, help='Output title for each line')
@@ -104,10 +108,14 @@ def platform(ctx, all, title, arch, os, compiler, platform, version):
 
 
 @cli.command()
-@click.argument('version', type=str, required=False)
+@click.option('--softdef-repo', '-t', type=str)
+@click.option('--softdef-dir', '-i', type=str)
+@click.argument('version', type=str)
 @click.pass_context
-def install(ctx, version):
+def install(ctx, softdef_repo, softdef_dir, version):
     cmd = Cmd('install')
+    ctx.obj['softdef_repo'] = softdef_repo
+    ctx.obj['softdef_dir'] = softdef_dir
     cmd.execute(ctx.obj, version_name=version)
 
 
@@ -120,7 +128,7 @@ def ls_remote(ctx, version):
 
 
 @cli.command()
-@click.argument('version', type=str, required=False)
+@click.argument('version', type=str)
 @click.pass_context
 def use(ctx, version):
     cmd = Cmd('use')

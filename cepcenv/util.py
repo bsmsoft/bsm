@@ -40,21 +40,18 @@ def safe_mkdir(directory):
 
 def safe_copy(src, dst):
     directory = os.path.dirname(dst)
-    if not os.path.exists(directory):
-        safe_mkdir(directory)
+    safe_mkdir(directory)
     shutil.copy2(src, dst)
 
 def safe_cpdir(src, dst):
     directory = os.path.dirname(dst)
-    if not os.path.exists(directory):
-        safe_mkdir(directory)
+    safe_mkdir(directory)
     safe_rmdir(dst)
     shutil.copytree(src, dst)
 
 def safe_mvdir(src, dst):
     directory = os.path.dirname(dst)
-    if not os.path.exists(directory):
-        safe_mkdir(directory)
+    safe_mkdir(directory)
     safe_rmdir(dst)
     shutil.move(src, dst)
 
