@@ -1,6 +1,9 @@
+from cepcenv.logger import get_logger
 from cepcenv.util import expand_path
 
 from cepcenv.config import load_config
+
+_logger = get_logger()
 
 
 def load_main(options_common):
@@ -14,8 +17,7 @@ def load_main(options_common):
                 c = {}
             config.update(c)
         except Exception as e:
-#            print('Can not load config: {0}'.format(e))
-            pass
+            _logger.warn('Can not load config: {0}'.format(e))
 
     # The final verbose value: config['verbose'] || verbose
     if ('verbose' not in config) or (not config['verbose']):

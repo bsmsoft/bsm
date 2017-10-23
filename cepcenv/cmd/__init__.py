@@ -1,7 +1,9 @@
 import inspect
+import logging
 
 import click
 
+from cepcenv.logger import add_stream_logger
 from cepcenv.loader import load_common
 
 from cepcenv.config.main    import load_main
@@ -33,6 +35,8 @@ class Cmd(object):
             return
 
         self.__load_config(options_common)
+
+        add_stream_logger('INFO')
 
         version_config_cmd = options_common.copy()
         cmd_kwargs = kwargs.copy()

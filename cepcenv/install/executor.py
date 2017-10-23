@@ -4,11 +4,14 @@ import random
 import datetime
 
 from cepcenv.loader import load_func
+from cepcenv.logger import get_logger
+from cepcenv.util import safe_mkdir
 
 from cepcenv.config import load_config
 from cepcenv.config import dump_config
 
-from cepcenv.util import safe_mkdir
+
+_logger = get_logger()
 
 
 class InstallExecutorError(Exception):
@@ -128,7 +131,7 @@ class Executor(object):
         action = param['action']
 
         if param['finished']:
-            print('Skip doing: {0} {1}'.format(pkg, action))
+            _logger.debug('Skip doing: {0} {1}'.format(pkg, action))
             return None
 
         result = {}
@@ -138,6 +141,7 @@ class Executor(object):
         f = load_func('_cepcenv_handler_run_avoid_conflict.'+param['action_handler'], param['action'])
         result_action = f(param)
         if result_action is not None and not result_action:
+            _logger.critical('{0}.{1} execution error. Find log in "{2}"'.format(pkg, action, param['pkg_config']['log_dir']))
             raise InstallExecutorError('{0}.{1} execution error'.format(pkg, action))
 
         result['end'] = datetime.datetime.utcnow()
@@ -175,7 +179,7 @@ class Executor(object):
                 self.__setup_env(pkg)
 
             if result:
-                print('Package "{0}" {1} finished'.format(pkg, action))
+                _logger.info('Package "{0}" {1} finished'.format(pkg, action))
 
                 if pkg not in self.__status_info:
                     self.__status_info[pkg] = {}
@@ -192,7 +196,7 @@ class Executor(object):
         if not vertice:
             return
         running_vertice = ', '.join(['{0}({1})'.format(*v) for v in vertice])
-        print('Running: ' + running_vertice)
+        _logger.info('Running: ' + running_vertice)
 
     def deliver(self, vertex, result):
         pass
