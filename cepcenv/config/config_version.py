@@ -130,10 +130,14 @@ class ConfigVersion(object):
         return self.__config_version
 
     @property
-    def main_dir(self):
+    def cepcenv_dir(self):
         if 'release_root' not in self.__config_version:
             raise ConfigVersionError('"release_root" not specified in configuration')
-        return os.path.join(self.__config_version['release_root'], '_cepcenv', self.__config_version['version'])
+        return os.path.join(self.__config_version['release_root'], '_cepcenv')
+
+    @property
+    def main_dir(self):
+        return os.path.join(self.cepcenv_dir, self.__config_version['version'])
 
     @property
     def def_dir(self):

@@ -1,5 +1,5 @@
 # TODO: add this priority mechanism
-PRIORITY_LIST = ['INSTALL', 'EXTRACT', 'POST_CHECK', 'PRE_CHECK', 'DOWNLOAD']
+PRIORITY_LIST = ('compile', 'extract', 'source', 'post_check', 'pre_check', 'download')
 
 class Selector(object):
     def __init__(self, config, release_config):
@@ -7,29 +7,29 @@ class Selector(object):
         self.__release_config = release_config
 
         self.__max_total = 8
-        self.__max_extract = 2
-        self.__max_install = 2
+        self.__max_extract = 1
+        self.__max_compile = 1
 
     def select(self, running, idle):
         running_total = 0
         running_extract = 0
-        running_install = 0
+        running_compile = 0
         for v in running:
             running_total += 1
-            if v[1] == 'EXTRACT':
+            if v[1] == 'extract':
                 running_extract += 1
-            if v[1] == 'INSTALL':
-                running_install += 1
+            if v[1] == 'compile':
+                running_compile += 1
 
-        idle_extract = [v for v in idle if v[1] == 'EXTRACT']
-        idle_install = [v for v in idle if v[1] == 'INSTALL']
+        idle_extract = [v for v in idle if v[1] == 'extract']
+        idle_compile = [v for v in idle if v[1] == 'compile']
 
         selected = []
 
-        for v in idle_install:
-            if running_install < self.__max_install and running_total < self.__max_total:
+        for v in idle_compile:
+            if running_compile < self.__max_compile and running_total < self.__max_total:
                 selected.append(v)
-                running_install += 1
+                running_compile += 1
                 running_total += 1
 
         for v in idle_extract:
@@ -39,7 +39,7 @@ class Selector(object):
                 running_total += 1
 
         for v in idle:
-            if v not in idle_install and v not in idle_extract and running_total < self.__max_total:
+            if v not in idle_compile and v not in idle_extract and running_total < self.__max_total:
                 selected.append(v)
                 running_total += 1
 

@@ -119,12 +119,20 @@ def install(ctx, softdef_repo, softdef_dir, version):
     cmd.execute(ctx.obj, version_name=version)
 
 
-@cli.command(name='ls-remote')
-@click.argument('version', type=str, required=False)
+@cli.command()
 @click.pass_context
-def ls_remote(ctx, version):
+def ls(ctx):
+    cmd = Cmd('ls')
+    cmd.execute(ctx.obj)
+
+
+@cli.command(name='ls-remote')
+@click.option('--softdef-repo', '-t', type=str)
+@click.pass_context
+def ls_remote(ctx, softdef_repo):
     cmd = Cmd('ls_remote')
-    cmd.execute(ctx.obj, version_name=version)
+    ctx.obj['softdef_repo'] = softdef_repo
+    cmd.execute(ctx.obj)
 
 
 @cli.command()

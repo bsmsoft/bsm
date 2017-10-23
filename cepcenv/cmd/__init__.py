@@ -36,15 +36,12 @@ class Cmd(object):
 
         version_config_cmd = options_common.copy()
         cmd_kwargs = kwargs.copy()
-#        for k in ['softdef_repo', 'softdef_dir']:
-#            if k in cmd_kwargs:
-#                version_config_cmd[k] = cmd_kwargs[k]
-#                del cmd_kwargs[k]
 
-        if 'version_name' in cmd_kwargs:
+        if self.__cmd_config_version or self.__cmd_config_release:
             self.__config_version = ConfigVersion(self.__config, cmd_kwargs.get('version_name'), version_config_cmd)
             if self.__cmd_config_release:
                 self.__config_release = ConfigRelease(self.__config_version)
+        if 'version_name' in cmd_kwargs:
             del cmd_kwargs['version_name']
 
         self.__load_shell(version_config_cmd['shell_name'])

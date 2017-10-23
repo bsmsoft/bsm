@@ -10,6 +10,11 @@ from cepcenv.config import dump_config
 
 from cepcenv.util import safe_mkdir
 
+
+class InstallExecutorError(Exception):
+    pass
+
+
 class Executor(object):
     def __init__(self, config, config_version, config_release):
         self.__config = config
@@ -131,7 +136,9 @@ class Executor(object):
         result['start'] = datetime.datetime.utcnow()
 
         f = load_func('_cepcenv_handler_run_avoid_conflict.'+param['action_handler'], param['action'])
-        result['action'] = f(param)
+        result_action = f(param)
+        if result_action is not None and not result_action:
+            raise InstallExecutorError('{0}.{1} execution error'.format(pkg, action))
 
         result['end'] = datetime.datetime.utcnow()
 
@@ -167,18 +174,9 @@ class Executor(object):
             if action == 'post_check':
                 self.__setup_env(pkg)
 
-            if result and result['action']:
+            if result:
                 print('Package "{0}" {1} finished'.format(pkg, action))
 
-                if 'log' in result['action']:
-                    log_dir = self.__exe_config[pkg]['log_dir']
-                    with open(os.path.join(log_dir, action+'.out'), 'w') as f:
-                        f.write(result['action']['log']['stdout'])
-                    with open(os.path.join(log_dir, action+'.err'), 'w') as f:
-                        f.write(result['action']['log']['stderr'])
-
-
-            if result:
                 if pkg not in self.__status_info:
                     self.__status_info[pkg] = {}
                 if action not in self.__status_info[pkg]:
