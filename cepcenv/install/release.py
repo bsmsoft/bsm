@@ -8,11 +8,11 @@ class ReleaseVersionNotExistError(Exception):
     pass
 
 
-def __install_from_dir(src_dir, dst_dir):
+def _install_from_dir(src_dir, dst_dir):
     safe_cpdir(src_dir, dst_dir)
 
 
-def __install_from_git_repo(src_repo, release_version, dst_dir):
+def _install_from_git_repo(src_repo, release_version, dst_dir):
     release_tag = 'v'+release_version
     if release_tag not in list_remote_tag(src_repo):
         raise ReleaseVersionNotExistError('Release version "{0}" does not exist in repo {1}'.format(release_version, src_repo))
@@ -29,9 +29,9 @@ def install_definition(config_version):
     def_dir = config_version.def_dir
 
     if 'softdef_dir' in cv and cv['softdef_dir']:
-        __install_from_dir(cv['softdef_dir'], def_dir)
+        _install_from_dir(cv['softdef_dir'], def_dir)
     elif 'version' in cv and cv['version']:
-        __install_from_git_repo(cv['softdef_repo'], cv['version'], def_dir)
+        _install_from_git_repo(cv['softdef_repo'], cv['version'], def_dir)
 
 def install_handler(config_version):
     def_dir = config_version.def_dir

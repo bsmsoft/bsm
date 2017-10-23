@@ -8,7 +8,7 @@ class GitError(Exception):
     pass
 
 
-def __git_cmd(cwd, cmd, *args):
+def _git_cmd(cwd, cmd, *args):
     full_cmd = ['git', cmd] + list(args)
     try:
         p = subprocess.Popen(full_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd)
@@ -25,9 +25,9 @@ def __git_cmd(cwd, cmd, *args):
     return out
 
 
-def __list_remote(remote_path, ref):
+def _list_remote(remote_path, ref):
     ref_arg = '--' + ref
-    out = __git_cmd(None, 'ls-remote', '--refs', ref_arg, remote_path)
+    out = _git_cmd(None, 'ls-remote', '--refs', ref_arg, remote_path)
     items = []
     for i in out.splitlines():
         i = i.strip().split()[1]
@@ -37,10 +37,10 @@ def __list_remote(remote_path, ref):
     return items
 
 def list_remote_branch(remote_path):
-    return __list_remote(remote_path, 'heads')
+    return _list_remote(remote_path, 'heads')
 
 def list_remote_tag(remote_path):
-    return __list_remote(remote_path, 'tags')
+    return _list_remote(remote_path, 'tags')
 
 
 class Git(object):
@@ -48,10 +48,10 @@ class Git(object):
         self.__repo_path = repo_path
 
     def clone(self, remote_path):
-        out = __git_cmd(None, 'clone', remote_path, self.__repo_path)
+        out = _git_cmd(None, 'clone', remote_path, self.__repo_path)
 
     def checkout(self, branch):
-        out = __git_cmd(self.__repo_path, 'checkout', branch)
+        out = _git_cmd(self.__repo_path, 'checkout', branch)
 
     def clear_git_info(self):
         safe_rmdir(os.path.join(self.__repo_path, '.git'))
@@ -59,7 +59,7 @@ class Git(object):
 
     def __list_ref(self, ref):
         ref_prefix = 'refs/' + ref
-        out = __git_cmd(self.__repo_path, 'for-each-ref', '--format=%(refname)', ref_prefix)
+        out = _git_cmd(self.__repo_path, 'for-each-ref', '--format=%(refname)', ref_prefix)
         items = []
         for i in out.splitlines():
             i = i.strip()
