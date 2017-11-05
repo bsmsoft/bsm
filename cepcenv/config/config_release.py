@@ -36,12 +36,25 @@ class ConfigRelease(object):
             except ConfigError as e:
                 raise ConfigReleaseError('Fail to load config file "{0}": {1}'.format(config_file, e))
 
-        for k, v in self.__config_release['info']['category_root'].items():
-            self.__config_release['info']['category_root'][k] = v.format(**self.__config_version.config)
+        for k, v in self.__config_release['info']['categories'].items():
+            if 'root' in v:
+#                self.__config_release['info']['categories'][k]['root'] = v['root'].format(**self.__config_version.config)
+                v['root'] = v['root'].format(**self.__config_version.config)
 
 
     def get(self, key, default_value=None):
         return self.__config_release.get(key, default_value)
+
+    def package_root(self, pkg):
+        pkg_root = ''
+
+        pkg_cfg = self.__config_release['package'][pkg]
+
+        categories = self.__config_release['info']['categories']
+        if pkg_cfg['category'] in categories and 'root' in categories[pkg_cfg['category']]:
+            pkg_root = os.path.join(categories[pkg_cfg['category']]['root'], pkg_cfg['path'], pkg)
+
+        return pkg_root
 
     @property
     def config(self):

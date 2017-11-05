@@ -36,7 +36,7 @@ class Cmd(object):
 
         self.__load_config(options_common)
 
-        add_stream_logger('INFO')
+        add_stream_logger('DEBUG')
 
         version_config_cmd = options_common.copy()
         cmd_kwargs = kwargs.copy()

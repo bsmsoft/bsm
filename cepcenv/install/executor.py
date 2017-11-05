@@ -24,21 +24,46 @@ class Executor(object):
         self.__config_version = config_version
         self.__config_release = config_release
 
-        self.__load_status_info()
         self.__prepare_packages()
         self.__package_path()
 
         self.__extra_path = {}
         self.__extra_env = {}
 
-    def __load_status_info(self):
-        status_file = self.__config_version.status_file
+    def __load_install_status(self, pkg, action):
+        if 'status_dir' not in self.__exe_config[pkg]:
+            return {}
+
+        status_file = os.path.join(self.__exe_config[pkg]['status_dir'], 'install.yml')
+
         try:
-            self.__status_info = load_config(status_file)
-            if not isinstance(self.__status_info, dict):
-                self.__status_info = {}
+            install_status = load_config(status_file)
+            if not isinstance(install_status, dict):
+                return {}
+            return install_status
         except:
-            self.__status_info = {}
+            return {}
+
+    def __is_ready(self, pkg, action):
+        install_status = self.__load_install_status(pkg, action)
+        return action in install_status and \
+                'finished' in install_status[action] and \
+                install_status[action]['finished']
+
+    def __save_action_status(self, pkg, action, start, end):
+        if 'status_dir' not in self.__exe_config[pkg]:
+            return
+
+        install_status = self.__load_install_status(pkg, action)
+
+        if action not in install_status:
+            install_status[action] = {}
+        install_status[action]['finished'] = True
+        install_status[action]['start'] = start
+        install_status[action]['end'] = end
+
+        status_file = os.path.join(self.__exe_config[pkg]['status_dir'], 'install.yml')
+        dump_config(install_status, status_file)
 
     def __prepare_packages(self):
         self.__exe_config = {}
@@ -49,12 +74,12 @@ class Executor(object):
             package_version = cfg.get('version')
             exe_config['version'] = package_version
 
-            category_root = self.__config_release.config['info']['category_root']
-            if cfg['category'] in category_root:
-                package_root = os.path.join(category_root[cfg['category']], cfg['path'], pkg)
+            package_root = self.__config_release.package_root(pkg)
+            if package_root:
                 exe_config['package_root'] = package_root
 
                 location = self.__config_release.config['attribute'][pkg]['location']
+                exe_config['status_dir'] = os.path.join(package_root, '_cepcenv', package_version, 'status')
                 exe_config['log_dir'] = os.path.join(package_root, '_cepcenv', package_version, 'log')
                 exe_config['download_dir'] = os.path.join(package_root, '_cepcenv', package_version, 'download')
                 exe_config['extract_dir'] = os.path.join(package_root, '_cepcenv', package_version, 'extract')
@@ -63,6 +88,7 @@ class Executor(object):
                 exe_config['install_dir'] = os.path.join(package_root, package_version, location['install']).rstrip(os.sep)
 
                 safe_mkdir(exe_config['package_root'])
+                safe_mkdir(exe_config['status_dir'])
                 safe_mkdir(exe_config['log_dir'])
                 safe_mkdir(exe_config['download_dir'])
                 safe_mkdir(exe_config['extract_dir'])
@@ -118,10 +144,7 @@ class Executor(object):
                 env_final[k] += (os.pathsep + os.environ[k])
         par['env'] = env_final
 
-        par['finished'] = False
-        if pkg in self.__status_info and action in self.__status_info[pkg] and \
-                'finished' in self.__status_info[pkg][action] and self.__status_info[pkg][action]['finished']:
-            par['finished'] = True
+        par['finished'] = self.__is_ready(pkg, action)
 
         return par
 
@@ -180,17 +203,7 @@ class Executor(object):
 
             if result:
                 _logger.info('Package "{0}" {1} finished'.format(pkg, action))
-
-                if pkg not in self.__status_info:
-                    self.__status_info[pkg] = {}
-                if action not in self.__status_info[pkg]:
-                    self.__status_info[pkg][action] = {}
-                self.__status_info[pkg][action]['finished'] = True
-                self.__status_info[pkg][action]['start'] = result['start']
-                self.__status_info[pkg][action]['end'] = result['end']
-
-                status_file = self.__config_version.status_file
-                dump_config(self.__status_info, status_file)
+                self.__save_action_status(pkg, action, result['start'], result['end'])
 
     def report_running(self, vertice):
         if not vertice:

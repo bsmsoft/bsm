@@ -152,5 +152,9 @@ class ConfigVersion(object):
         return os.path.join(self.handler_dir, _HANDLER_MODULE_NAME)
 
     @property
-    def status_file(self):
-        return os.path.join(self.main_dir, 'status.yml')
+    def status_dir(self):
+        return os.path.join(self.main_dir, 'status')
+
+    @property
+    def install_status_file(self):
+        return os.path.join(self.status_dir, 'install.yml')

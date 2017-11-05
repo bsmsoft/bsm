@@ -17,7 +17,7 @@ class Ls(object):
                     local_versions.append(version_dir)
 
                     if version_in_def != version_dir:
-                        _logger.warn('Version inconsistent for {0}: Defined as {1}'.format(version_dir, version_in_def))
+                        _logger.warn('Version inconsistent for "{0}": Defined as "{1}"'.format(version_dir, version_in_def))
                 except:
                     continue
         except:
