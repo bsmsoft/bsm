@@ -1,6 +1,6 @@
-verbose: false
+log_level: INFO
 
-#release_repo: https://github.com/xianghuzhao/cepcsoft
+#release_repo: https://github.com/cepc/cepc-release
 
 #release_root: ~/cepcsoft
 #work_root: ~/myarea
