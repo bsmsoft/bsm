@@ -37,7 +37,7 @@ class Use(object):
             script += shell.unset_env('CEPCENV_PATH_LIST')
 
 
-        obj = CepcenvUse(config, config_version, config_release)
+        obj = CepcenvUse(config, config_release)
         path, env = obj.run()
 
 

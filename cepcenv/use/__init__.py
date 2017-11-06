@@ -6,10 +6,9 @@ from paradag import dag_run
 from cepcenv.util import ensure_list
 
 class Use(object):
-    def __init__(self, config, version_config, release_config):
+    def __init__(self, config, config_release):
         self.__config = config
-        self.__version_config = version_config
-        self.__release_config = release_config
+        self.__config_release = config_release
 
         self.__build_dag()
 
@@ -18,8 +17,8 @@ class Use(object):
     def __build_dag(self):
         self.__dag = Dag()
 
-        package_config = self.__release_config.get('package', {})
-        attribute_config = self.__release_config.get('attribute', {})
+        package_config = self.__config_release.get('package', {})
+        attribute_config = self.__config_release.get('attribute', {})
 
         for pkg, cfg in package_config.items():
             self.__dag.add_vertex(pkg)
@@ -42,17 +41,18 @@ class Use(object):
 
     def __prepare_packages(self):
         self.__exe_config = {}
-        for pkg, cfg in self.__release_config['package'].items():
+        for pkg, cfg in self.__config_release.config['package'].items():
             exe_config = {}
 
             package_version = cfg.get('version')
             exe_config['version'] = package_version
 
-            if (cfg['category']+'_root') in self.__version_config:
-                package_root = os.path.join(self.__version_config[cfg['category']+'_root'], cfg['path'], pkg)
+            package_root = self.__config_release.package_root(pkg)
+            if package_root:
                 exe_config['package_root'] = package_root
 
-                location = self.__release_config['attribute'][pkg]['location']
+                location = self.__config_release.config['attribute'][pkg]['location']
+                exe_config['status_dir'] = os.path.join(package_root, '_cepcenv', package_version, 'status')
                 exe_config['log_dir'] = os.path.join(package_root, '_cepcenv', package_version, 'log')
                 exe_config['download_dir'] = os.path.join(package_root, '_cepcenv', package_version, 'download')
                 exe_config['extract_dir'] = os.path.join(package_root, '_cepcenv', package_version, 'extract')
@@ -69,12 +69,12 @@ class Use(object):
         env = {}
 
         for pkg in sorted_pkgs:
-            if pkg not in self.__release_config['attribute']:
+            if pkg not in self.__config_release.config['attribute']:
                 continue
 
             PATH_NAME = {'bin': 'PATH', 'lib': 'LD_LIBRARY_PATH', 'man': 'MANPATH', 'info': 'INFOPATH'}
-            if 'path' in self.__release_config['attribute'][pkg]:
-                for k, v in self.__release_config['attribute'][pkg]['path'].items():
+            if 'path' in self.__config_release.config['attribute'][pkg]:
+                for k, v in self.__config_release.config['attribute'][pkg]['path'].items():
                     if k in PATH_NAME:
                         path_env_name = PATH_NAME[k]
                         if path_env_name not in path:
@@ -83,8 +83,8 @@ class Use(object):
                         if full_path not in path[path_env_name]:
                             path[path_env_name].append(full_path)
 
-            if 'env' in self.__release_config['attribute'][pkg]:
-                for k, v in self.__release_config['attribute'][pkg]['env'].items():
+            if 'env' in self.__config_release.config['attribute'][pkg]:
+                for k, v in self.__config_release.config['attribute'][pkg]['env'].items():
                     env[k] = v.format(**self.__exe_config[pkg])
 
         return path, env

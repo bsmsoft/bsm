@@ -72,6 +72,6 @@ class Install(object):
         selector = InstallSelector(self.__config, self.__config_release)
         processor = MultiThreadProcessor()
 #        processor = SequentialProcessor()
-        executor = InstallExecutor(self.__config, self.__config_version, self.__config_release)
+        executor = InstallExecutor(self.__config, self.__config_release)
 
         dag_run(self.__dag, selector=selector, processor=processor, executor=executor)

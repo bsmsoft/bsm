@@ -19,9 +19,8 @@ class InstallExecutorError(Exception):
 
 
 class Executor(object):
-    def __init__(self, config, config_version, config_release):
+    def __init__(self, config, config_release):
         self.__config = config
-        self.__config_version = config_version
         self.__config_release = config_release
 
         self.__prepare_packages()
