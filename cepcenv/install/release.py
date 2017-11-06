@@ -3,6 +3,9 @@ import os
 from cepcenv.util import safe_cpdir
 from cepcenv.util import safe_rmdir
 
+from cepcenv.git import list_remote_tag
+from cepcenv.git import Git
+
 
 class ReleaseVersionNotExistError(Exception):
     pass
