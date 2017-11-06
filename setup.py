@@ -30,7 +30,7 @@ setup(
     version = version,
     description = 'CEPC software management toolkit',
     long_description = long_description,
-    url = 'https://cepc.github.io/',
+    url = 'https://cepcsoft.ihep.ac.cn/',
     author = 'Xianghu Zhao',
     author_email = 'zhaoxh@ihep.ac.cn',
     license = 'MIT',

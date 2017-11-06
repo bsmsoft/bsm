@@ -1,7 +1,7 @@
 #!/bin/sh
 
 pypy_url='https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.9-linux_x86_64-portable.tar.bz2'
-git_repo='https://github.com/xianghuzhao/cepcenv.git'
+git_repo='https://github.com/cepc/cepcenv.git'
 
 download_http() {
   if which curl >/dev/null 2>&1; then
