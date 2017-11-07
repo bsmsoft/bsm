@@ -8,6 +8,8 @@ class Use(object):
         script = ''
 
 
+        script += shell.unset_env('CEPCSOFT_VERSION')
+
         if 'CEPCENV_ENV_LIST' in os.environ:
             for k in os.environ['CEPCENV_ENV_LIST'].split():
                 script += shell.unset_env(k)
@@ -65,5 +67,7 @@ class Use(object):
 
         script += shell.set_env('CEPCENV_PATH_LIST', ' '.join(path_list))
         script += shell.set_env('CEPCENV_ENV_LIST', ' '.join(env_list))
+
+        script += shell.set_env('CEPCSOFT_VERSION', config_version.config['version'])
 
         click.echo(script, nl=False)

@@ -9,7 +9,9 @@ class Ls(object):
         local_versions = []
 
         try:
-            for version_dir in os.listdir(config_version.cepcenv_dir):
+            version_dirs = os.listdir(config_version.cepcenv_dir)
+            version_dirs.sort()
+            for version_dir in version_dirs:
                 try:
                     with open(os.path.join(config_version.cepcenv_dir, version_dir, 'def', 'config', 'version.yml')) as f:
                         version_in_def = f.read().strip()

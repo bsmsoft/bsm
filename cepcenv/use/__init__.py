@@ -72,7 +72,7 @@ class Use(object):
             if pkg not in self.__config_release.config['attribute']:
                 continue
 
-            PATH_NAME = {'bin': 'PATH', 'lib': 'LD_LIBRARY_PATH', 'man': 'MANPATH', 'info': 'INFOPATH'}
+            PATH_NAME = {'bin': 'PATH', 'lib': 'LD_LIBRARY_PATH', 'man': 'MANPATH', 'info': 'INFOPATH', 'cmake': 'CMAKE_PREFIX_PATH'}
             if 'path' in self.__config_release.config['attribute'][pkg]:
                 for k, v in self.__config_release.config['attribute'][pkg]['path'].items():
                     if k in PATH_NAME:
