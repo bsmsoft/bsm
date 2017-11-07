@@ -23,6 +23,7 @@ _VERSION_ITEMS = ('version', 'release_root', 'work_root',
 _PATH_ITEMS = ('release_root', 'work_root', 'softdef_dir')
 
 _DEFAULT_ITEMS = {
+        'release_root': os.getcwd(),
         'softdef_repo': 'https://github.com/cepc/cepc-release',
 }
 

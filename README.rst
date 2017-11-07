@@ -31,7 +31,10 @@ List available ``cepc-release`` version::
 
 Specified ``cepc-release`` version and where to install::
 
-    cepcenv -r <CEPCSOFT_INSTALL_DIR> install <version>
+    cepcenv [-r <CEPCSOFT_INSTALL_DIR>] install <version>
+
+If ``-r <CEPCSOFT_INSTALL_DIR>`` is not specified, everything will be installed
+in the current directory.
 
 List local installed ``cepc-release`` version::
 
