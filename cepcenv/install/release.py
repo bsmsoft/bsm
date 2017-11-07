@@ -20,6 +20,8 @@ def _install_from_git_repo(src_repo, release_version, dst_dir):
     if release_tag not in list_remote_tag(src_repo):
         raise ReleaseVersionNotExistError('Release version "{0}" does not exist in repo {1}'.format(release_version, src_repo))
 
+    safe_rmdir(dst_dir)
+
     git = Git(dst_dir)
     git.clone(src_repo)
     git.checkout(release_tag)
