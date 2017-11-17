@@ -3,11 +3,13 @@ import os
 from paradag import Dag
 from paradag import dag_run
 
+from cepcenv.env import Env
 from cepcenv.util import ensure_list
 
 class Use(object):
-    def __init__(self, config, config_release):
+    def __init__(self, config, config_version, config_release):
         self.__config = config
+        self.__config_version = config_version
         self.__config_release = config_release
 
         self.__build_dag()
@@ -65,26 +67,21 @@ class Use(object):
     def run(self):
         sorted_pkgs = dag_run(self.__dag)
 
-        path = {}
-        env = {}
+        env = Env()
+        env.clean()
+        env.set_release(self.__config_version.config['release_root'], self.__config_version.config['version'])
 
         for pkg in sorted_pkgs:
             if pkg not in self.__config_release.config['attribute']:
                 continue
 
-            PATH_NAME = {'bin': 'PATH', 'lib': 'LD_LIBRARY_PATH', 'man': 'MANPATH', 'info': 'INFOPATH', 'cmake': 'CMAKE_PREFIX_PATH'}
-            if 'path' in self.__config_release.config['attribute'][pkg]:
-                for k, v in self.__config_release.config['attribute'][pkg]['path'].items():
-                    if k in PATH_NAME:
-                        path_env_name = PATH_NAME[k]
-                        if path_env_name not in path:
-                            path[path_env_name] = []
-                        full_path = v.format(**self.__exe_config[pkg])
-                        if full_path not in path[path_env_name]:
-                            path[path_env_name].append(full_path)
+            path_mode = self.__config_release.config['main'].get('path_mode', {})
+            pkg_config = {
+                'name': pkg,
+                'package': self.__config_release.config['package'].get(pkg, {}),
+                'attribute': self.__config_release.config['attribute'].get(pkg, {}),
+                'format': self.__exe_config[pkg],
+            }
+            env.set_package(path_mode, pkg_config)
 
-            if 'env' in self.__config_release.config['attribute'][pkg]:
-                for k, v in self.__config_release.config['attribute'][pkg]['env'].items():
-                    env[k] = v.format(**self.__exe_config[pkg])
-
-        return path, env
+        return env.final_all_env()

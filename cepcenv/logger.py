@@ -39,16 +39,22 @@ class JsubFormatter(logging.Formatter):
 _FORMATTER = JsubFormatter('[%(asctime)s][%(name)s|%(levelname)s]: %(message)s')
 #_FORMATTER = logging.Formatter('[%(asctime)s](%(name)s:%(levelname)s) %(message)s', '%Y-%m-%d %H:%M:%S')
 
+_FORMATTER_SIMPLE = logging.Formatter('%(levelname)s: %(message)s')
 
-def add_stream_logger(level):
+
+def add_stream_logger(verbose=False):
     logger = logging.getLogger(_MAIN_LOGGER_NAME)
 
-    if str(level) == level:
-        level = logging.getLevelName(level)
-    logger.setLevel(level)
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
 
     ch = logging.StreamHandler()
-    ch.setFormatter(_FORMATTER)
+    if verbose:
+        ch.setFormatter(_FORMATTER)
+    else:
+        ch.setFormatter(_FORMATTER_SIMPLE)
 
     logger.addHandler(ch)
 

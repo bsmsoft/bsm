@@ -101,8 +101,7 @@ def config_release(ctx, version):
 @click.argument('version', type=str, required=False)
 @click.pass_context
 def platform(ctx, all, title, arch, os, compiler, platform, version):
-    # Use this name to avoid conflict with python library
-    cmd = Cmd('platform_cmd')
+    cmd = Cmd('platform')
     cmd.execute(ctx.obj, output_all=all, output_title=title, output_arch=arch, output_os=os, output_compiler=compiler,
             output_platform=platform, version_name=version)
 
@@ -135,12 +134,27 @@ def ls_remote(ctx, softdef_repo):
     cmd.execute(ctx.obj)
 
 
+@cli.command(name='ls-package')
+@click.pass_context
+def ls_package(ctx):
+    cmd = Cmd('ls_package')
+    cmd.execute(ctx.obj)
+
+
 @cli.command()
+@click.option('--default', '-d', is_flag=True)
 @click.argument('version', type=str)
 @click.pass_context
-def use(ctx, version):
+def use(ctx, default, version):
     cmd = Cmd('use')
-    cmd.execute(ctx.obj, version_name=version)
+    cmd.execute(ctx.obj, default=default, version_name=version)
+
+
+@cli.command()
+@click.pass_context
+def clean(ctx):
+    cmd = Cmd('clean')
+    cmd.execute(ctx.obj)
 
 
 def main(check_shell=False):

@@ -1,6 +1,11 @@
 import os
 import click
 
+from cepcenv.env import Env
+
+from cepcenv.config.info import Info
+from cepcenv.config.config_version import ConfigVersion
+
 from cepcenv.logger import get_logger
 _logger = get_logger()
 
@@ -25,8 +30,42 @@ class Ls(object):
         except:
             pass
 
+
+        env = Env()
+        current_root = env.release_root
+        current_version = env.release_version
+
+        info = Info()
+        default_version_name = info.default_version
+        _logger.debug('Default version name: {0}'.format(default_version_name))
+
+        default_root = None
+        default_version = None
+        if default_version_name:
+            config_version_default = ConfigVersion(config, default_version_name)
+            default_root = config_version_default.get('release_root')
+            default_version = config_version_default.get('version')
+
+        _logger.debug('Current release: {0} {1}'.format(current_root, current_version))
+        _logger.debug('Default release: {0} {1}'.format(default_root, default_version))
+
+
         script = ''
+
+        release_root = config_version.get('release_root')
+        script += shell.echo('(Release root: "{0}")'.format(release_root))
+
         for version in local_versions:
-            script += shell.echo(version)
+            ver_status = []
+            if release_root == current_root and version == current_version:
+                ver_status.append('current')
+            if release_root == default_root and version == default_version:
+                ver_status.append('default')
+
+            version_line = version
+            if ver_status:
+                version_line += '  ({0})'.format(', '.join(ver_status))
+
+            script += shell.echo(version_line)
 
         click.echo(script, nl=False)

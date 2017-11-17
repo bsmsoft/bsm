@@ -1,9 +1,9 @@
-log_level: INFO
+#verbose: false
 
 #release_repo: https://github.com/cepc/cepc-release
 
 #release_root: ~/cepcsoft
-#work_root: ~/myarea
+#work_root: ~/mywork
 
 #make_opt: -j16
 
@@ -12,8 +12,6 @@ log_level: INFO
 #    version: 3.1.2
 #    cepcsoft_root: ~/cepcsoft3
 #    work_root: ~/mywork2
-#    arch: xxx
-#    platform: hehe
 #  'test':
 #    version: 1.2.1
 #    work_root: ~/mywork_test

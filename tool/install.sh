@@ -1,13 +1,16 @@
 #!/bin/sh
 
-pypy_url='https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.9-linux_x86_64-portable.tar.bz2'
+pypy_url='http://cepcsoft.ihep.ac.cn/package/cepcenv/pypy/pypy-current-linux_x86_64-portable.tar.bz2'
+pypy_origin_url='https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.9-linux_x86_64-portable.tar.bz2'
 git_repo='https://github.com/cepc/cepcenv.git'
+
+retry_time=5
 
 download_http() {
   if which curl >/dev/null 2>&1; then
-    curl -L "$1"
+    curl --retry $retry_time -L "$1"
   elif which wget >/dev/null 2>&1; then
-    wget -O - "$1"
+    wget -t $retry_time -O - "$1"
   else
     echo >&2 "Please install curl or wget first"
     exit 1

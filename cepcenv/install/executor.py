@@ -4,13 +4,12 @@ import random
 import datetime
 
 from cepcenv.loader import load_func
-from cepcenv.logger import get_logger
 from cepcenv.util import safe_mkdir
 
 from cepcenv.config import load_config
 from cepcenv.config import dump_config
 
-
+from cepcenv.logger import get_logger
 _logger = get_logger()
 
 
@@ -24,7 +23,7 @@ class Executor(object):
         self.__config_release = config_release
 
         self.__prepare_packages()
-        self.__package_path()
+        self.__package_dirs()
 
         self.__extra_path = {}
         self.__extra_env = {}
@@ -97,12 +96,13 @@ class Executor(object):
 
             self.__exe_config[pkg] = exe_config
 
-    def __package_path(self):
+    def __package_dirs(self):
         self.__pkg_path = {}
         for pkg in self.__config_release.config['package']:
             if pkg not in self.__config_release.config['attribute']:
                 continue
 
+            _logger.debug('Generating directory for package {0}'.format(pkg))
             pkg_root_key = pkg.lower() + '_root_dir'
             self.__pkg_path[pkg_root_key] = self.__exe_config[pkg]['install_dir']
 

@@ -41,14 +41,12 @@ class Install(object):
         for pkg, cfg in package_config.items():
             self.__dag.add_vertex((pkg, 'download'))
             self.__dag.add_vertex((pkg, 'extract'))
-            self.__dag.add_vertex((pkg, 'source'))
             self.__dag.add_vertex((pkg, 'pre_check'))
             self.__dag.add_vertex((pkg, 'compile'))
             self.__dag.add_vertex((pkg, 'post_check'))
 
             self.__dag.add_edge((pkg, 'download'), (pkg, 'extract'))
-            self.__dag.add_edge((pkg, 'extract'), (pkg, 'source'))
-            self.__dag.add_edge((pkg, 'source'), (pkg, 'pre_check'))
+            self.__dag.add_edge((pkg, 'extract'), (pkg, 'pre_check'))
             self.__dag.add_edge((pkg, 'pre_check'), (pkg, 'compile'))
             self.__dag.add_edge((pkg, 'compile'), (pkg, 'post_check'))
 

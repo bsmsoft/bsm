@@ -5,7 +5,7 @@ import datetime
 
 from cepcenv.util import expand_path
 
-from cepcenv.sw import Platform
+from cepcenv.platform import Platform
 
 
 class ConfigVersionError(Exception):
@@ -85,6 +85,9 @@ class ConfigVersion(object):
                 self.__config_version[k] = expand_path(self.__config_version[k])
 
     def __process_config(self):
+        if self.__version_name:
+            self.__config_version['version_name'] = self.__version_name
+
         if 'version' not in self.__config_version:
             self.__config_version['version'] = _temp_version()
 

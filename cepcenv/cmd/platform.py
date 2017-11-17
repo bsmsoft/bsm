@@ -1,6 +1,6 @@
 import click
 
-class PlatformCmd(object):
+class Platform(object):
     def execute(self, config, config_version, output_all, output_title,
             output_arch, output_os, output_compiler, output_platform):
         if output_all:

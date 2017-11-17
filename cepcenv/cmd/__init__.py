@@ -1,16 +1,23 @@
+import sys
 import inspect
-import logging
+import traceback
 
 import click
 
 from cepcenv.logger import add_stream_logger
+from cepcenv.logger import get_logger
+
 from cepcenv.loader import load_common
 
 from cepcenv.config.main    import load_main
 from cepcenv.config.config_version import ConfigVersion
 from cepcenv.config.config_release import ConfigRelease
+from cepcenv.config.config_release import ConfigReleaseError
 
 from cepcenv.shell import load_shell
+
+
+_logger = get_logger()
 
 
 class CmdError(Exception):
@@ -36,11 +43,24 @@ class Cmd(object):
 
         self.__load_config(options_common)
 
-        add_stream_logger('DEBUG')
+        add_stream_logger(self.__config['verbose'])
 
         version_config_cmd = options_common.copy()
         cmd_kwargs = kwargs.copy()
 
+        try:
+            self.__execute_main(version_config_cmd, cmd_kwargs)
+        except ConfigReleaseError as e:
+            _logger.critical('Load release version error: {0}'.format(e))
+            sys.exit(2)
+        except Exception as e:
+            if self.__config['verbose']:
+                _logger.critical('Traceback:\n{0}'.format(traceback.format_exc()))
+            _logger.critical('Fatal error: {0}'.format(e))
+            sys.exit(1)
+
+
+    def __execute_main(self, version_config_cmd, cmd_kwargs):
         if self.__cmd_config_version or self.__cmd_config_release:
             self.__config_version = ConfigVersion(self.__config, cmd_kwargs.get('version_name'), version_config_cmd)
             if self.__cmd_config_release:
@@ -56,8 +76,8 @@ class Cmd(object):
             cmd_kwargs['config_version'] = self.__config_version
         if self.__cmd_config_release:
             cmd_kwargs['config_release'] = self.__config_release
-        self.__cmd.execute(config=self.__config, **cmd_kwargs)
 
+        self.__cmd.execute(config=self.__config, **cmd_kwargs)
 
     def __load_cmd(self, cmd_name):
         self.__cmd = None
