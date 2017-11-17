@@ -2,7 +2,6 @@
 
 pypy_url='http://cepcsoft.ihep.ac.cn/package/cepcenv/pypy/pypy-current-linux_x86_64-portable.tar.bz2'
 pypy_origin_url='https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.9-linux_x86_64-portable.tar.bz2'
-git_repo='https://github.com/cepc/cepcenv.git'
 
 retry_time=5
 
@@ -48,7 +47,7 @@ main() {
   pypy/bin/pypy -m ensurepip
   pypy/bin/pip install -U pip wheel
 
-  pypy/bin/pip install "git+${git_repo}"
+  pypy/bin/pip install cepcenv
 
   echo "eval \"\$('${install_full_dir}/pypy/bin/cepcenv_cmd' init)\"" > setup.sh
 }
