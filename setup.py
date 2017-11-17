@@ -36,7 +36,7 @@ setup(
     license = 'MIT',
 
     classifiers = [
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
 
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering :: Physics',
@@ -62,7 +62,6 @@ setup(
         'paradag',
         'click>=6.0,<7.0',
         'PyYAML>=3.0,<4.0',
-#        'schema>=0.6,<0.7',
     ],
     include_package_data = True,
     tests_require = [

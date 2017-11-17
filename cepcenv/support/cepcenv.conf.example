@@ -5,7 +5,7 @@
 #release_root: ~/cepcsoft
 #work_root: ~/mywork
 
-#make_opt: -j16
+#make_opt: -j4
 
 #versions:
 #  '312':
