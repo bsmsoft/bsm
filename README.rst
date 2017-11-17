@@ -21,6 +21,11 @@ If ``CEPCENV_DIR`` is omitted, ``cepcenv`` will be installed in the current dire
 Install cepcsoft with cepcenv
 -----------------------------
 
+``git`` command is necessary for executing the following commands. ``git`` could
+be installed via the package manager::
+
+    yum install -y git
+
 Setup ``cepcenv``::
 
     . <CEPCENV_DIR>/setup.sh
