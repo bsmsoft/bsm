@@ -34,7 +34,7 @@ class Cmd(object):
         self.__load_cmd(cmd_name)
 
     def execute(self, options_common, **kwargs):
-        if options_common['check_shell']:
+        if 'check_shell' in options_common and options_common['check_shell']:
             if self.__cmd_output_shell:
                 click.echo('CEPCENV:OUTPUT_IS_SHELL')
             else:
@@ -52,6 +52,7 @@ class Cmd(object):
             self.__execute_main(version_config_cmd, cmd_kwargs)
         except ConfigReleaseError as e:
             _logger.critical('Load release version error: {0}'.format(e))
+            _logger.critical('\n{0}'.format(traceback.format_exc()))
             sys.exit(2)
         except Exception as e:
             _logger.critical('Fatal error: {0}'.format(e))

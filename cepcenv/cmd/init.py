@@ -11,6 +11,7 @@ class Init(object):
         script = ''
 
         script += shell.define_cepcenv()
+        script += '\n'
 
         info = Info()
         default_version = info.default_version

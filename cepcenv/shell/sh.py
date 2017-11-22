@@ -17,27 +17,25 @@ class Sh(Shell):
 
         cepcenv_func = '''\
 cepcenv() {{
-  check_shell=$({python_exe} -c 'from cepcenv import main;main(check_shell=True)' $* 2>/dev/null)
-  check_shell_exit_code=$?
+  local _check_shell="$('{python_exe}' -c 'from cepcenv import main;main(check_shell=True)' $* 2>/dev/null)"
 
-  if [ $check_shell_exit_code = 0 -a "$check_shell" = 'CEPCENV:OUTPUT_IS_SHELL' ]; then
-    script=$({python_exe} -c 'from cepcenv import main;main()' --shell=sh $*)
-    exit_code=$?
-    [ $exit_code -eq 0 ] && eval "$script"
+  if [ "$_check_shell" = 'CEPCENV:OUTPUT_IS_SHELL' ]; then
+    local _script=$('{python_exe}' -c 'from cepcenv import main;main()' --shell sh $*)
+    local _exit_code=$?
+    [ $_exit_code -eq 0 ] && eval "$_script"
   else
-    {python_exe} -c 'from cepcenv import main;main()' $*
-    exit_code=$?
+    '{python_exe}' -c 'from cepcenv import main;main()' $*
+    local _exit_code=$?
   fi
 
-  return "$exit_code"
+  return "$_exit_code"
 }}
 
 cepcenv_script() {{
-  check_shell=$({python_exe} -c 'from cepcenv import main;main(check_shell=True)' $* 2>/dev/null)
-  check_shell_exit_code=$?
+  local _check_shell="$('{python_exe}' -c 'from cepcenv import main;main(check_shell=True)' $* 2>/dev/null)"
 
-  if [ $check_shell_exit_code = 0 -a "$check_shell" = 'CEPCENV:OUTPUT_IS_SHELL' ]; then
-    {python_exe} -c 'from cepcenv import main;main()' --shell=sh $*
+  if [ "$_check_shell" = 'CEPCENV:OUTPUT_IS_SHELL' ]; then
+    '{python_exe}' -c 'from cepcenv import main;main()' --shell sh $*
   else
     >&2 echo 'This command does not output shell script'
     return 2
