@@ -98,7 +98,14 @@ class Executor(object):
 
     def __package_dirs(self):
         self.__pkg_path = {}
-        for pkg in self.__config_release.config['package']:
+        for pkg, cfg in self.__config_release.config['package'].items():
+            category = cfg['category']
+            should_install = False
+            if category in self.__config_release.config['main']['category']['categories']:
+                should_install = self.__config_release.config['main']['category']['categories'][category].get('install', False)
+            if not should_install:
+                continue
+
             if pkg not in self.__config_release.config['attribute']:
                 continue
 
@@ -121,7 +128,7 @@ class Executor(object):
 
         par['package'] = pkg
         par['action'] = action
-        if action in self.__config_release.config['install'][pkg]:
+        if pkg in self.__config_release.config['install'] and action in self.__config_release.config['install'][pkg]:
             par['action_handler'] = self.__config_release.config['install'][pkg][action].get('handler', 'default')
             par['action_param'] = self.__config_release.config['install'][pkg][action].get('param', {})
         else:
@@ -177,7 +184,7 @@ class Executor(object):
         if pkg not in self.__config_release.config['attribute']:
             return
 
-        PATH_NAME = {'bin': 'PATH', 'lib': 'LD_LIBRARY_PATH', 'man': 'MANPATH', 'info': 'INFOPATH', 'cmake': 'CMAKE_PREFIX_PATH'}
+        PATH_NAME = {'bin': 'PATH', 'library': 'LD_LIBRARY_PATH', 'man': 'MANPATH', 'info': 'INFOPATH', 'cmake': 'CMAKE_PREFIX_PATH'}
         if 'path' in self.__config_release.config['attribute'][pkg]:
             for k, v in self.__config_release.config['attribute'][pkg]['path'].items():
                 if k in PATH_NAME:

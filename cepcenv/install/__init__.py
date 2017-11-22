@@ -1,4 +1,3 @@
-import os
 import sys
 
 from paradag import Dag
@@ -15,6 +14,9 @@ from cepcenv.install.executor import Executor as InstallExecutor
 from cepcenv.config.config_release import ConfigRelease
 
 from cepcenv.util import ensure_list
+
+from cepcenv.logger import get_logger
+_logger = get_logger()
 
 
 class Install(object):
@@ -56,12 +58,21 @@ class Install(object):
                 if 'basic' in cfg and cfg['basic']:
                     basic_pkgs.append(pkg)
 
-        for pkg in package_config:
+        for pkg, cfg in package_config.items():
+#            category = cfg['category']
+#            should_install = False
+#            if category in self.__config_release.config['main']['category']['categories']:
+#                should_install = self.__config_release.config['main']['category']['categories'][category].get('install', False)
+
             if pkg not in basic_pkgs:
+#                if not should_install:
+#                    continue
                 for bp in basic_pkgs:
                     self.__dag.add_edge((bp, 'post_check'), (pkg, 'download'))
 
             if pkg in attribute_config and 'dep' in attribute_config[pkg]:
+#                if not should_install:
+#                    continue
                 pkgs_dep = ensure_list(attribute_config[pkg]['dep'])
                 for pkg_dep in pkgs_dep:
                     self.__dag.add_edge((pkg_dep, 'post_check'), (pkg, 'pre_check'))
