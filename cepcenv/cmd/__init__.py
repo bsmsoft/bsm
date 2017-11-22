@@ -52,7 +52,6 @@ class Cmd(object):
             self.__execute_main(version_config_cmd, cmd_kwargs)
         except ConfigReleaseError as e:
             _logger.critical('Load release version error: {0}'.format(e))
-            _logger.critical('\n{0}'.format(traceback.format_exc()))
             sys.exit(2)
         except Exception as e:
             _logger.critical('Fatal error: {0}'.format(e))

@@ -20,7 +20,7 @@ cepcenv() {{
   local _check_shell="$('{python_exe}' -c 'from cepcenv import main;main(check_shell=True)' $* 2>/dev/null)"
 
   if [ "$_check_shell" = 'CEPCENV:OUTPUT_IS_SHELL' ]; then
-    local _script=$('{python_exe}' -c 'from cepcenv import main;main()' --shell sh $*)
+    local _script="$('{python_exe}' -c 'from cepcenv import main;main()' --shell sh $*)"
     local _exit_code=$?
     [ $_exit_code -eq 0 ] && eval "$_script"
   else

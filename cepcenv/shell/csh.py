@@ -32,7 +32,7 @@ class Csh(Shell):
         common_alias = '''\
 alias {0} '\
 set _cepcenv_python_exe="{1}"; \
-set _cepcenv_argv=\!*; \
+set _cepcenv_argv="\!*"; \
 source "{2}"; \
 unset _cepcenv_argv; \
 unset _cepcenv_python_exe; \
