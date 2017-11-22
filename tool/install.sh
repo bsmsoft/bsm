@@ -49,7 +49,8 @@ main() {
 
   pypy/bin/pip install cepcenv
 
-  echo "eval \"\$('${install_full_dir}/pypy/bin/cepcenv_cmd' init)\"" > setup.sh
+  echo "eval \"\$('${install_full_dir}/pypy/bin/cepcenv_cmd' --shell sh init)\"" > setup.sh
+  echo "eval \"\`'${install_full_dir}/pypy/bin/cepcenv_cmd' --shell csh init\`\"" > setup.csh
 }
 
 main "$@"

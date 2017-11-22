@@ -69,7 +69,7 @@ setup(
     ],
     entry_points = {
         'console_scripts': [
-            'cepcenv-cmd = cepcenv:main',
+            'cepcenv_cmd = cepcenv:main',
         ],
     },
     cmdclass = {'test': PyTest},
