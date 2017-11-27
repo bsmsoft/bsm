@@ -36,10 +36,10 @@ class JsubFormatter(logging.Formatter):
         return s
 
 
-_FORMATTER = JsubFormatter('[%(asctime)s][%(name)s|%(levelname)s]: %(message)s')
+_FORMATTER = JsubFormatter('[%(asctime)s][%(name)s|%(levelname)s] %(message)s')
 #_FORMATTER = logging.Formatter('[%(asctime)s](%(name)s:%(levelname)s) %(message)s', '%Y-%m-%d %H:%M:%S')
 
-_FORMATTER_SIMPLE = logging.Formatter('%(levelname)s: %(message)s')
+_FORMATTER_SIMPLE = logging.Formatter('[%(levelname)s] %(message)s')
 
 
 def add_stream_logger(verbose=False):

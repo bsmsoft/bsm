@@ -54,7 +54,7 @@ class Cmd(object):
             _logger.critical('Load release version error: {0}'.format(e))
             sys.exit(2)
         except Exception as e:
-            _logger.critical('Fatal error: {0}'.format(e))
+            _logger.critical('Fatal error ({0}): {1}'.format(type(e).__name__, e))
             if self.__config['verbose']:
                 _logger.critical('\n{0}'.format(traceback.format_exc()))
             sys.exit(1)
