@@ -33,10 +33,10 @@ def install_definition(config_version):
     cv = config_version.config
     def_dir = config_version.def_dir
 
-    if 'softdef_dir' in cv and cv['softdef_dir']:
-        _install_from_dir(cv['softdef_dir'], def_dir)
+    if 'release_infodir' in cv and cv['release_infodir']:
+        _install_from_dir(cv['release_infodir'], def_dir)
     elif 'version' in cv and cv['version']:
-        _install_from_git_repo(cv['softdef_repo'], cv['version'], def_dir)
+        _install_from_git_repo(cv['release_repo'], cv['version'], def_dir)
 
 def install_handler(config_version):
     def_dir = config_version.def_dir

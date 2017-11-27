@@ -32,7 +32,7 @@ class Ls(object):
 
 
         env = Env()
-        current_root = env.release_root
+        current_root = env.software_root
         current_version = env.release_version
 
         info = Info()
@@ -43,7 +43,7 @@ class Ls(object):
         default_version = None
         if default_version_name:
             config_version_default = ConfigVersion(config, default_version_name)
-            default_root = config_version_default.get('release_root')
+            default_root = config_version_default.get('software_root')
             default_version = config_version_default.get('version')
 
         _logger.debug('Current release: {0} {1}'.format(current_root, current_version))
@@ -52,14 +52,14 @@ class Ls(object):
 
         script = ''
 
-        release_root = config_version.get('release_root')
-        script += shell.echo('(Release root: "{0}")'.format(release_root))
+        software_root = config_version.get('software_root')
+        script += shell.echo('(Release root: "{0}")'.format(software_root))
 
         for version in local_versions:
             ver_status = []
-            if release_root == current_root and version == current_version:
+            if software_root == current_root and version == current_version:
                 ver_status.append('current')
-            if release_root == default_root and version == default_version:
+            if software_root == default_root and version == default_version:
                 ver_status.append('default')
 
             version_line = version

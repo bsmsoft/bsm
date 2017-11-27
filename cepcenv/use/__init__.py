@@ -69,7 +69,7 @@ class Use(object):
 
         env = Env()
         env.clean()
-        env.set_release(self.__config_version.config['release_root'], self.__config_version.config['version'])
+        env.set_release(self.__config_version.config['software_root'], self.__config_version.config['version'])
 
         for pkg in sorted_pkgs:
             if pkg not in self.__config_release.config['attribute']:

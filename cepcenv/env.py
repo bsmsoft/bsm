@@ -5,7 +5,7 @@ from cepcenv.logger import get_logger
 _logger = get_logger()
 
 
-RELEASE_ROOT_ENV_NAME = 'CEPCENV_RELEASE_ROOT'
+SOFTWARE_ROOT_ENV_NAME = 'CEPCENV_SOFTWARE_ROOT'
 RELEASE_VERSION_ENV_NAME = 'CEPCENV_RELEASE_VERSION'
 PACKAGE_INFO_ENV_NAME = 'CEPCENV_PACKAGE_INFO'
 ENV_LIST_ENV_NAME = 'CEPCENV_ENV_LIST'
@@ -52,7 +52,7 @@ class Env(object):
         self.__init_os_path()
         self.__init_package_env()
 
-        self.__release_root = self.__initial_release_root
+        self.__software_root = self.__initial_software_root
         self.__release_version = self.__initial_release_version
         self.__pkg_info = copy.deepcopy(self.__initial_pkg_info)
         self.__pkg_path = copy.deepcopy(self.__initial_pkg_path)
@@ -60,9 +60,9 @@ class Env(object):
 
 
     def __init_release(self):
-        self.__initial_release_root = None
-        if RELEASE_ROOT_ENV_NAME in self.__initial_env:
-            self.__initial_release_root = self.__initial_env[RELEASE_ROOT_ENV_NAME]
+        self.__initial_software_root = None
+        if SOFTWARE_ROOT_ENV_NAME in self.__initial_env:
+            self.__initial_software_root = self.__initial_env[SOFTWARE_ROOT_ENV_NAME]
         self.__initial_release_version = None
         if RELEASE_VERSION_ENV_NAME in self.__initial_env:
             self.__initial_release_version = self.__initial_env[RELEASE_VERSION_ENV_NAME]
@@ -100,8 +100,8 @@ class Env(object):
 
 
     @property
-    def release_root(self):
-        return self.__release_root
+    def software_root(self):
+        return self.__software_root
 
     @property
     def release_version(self):
@@ -113,14 +113,14 @@ class Env(object):
 
 
     def clean(self):
-        self.__release_root = None
+        self.__software_root = None
         self.__release_version = None
         self.__pkg_info = {}
         self.__pkg_path = {}
         self.__pkg_env = {}
 
     def set_release(self, rel_root, rel_ver):
-        self.__release_root = rel_root
+        self.__software_root = rel_root
         self.__release_version = rel_ver
 
     # TODO: global envs are from main.yml
@@ -176,11 +176,11 @@ class Env(object):
         setenv = {}
         unset = []
 
-        if self.__release_root != self.__initial_release_root:
-            if self.__release_root is None:
-                unset.append(RELEASE_ROOT_ENV_NAME)
+        if self.__software_root != self.__initial_software_root:
+            if self.__software_root is None:
+                unset.append(SOFTWARE_ROOT_ENV_NAME)
             else:
-                setenv[RELEASE_ROOT_ENV_NAME] = self.__release_root
+                setenv[SOFTWARE_ROOT_ENV_NAME] = self.__software_root
 
         if self.__release_version != self.__initial_release_version:
             if self.__release_version is None:

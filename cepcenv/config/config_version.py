@@ -16,15 +16,15 @@ class ConfigVersionError(Exception):
 _HANDLER_MODULE_NAME = '_cepcenv_handler_run_avoid_conflict'
 
 
-_VERSION_ITEMS = ('version', 'release_root', 'work_root',
-        'softdef_dir', 'softdef_repo',
+_VERSION_ITEMS = ('version', 'software_root', 'work_root',
+        'release_infodir', 'release_repo',
         'platform', 'os', 'arch', 'compiler')
 
-_PATH_ITEMS = ('release_root', 'work_root', 'softdef_dir')
+_PATH_ITEMS = ('software_root', 'work_root', 'release_infodir')
 
 _DEFAULT_ITEMS = {
-        'release_root': os.getcwd(),
-        'softdef_repo': 'https://github.com/cepc/cepc-release',
+        'software_root': os.getcwd(),
+        'release_repo': 'https://github.com/cepc/cepc-release',
 }
 
 
@@ -135,9 +135,9 @@ class ConfigVersion(object):
 
     @property
     def cepcenv_dir(self):
-        if 'release_root' not in self.__config_version:
-            raise ConfigVersionError('"release_root" not specified in configuration')
-        return os.path.join(self.__config_version['release_root'], '_cepcenv')
+        if 'software_root' not in self.__config_version:
+            raise ConfigVersionError('"software_root" not specified in configuration')
+        return os.path.join(self.__config_version['software_root'], '_cepcenv')
 
     @property
     def main_dir(self):

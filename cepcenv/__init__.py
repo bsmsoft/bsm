@@ -15,21 +15,19 @@ CEPCENV_HOME = os.path.dirname(os.path.realpath(__file__))
 @click.option('--os', '-o', type=str, help='OS of the machine. e.g. "sl6"')
 #@click.option('--compiler', '-l', type=str, help='Compiler type and version. e.g. "gcc49"')
 @click.option('--platform', '-p', type=str, help='Platform (combination of arch and os). e.g. "x86_64-sl6"')
-@click.option('--release-root', '-r', type=str)
+@click.option('--software-root', '-r', type=str)
 #@click.option('--work-root', '-w', type=str)
 @click.pass_context
-def cli(ctx, config, verbose, shell, arch, os, platform, release_root):
+def cli(ctx, config, verbose, shell, arch, os, platform, software_root):
     ctx.obj['config_file'] = config
     ctx.obj['verbose'] = verbose
     ctx.obj['shell_name'] = shell
 
     ctx.obj['arch'] = arch
     ctx.obj['os'] = os
-#    ctx.obj['compiler'] = compiler
     ctx.obj['platform'] = platform
 
-    ctx.obj['release_root'] = release_root
-#    ctx.obj['work_root'] = work_root
+    ctx.obj['software_root'] = software_root
 
 
 @cli.command()
@@ -107,14 +105,14 @@ def platform(ctx, all, title, arch, os, compiler, platform, version):
 
 
 @cli.command()
-@click.option('--softdef-repo', '-t', type=str)
-@click.option('--softdef-dir', '-i', type=str)
+@click.option('--release-repo', '-t', type=str)
+@click.option('--release-infodir', '-i', type=str)
 @click.argument('version', type=str)
 @click.pass_context
-def install(ctx, softdef_repo, softdef_dir, version):
+def install(ctx, release_repo, release_infodir, version):
     cmd = Cmd('install')
-    ctx.obj['softdef_repo'] = softdef_repo
-    ctx.obj['softdef_dir'] = softdef_dir
+    ctx.obj['release_repo'] = release_repo
+    ctx.obj['release_infodir'] = release_infodir
     cmd.execute(ctx.obj, version_name=version)
 
 
@@ -126,11 +124,11 @@ def ls(ctx):
 
 
 @cli.command(name='ls-remote')
-@click.option('--softdef-repo', '-t', type=str)
+@click.option('--release-repo', '-t', type=str)
 @click.pass_context
-def ls_remote(ctx, softdef_repo):
+def ls_remote(ctx, release_repo):
     cmd = Cmd('ls_remote')
-    ctx.obj['softdef_repo'] = softdef_repo
+    ctx.obj['release_repo'] = release_repo
     cmd.execute(ctx.obj)
 
 
