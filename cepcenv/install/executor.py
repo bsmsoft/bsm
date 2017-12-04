@@ -11,6 +11,7 @@ from cepcenv.util import safe_mkdir
 
 from cepcenv.config import load_config
 from cepcenv.config import dump_config
+from cepcenv.config.config_version import HANDLER_MODULE_NAME
 
 from cepcenv.logger import get_logger
 _logger = get_logger()
@@ -73,8 +74,12 @@ class Executor(object):
 
         result['start'] = datetime.datetime.utcnow()
 
-        f = load_func('_cepcenv_handler_run_avoid_conflict.'+param['action_handler'], 'run')
+        safe_mkdir(param['pkg_info']['dir']['log'])
+
+        module_name = HANDLER_MODULE_NAME + '.' + param['action_handler']
+        f = load_func(module_name, 'run')
         result_action = f(param)
+
         if result_action is not None and not result_action:
             _logger.critical('"{0} - {1}" execution error. Find log in "{2}"'.format(pkg, action, param['log_file']))
             raise InstallExecutorError('"{0} - {1}" execution error'.format(pkg, action))
@@ -85,25 +90,6 @@ class Executor(object):
 
     def report_start(self, vertice):
         pass
-
-    def __setup_env(self, pkg):
-        if pkg not in self.__config_release.config['attribute']:
-            return
-
-        PATH_NAME = {'bin': 'PATH', 'library': 'LD_LIBRARY_PATH', 'man': 'MANPATH', 'info': 'INFOPATH', 'cmake': 'CMAKE_PREFIX_PATH'}
-        if 'path' in self.__config_release.config['attribute'][pkg]:
-            for k, v in self.__config_release.config['attribute'][pkg]['path'].items():
-                if k in PATH_NAME:
-                    path_env_name = PATH_NAME[k]
-                    if path_env_name not in self.__extra_path:
-                        self.__extra_path[path_env_name] = []
-                    full_path = v.format(**self.__exe_config[pkg])
-                    if full_path not in self.__extra_path[path_env_name]:
-                        self.__extra_path[path_env_name].append(full_path)
-
-        if 'env' in self.__config_release.config['attribute'][pkg]:
-            for k, v in self.__config_release.config['attribute'][pkg]['env'].items():
-                self.__extra_env[k] = v.format(**self.__exe_config[pkg])
 
     def report_finish(self, vertice_result):
         for vertex, result in vertice_result:

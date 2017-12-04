@@ -14,7 +14,7 @@ class ConfigVersionError(Exception):
 
 
 # This name is very long in order to avoid conflict with other modules
-_HANDLER_MODULE_NAME = '_cepcenv_handler_run_avoid_conflict'
+HANDLER_MODULE_NAME = '_cepcenv_handler_run_avoid_conflict'
 
 
 _VERSION_ITEMS = ('version', 'software_root',
@@ -154,7 +154,7 @@ class ConfigVersion(object):
 
     @property
     def handler_module_dir(self):
-        return os.path.join(self.handler_dir, _HANDLER_MODULE_NAME)
+        return os.path.join(self.handler_dir, HANDLER_MODULE_NAME)
 
     @property
     def status_dir(self):

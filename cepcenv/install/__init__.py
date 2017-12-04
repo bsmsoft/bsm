@@ -26,15 +26,16 @@ class Install(object):
         self.__config = config
         self.__config_version = config_version
 
-        self.__config_release = ConfigRelease(self.__config_version)
-
-        self.__pkg_mgr = PackageManager(config_version, self.__config_release)
-
-        self.__build_dag()
-
     def run(self):
         install_definition(self.__config_version)
         install_handler(self.__config_version)
+
+        # Must initialize ConfigRelease after install_definition
+        self.__config_release = ConfigRelease(self.__config_version)
+
+        self.__pkg_mgr = PackageManager(self.__config_version, self.__config_release)
+
+        self.__build_dag()
 
         sys.path.insert(0, self.__config_version.handler_dir)
         self.__dag_run()
