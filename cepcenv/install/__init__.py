@@ -13,6 +13,8 @@ from cepcenv.install.executor import Executor as InstallExecutor
 
 from cepcenv.config.config_release import ConfigRelease
 
+from cepcenv.package_manager import PackageManager
+
 from cepcenv.util import ensure_list
 
 from cepcenv.logger import get_logger
@@ -24,23 +26,26 @@ class Install(object):
         self.__config = config
         self.__config_version = config_version
 
+        self.__config_release = ConfigRelease(self.__config_version)
+
+        self.__pkg_mgr = PackageManager(config_version, self.__config_release)
+
+        self.__build_dag()
+
     def run(self):
         install_definition(self.__config_version)
         install_handler(self.__config_version)
 
-        self.__config_release = ConfigRelease(self.__config_version)
-
-        self.__build_dag()
         sys.path.insert(0, self.__config_version.handler_dir)
         self.__dag_run()
 
     def __build_dag(self):
         self.__dag = Dag()
 
-        package_config = self.__config_release.get('package', {})
-        attribute_config = self.__config_release.get('attribute', {})
+        for pkg, pkg_info in self.__pkg_mgr.package_all().items():
+            if not pkg_info.get('category', {}).get('install'):
+                continue
 
-        for pkg, cfg in package_config.items():
             self.__dag.add_vertex((pkg, 'download'))
             self.__dag.add_vertex((pkg, 'extract'))
             self.__dag.add_vertex((pkg, 'pre_compile'))
@@ -53,29 +58,23 @@ class Install(object):
             self.__dag.add_edge((pkg, 'compile'), (pkg, 'post_compile'))
 
         basic_pkgs = []
-        for pkg, cfg in attribute_config.items():
-            if pkg in package_config:
-                if 'basic' in cfg and cfg['basic']:
-                    basic_pkgs.append(pkg)
+        for pkg, pkg_info in self.__pkg_mgr.package_all().items():
+            if not pkg_info.get('category', {}).get('install'):
+                continue
+            if pkg_info.get('attribute', {}).get('basic'):
+                basic_pkgs.append(pkg)
 
-        for pkg, cfg in package_config.items():
-#            category = cfg['category']
-#            should_install = False
-#            if category in self.__config_release.config['main']['category']['categories']:
-#                should_install = self.__config_release.config['main']['category']['categories'][category].get('install', False)
+        for pkg, pkg_info in self.__pkg_mgr.package_all().items():
+            if not pkg_info.get('category', {}).get('install'):
+                continue
 
             if pkg not in basic_pkgs:
-#                if not should_install:
-#                    continue
                 for bp in basic_pkgs:
                     self.__dag.add_edge((bp, 'post_compile'), (pkg, 'download'))
 
-            if pkg in attribute_config and 'dep' in attribute_config[pkg]:
-#                if not should_install:
-#                    continue
-                pkgs_dep = ensure_list(attribute_config[pkg]['dep'])
-                for pkg_dep in pkgs_dep:
-                    self.__dag.add_edge((pkg_dep, 'post_compile'), (pkg, 'pre_compile'))
+            pkgs_dep = ensure_list(pkg_info.get('category', {}).get('dep', []))
+            for pkg_dep in pkgs_dep:
+                self.__dag.add_edge((pkg_dep, 'post_compile'), (pkg, 'pre_compile'))
 
     def __dag_run(self):
         selector = InstallSelector(self.__config, self.__config_release)

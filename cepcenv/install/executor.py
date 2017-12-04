@@ -3,6 +3,7 @@ import time
 import random
 import datetime
 
+from cepcenv.env import Env
 from cepcenv.package_manager import PackageManager
 
 from cepcenv.loader import load_func
@@ -25,8 +26,8 @@ class Executor(object):
         self.__config_version = config_version
         self.__config_release = config_release
 
-        self.__extra_path = {}
-        self.__extra_env = {}
+        self.__env = Env()
+        self.__env.clean()
 
         self.__pkg_mgr = PackageManager(config_version, config_release)
 
@@ -49,14 +50,7 @@ class Executor(object):
 
         par['log_file'] = os.path.join(self.__pkg_mgr.package_info(pkg)['dir']['log'], '{0}_{1}.log'.format(action, pkg))
 
-        # Make a copy in order to avoid change of extra_env when action executing
-        env_final = os.environ.copy()
-        env_final.update(self.__extra_env)
-        for k, v in self.__extra_path.items():
-            env_final[k] = os.pathsep.join(v)
-            if k in os.environ:
-                env_final[k] += (os.pathsep + os.environ[k])
-        par['env'] = env_final
+        par['env'] = self.__env.env_final()
 
         par['finished'] = self.__pkg_mgr.is_ready(pkg, action)
 
@@ -117,7 +111,9 @@ class Executor(object):
 
             # TODO: post_compile may be absent, find out a secure way
             if action == 'post_compile':
-                self.__setup_env(pkg)
+                path_usage = self.__config_release.config['setting'].get('path_usage', {})
+                pkg_info = self.__pkg_mgr.package_info(pkg)
+                self.__env.set_package(path_usage, pkg_info)
 
             if result:
                 _logger.info('Package "{0} - {1}" finished'.format(pkg, action))

@@ -58,11 +58,8 @@ class Use(object):
         env.clean()
         env.set_release(software_root, release_version)
 
+        path_usage = self.__config_release.config['setting'].get('path_usage', {})
         for pkg in sorted_pkgs:
-            if pkg not in self.__config_release.config['attribute']:
-                continue
-
-            path_usage = self.__config_release.config['setting'].get('path_usage', {})
             pkg_info = self.__pkg_mgr.package_info(pkg)
             env.set_package(path_usage, pkg_info)
 
