@@ -43,14 +43,14 @@ class Install(object):
         for pkg, cfg in package_config.items():
             self.__dag.add_vertex((pkg, 'download'))
             self.__dag.add_vertex((pkg, 'extract'))
-            self.__dag.add_vertex((pkg, 'pre_check'))
+            self.__dag.add_vertex((pkg, 'pre_compile'))
             self.__dag.add_vertex((pkg, 'compile'))
-            self.__dag.add_vertex((pkg, 'post_check'))
+            self.__dag.add_vertex((pkg, 'post_compile'))
 
             self.__dag.add_edge((pkg, 'download'), (pkg, 'extract'))
-            self.__dag.add_edge((pkg, 'extract'), (pkg, 'pre_check'))
-            self.__dag.add_edge((pkg, 'pre_check'), (pkg, 'compile'))
-            self.__dag.add_edge((pkg, 'compile'), (pkg, 'post_check'))
+            self.__dag.add_edge((pkg, 'extract'), (pkg, 'pre_compile'))
+            self.__dag.add_edge((pkg, 'pre_compile'), (pkg, 'compile'))
+            self.__dag.add_edge((pkg, 'compile'), (pkg, 'post_compile'))
 
         basic_pkgs = []
         for pkg, cfg in attribute_config.items():
@@ -68,19 +68,19 @@ class Install(object):
 #                if not should_install:
 #                    continue
                 for bp in basic_pkgs:
-                    self.__dag.add_edge((bp, 'post_check'), (pkg, 'download'))
+                    self.__dag.add_edge((bp, 'post_compile'), (pkg, 'download'))
 
             if pkg in attribute_config and 'dep' in attribute_config[pkg]:
 #                if not should_install:
 #                    continue
                 pkgs_dep = ensure_list(attribute_config[pkg]['dep'])
                 for pkg_dep in pkgs_dep:
-                    self.__dag.add_edge((pkg_dep, 'post_check'), (pkg, 'pre_check'))
+                    self.__dag.add_edge((pkg_dep, 'post_compile'), (pkg, 'pre_compile'))
 
     def __dag_run(self):
         selector = InstallSelector(self.__config, self.__config_release)
         processor = MultiThreadProcessor()
 #        processor = SequentialProcessor()
-        executor = InstallExecutor(self.__config, self.__config_release)
+        executor = InstallExecutor(self.__config, self.__config_version, self.__config_release)
 
         dag_run(self.__dag, selector=selector, processor=processor, executor=executor)

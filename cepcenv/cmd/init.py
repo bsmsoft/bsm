@@ -20,11 +20,11 @@ class Init(object):
             config_release = ConfigRelease(config_version)
 
             obj = CepcenvUse(config, config_version, config_release)
-            setenv, unset = obj.run()
+            set_env, unset_env = obj.run()
 
-            for e in unset:
+            for e in unset_env:
                 script += shell.unset_env(e)
-            for k, v in setenv.items():
+            for k, v in set_env.items():
                 script += shell.set_env(k, v)
 
         click.echo(script, nl=False)

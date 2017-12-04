@@ -1,5 +1,5 @@
 # TODO: add this priority mechanism
-PRIORITY_LIST = ('compile', 'extract', 'source', 'post_check', 'pre_check', 'download')
+PRIORITY_LIST = ('compile', 'extract', 'source', 'post_compile', 'pre_compile', 'download')
 
 class Selector(object):
     def __init__(self, config, release_config):

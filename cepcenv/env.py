@@ -116,31 +116,36 @@ class Env(object):
         self.__software_root = None
         self.__release_version = None
         self.__pkg_info = {}
-        self.__pkg_path = {}
-        self.__pkg_env = {}
+
+        # Do not use "self.__pkg_path = {}, self.__pkg_env = {}" here
+        # We need to know which paths and envs ever exist
+        for k in self.__pkg_path:
+            self.__pkg_path[k] = []
+        for k in self.__pkg_env:
+            self.__pkg_env[k] = None
 
     def set_release(self, rel_root, rel_ver):
         self.__software_root = rel_root
         self.__release_version = rel_ver
 
-    # TODO: global envs are from main.yml
+    # TODO: global envs are from setting.yml
     def set_global_env(self, env):
         for k, v in env.items():
             self.__pkg_env[k] = v.format(**pkg_format)
 
     # TODO: delete old_pkg env
-    def remove_package(self, path_mode, pkg_config):
+    def remove_package(self, path_usage, pkg_info):
         pass
 
-    def set_package(self, path_mode, pkg_config):
-        pkg_name = pkg_config['name']
-        pkg_format = pkg_config.get('format', {})
-        package = pkg_config.get('package', {})
-        attribute = pkg_config.get('attribute', {})
+    def set_package(self, path_usage, pkg_info):
+        pkg_name = pkg_info['name']
+        pkg_dir = pkg_info.get('dir', {})
+        package = pkg_info.get('package', {})
+        attribute = pkg_info.get('attribute', {})
 
         self.__set_package_info(pkg_name, package)
-        self.__set_package_path(path_mode, pkg_name, attribute, pkg_format)
-        self.__set_package_env(path_mode, pkg_name, attribute, pkg_format)
+        self.__set_package_path(path_usage, pkg_name, attribute, pkg_dir)
+        self.__set_package_env(path_usage, pkg_name, attribute, pkg_dir)
 
     def __set_package_info(self, pkg_name, package):
         if pkg_name not in self.__pkg_info:
@@ -149,139 +154,129 @@ class Env(object):
         self.__pkg_info[pkg_name]['path'] = package.get('path', '')
         self.__pkg_info[pkg_name]['version'] = package.get('version', 'empty')
 
-    def __set_package_path(self, path_mode, pkg_name, attribute, pkg_format):
+    def __set_package_path(self, path_usage, pkg_name, attribute, pkg_dir):
         all_path = attribute.get('path', {})
         for k, v in all_path.items():
-            multiple_path_name = path_mode.get('multiple', {})
-            if k in multiple_path_name:
-                path_name = multiple_path_name[k]
+            multi_env_path_name = path_usage.get('multi_env', {})
+            if k in multi_env_path_name:
+                path_name = multi_env_path_name[k]
                 if path_name not in self.__pkg_path:
                     self.__pkg_path[path_name] = []
-                self.__pkg_path[path_name].insert(0, v.format(**pkg_format))
+                _logger.debug('pkg_name: {0}'.format(pkg_name))
+                _logger.debug('path_name: {0}'.format(path_name))
+                _logger.debug('v: {0}'.format(v))
+                self.__pkg_path[path_name].insert(0, v.format(**pkg_dir))
 
-    def __set_package_env(self, path_mode, pkg_name, attribute, pkg_format):
+    def __set_package_env(self, path_usage, pkg_name, attribute, pkg_dir):
         all_path = attribute.get('path', {})
         for k, v in all_path.items():
-            single_path_name = path_mode.get('single', {})
-            if k in single_path_name:
-                env_name = single_path_name[k].format(package=pkg_name)
-                self.__pkg_env[env_name] = v.format(**pkg_format)
+            single_env_path_name = path_usage.get('single_env', {})
+            if k in single_env_path_name:
+                env_name = single_env_path_name[k].format(package=pkg_name)
+                self.__pkg_env[env_name] = v.format(**pkg_dir)
 
         all_env = attribute.get('env', {})
         for k, v in all_env.items():
-            self.__pkg_env[k] = v.format(**pkg_format)
+            self.__pkg_env[k] = v.format(**pkg_dir)
 
 
-    def release_env(self):
-        setenv = {}
-        unset = []
+    def __env_release(self):
+        env = {}
+        env[SOFTWARE_ROOT_ENV_NAME] = self.__software_root
+        env[RELEASE_VERSION_ENV_NAME] = self.__release_version
+        return env
 
-        if self.__software_root != self.__initial_software_root:
-            if self.__software_root is None:
-                unset.append(SOFTWARE_ROOT_ENV_NAME)
-            else:
-                setenv[SOFTWARE_ROOT_ENV_NAME] = self.__software_root
-
-        if self.__release_version != self.__initial_release_version:
-            if self.__release_version is None:
-                unset.append(RELEASE_VERSION_ENV_NAME)
-            else:
-                setenv[RELEASE_VERSION_ENV_NAME] = self.__release_version
-
-        _logger.debug('setenv release version: {0}'.format(setenv))
-        _logger.debug('unset release version: {0}'.format(unset))
-        return setenv, unset
-
-    def final_info_env(self):
-        setenv = {}
-        unset = []
+    def __env_package_info(self):
+        env = {}
         if self.__pkg_info:
-            setenv[PACKAGE_INFO_ENV_NAME] = _emit_package_info(self.__pkg_info)
+            env[PACKAGE_INFO_ENV_NAME] = _emit_package_info(self.__pkg_info)
         else:
-            if self.__initial_pkg_info:
-                unset.append(PACKAGE_INFO_ENV_NAME)
-        _logger.debug('setenv package info: {0}'.format(setenv))
-        _logger.debug('unset package info: {0}'.format(unset))
-        return setenv, unset
+            env[PACKAGE_INFO_ENV_NAME] = None
+        return env
 
-    def final_path_env(self):
-        setenv = {}
-        unset = []
-
-        _logger.debug('find path env self.__initial_os_path: {0}'.format(self.__initial_os_path))
-        _logger.debug('find path env self.__initial_pkg_path: {0}'.format(self.__initial_pkg_path))
+    def __env_package_path(self):
+        env = {}
 
         for k in self.__initial_pkg_path:
             if k not in self.__pkg_path:
                 if k in self.__initial_os_path and self.__initial_os_path[k]:
-                    setenv[k] = _emit_path(self.__initial_os_path[k])
+                    env[k] = _emit_path(self.__initial_os_path[k])
                 else:
-                    unset.append(k)
-                unset.append(PATH_ENV_PREFIX+k)
+                    env[k] = None
+                env[PATH_ENV_PREFIX+k] = None
 
         path_list = []
         for k, v in self.__pkg_path.items():
-            path_list.append(k)
             if k in self.__initial_os_path:
                 path_full = v + self.__initial_os_path[k]
             elif k in self.__initial_env:
                 path_full = v + _parse_path(self.__initial_env[k])
             else:
                 path_full = v
-            setenv[k] = _emit_path(path_full)
-            setenv[PATH_ENV_PREFIX+k] = _emit_path(v)
+
+            if v:
+                path_list.append(k)
+                env[PATH_ENV_PREFIX+k] = _emit_path(v)
+            else:
+                env[PATH_ENV_PREFIX+k] = None
+
+            if path_full:
+                env[k] = _emit_path(path_full)
+            else:
+                env[k] = None
 
         if path_list:
-            setenv[PATH_LIST_ENV_NAME] = ' '.join(path_list)
+            env[PATH_LIST_ENV_NAME] = ' '.join(path_list)
         else:
-            if self.__initial_pkg_path:
-                unset.append(PATH_LIST_ENV_NAME)
+            env[PATH_LIST_ENV_NAME] = None
 
-        _logger.debug('setenv env path: {0}'.format(setenv))
-        _logger.debug('unset env path: {0}'.format(unset))
-        return setenv, unset
+        return env
 
-    def final_package_env(self):
-        setenv = {}
-        unset = []
-
-        for k in self.__initial_pkg_env:
-            if k not in self.__pkg_env:
-                unset.append(k)
+    def __env_package_env(self):
+        env = {}
 
         env_list = []
         for k, v in self.__pkg_env.items():
-            env_list.append(k)
-            setenv[k] = v
+            if v is not None:
+                env_list.append(k)
+            env[k] = v
 
         if env_list:
-            setenv[ENV_LIST_ENV_NAME] = ' '.join(env_list)
+            env[ENV_LIST_ENV_NAME] = ' '.join(env_list)
         else:
-            if self.__initial_pkg_env:
-                unset.append(ENV_LIST_ENV_NAME)
+            env[ENV_LIST_ENV_NAME] = None
 
-        _logger.debug('setenv env: {0}'.format(setenv))
-        _logger.debug('unset env: {0}'.format(unset))
-        return setenv, unset
+        return env
 
-    def final_all_env(self):
-        all_setenv = {}
-        all_unset = []
+    def __env_all(self):
+        env_all = {}
+        env_all.update(self.__env_release())
+        env_all.update(self.__env_package_info())
+        env_all.update(self.__env_package_path())
+        env_all.update(self.__env_package_env())
+        return env_all
 
-        setenv, unset = self.release_env()
-        all_setenv.update(setenv)
-        all_unset = unset + all_unset
 
-        setenv, unset = self.final_info_env()
-        all_setenv.update(setenv)
-        all_unset = unset + all_unset
+    def env_final(self):
+        env_to_update = self.__env_all()
 
-        setenv, unset = self.final_path_env()
-        all_setenv.update(setenv)
-        all_unset = unset + all_unset
+        final = self.__initial_env.copy()
+        for k, v in env_to_update.items():
+            if v is None and k in final:
+                del final[k]
+            else:
+                final[k] = v
+        return final
 
-        setenv, unset = self.final_package_env()
-        all_setenv.update(setenv)
-        all_unset = unset + all_unset
+    def env_change(self):
+        env_origin = self.__initial_env
+        env_to_update = self.__env_all()
 
-        return all_setenv, all_unset
+        set_env = {}
+        unset_env = []
+        for k, v in env_to_update.items():
+            if v is None and k in env_origin:
+                unset_env.append(k)
+            elif k not in env_origin or v != env_origin[k]:
+                set_env[k] = v
+        return set_env, unset_env

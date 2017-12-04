@@ -4,6 +4,7 @@ import string
 import datetime
 
 from cepcenv.util import expand_path
+from cepcenv.util import ensure_list
 
 from cepcenv.platform import Platform
 
@@ -16,11 +17,11 @@ class ConfigVersionError(Exception):
 _HANDLER_MODULE_NAME = '_cepcenv_handler_run_avoid_conflict'
 
 
-_VERSION_ITEMS = ('version', 'software_root', 'work_root',
+_VERSION_ITEMS = ('version', 'software_root',
         'release_infodir', 'release_repo',
         'platform', 'os', 'arch', 'compiler')
 
-_PATH_ITEMS = ('software_root', 'work_root', 'release_infodir')
+_PATH_ITEMS = ('software_root', 'release_infodir')
 
 _DEFAULT_ITEMS = {
         'software_root': os.getcwd(),
@@ -37,24 +38,13 @@ def _temp_version():
             + ''.join(random.SystemRandom().choice(string.ascii_lowercase + string.digits) for _ in range(__TEMP_VERSION_LENGTH))
 
 
-def _filter_version_config(config):
-    version_config = {}
-
-    for k, v in config.items():
-        if v is None:
-            continue
-
-        if k in _VERSION_ITEMS:
-            version_config[k] = v
-
-    return version_config
-
-
 class ConfigVersion(object):
-    def __init__(self, config, version_name=None, version_config_cmd={}):
+    def __init__(self, config, version_name=None, version_config_cmd={}, extra_config=[]):
         self.__config = config
         self.__version_name = version_name
         self.__config_version_cmd = version_config_cmd
+
+        self.__items = list(_VERSION_ITEMS) + ensure_list(extra_config)
 
         self.__load_config()
 
@@ -96,15 +86,26 @@ class ConfigVersion(object):
         self.__format_config()
         self.__expand_path()
 
+    def __filter_version_config(self, config):
+        version_config = {}
+
+        for k, v in config.items():
+            if v is None:
+                continue
+
+            if k in self.__items:
+                version_config[k] = v
+
+        return version_config
 
     def __config_global(self):
-        return _filter_version_config(self.__config)
+        return self.__filter_version_config(self.__config)
 
     def __config_specific(self):
         config_temp = {}
 
         if 'versions' in self.__config and self.__version_name in self.__config['versions']:
-            config_temp.update(_filter_version_config(self.__config['versions'][self.__version_name]))
+            config_temp.update(self.__filter_version_config(self.__config['versions'][self.__version_name]))
 
         if 'version' not in config_temp:
             config_temp['version'] = self.__version_name
@@ -112,7 +113,7 @@ class ConfigVersion(object):
         return config_temp
 
     def __config_cmd(self):
-        return _filter_version_config(self.__config_version_cmd)
+        return self.__filter_version_config(self.__config_version_cmd)
 
 
     def __load_config(self):

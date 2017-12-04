@@ -65,6 +65,10 @@ class Cmd(object):
             self.__config_version = ConfigVersion(self.__config, cmd_kwargs.get('version_name'), version_config_cmd)
             if self.__cmd_config_release:
                 self.__config_release = ConfigRelease(self.__config_version)
+                extra_config = self.__config_release.get('setting', {}).get('category', {}).get('extra_config', [])
+                if extra_config:
+                    self.__config_version = ConfigVersion(self.__config, cmd_kwargs.get('version_name'), version_config_cmd, extra_config)
+
         if 'version_name' in cmd_kwargs:
             del cmd_kwargs['version_name']
 
