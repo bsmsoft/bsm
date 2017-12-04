@@ -39,9 +39,11 @@ class Executor(object):
 
         par['package'] = pkg
         par['action'] = action
-        if pkg in self.__config_release.config['install'] and action in self.__config_release.config['install'][pkg]:
-            par['action_handler'] = self.__config_release.config['install'][pkg][action].get('handler', 'default')
-            par['action_param'] = self.__config_release.config['install'][pkg][action].get('param', {})
+        if action in self.__pkg_mgr.package_info(pkg)['install']:
+            handler = self.__pkg_mgr.package_info(pkg)['install'][action].get('handler')
+            if handler:
+                par['action_handler'] = handler
+                par['action_param'] = self.__pkg_mgr.package_info(pkg)['install'][action].get('param', {})
 
         par['config'] = self.__config
 
@@ -103,6 +105,7 @@ class Executor(object):
 
             if result:
                 _logger.info('Package "{0} - {1}" finished'.format(pkg, action))
+                safe_mkdir(self.__pkg_mgr.package_info(pkg)['dir']['status'])
                 self.__pkg_mgr.save_action_status(pkg, action, result['start'], result['end'])
 
     def report_running(self, vertice):

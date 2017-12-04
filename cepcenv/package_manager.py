@@ -3,6 +3,9 @@ import os
 from cepcenv.config import load_config
 from cepcenv.config import dump_config
 
+from cepcenv.logger import get_logger
+_logger = get_logger()
+
 class PackageNotFoundError(Exception):
     pass
 
@@ -119,6 +122,7 @@ class PackageManager(object):
         if pkg not in self.__pkgs:
             raise PackageNotFoundError('Package {0} not found'.format(pkg))
         if not self.__pkgs[pkg]['category'].get('install'):
+            _logger.warn('Will not save status for: {0}.{1}'.format(pkg, action))
             return
 
         install_status = self.__load_install_status(pkg, action)

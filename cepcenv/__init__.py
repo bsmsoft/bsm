@@ -140,6 +140,13 @@ def ls_package(ctx):
 
 
 @cli.command()
+@click.pass_context
+def pack(ctx):
+    cmd = Cmd('pack')
+    cmd.execute(ctx.obj)
+
+
+@cli.command()
 @click.option('--default', '-d', is_flag=True)
 @click.argument('version', type=str)
 @click.pass_context

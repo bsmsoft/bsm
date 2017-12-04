@@ -44,8 +44,10 @@ class Use(object):
                 for bp in basic_pkgs:
                     self.__dag.add_edge(bp, pkg)
 
-            pkgs_dep = ensure_list(pkg_info.get('category', {}).get('dep', []))
+            pkgs_dep = ensure_list(pkg_info.get('attribute', {}).get('dep', []))
             for pkg_dep in pkgs_dep:
+                if not self.__pkg_mgr.package_info(pkg_dep).get('category', {}).get('set_env'):
+                    continue
                 self.__dag.add_edge(pkg_dep, pkg)
 
     def run(self):

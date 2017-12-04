@@ -162,9 +162,6 @@ class Env(object):
                 path_name = multi_env_path_name[k]
                 if path_name not in self.__pkg_path:
                     self.__pkg_path[path_name] = []
-                _logger.debug('pkg_name: {0}'.format(pkg_name))
-                _logger.debug('path_name: {0}'.format(path_name))
-                _logger.debug('v: {0}'.format(v))
                 self.__pkg_path[path_name].insert(0, v.format(**pkg_dir))
 
     def __set_package_env(self, path_usage, pkg_name, attribute, pkg_dir):

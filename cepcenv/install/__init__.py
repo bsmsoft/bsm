@@ -73,8 +73,10 @@ class Install(object):
                 for bp in basic_pkgs:
                     self.__dag.add_edge((bp, 'post_compile'), (pkg, 'download'))
 
-            pkgs_dep = ensure_list(pkg_info.get('category', {}).get('dep', []))
+            pkgs_dep = ensure_list(pkg_info.get('attribute', {}).get('dep', []))
             for pkg_dep in pkgs_dep:
+                if not self.__pkg_mgr.package_info(pkg_dep).get('category', {}).get('install'):
+                    continue
                 self.__dag.add_edge((pkg_dep, 'post_compile'), (pkg, 'pre_compile'))
 
     def __dag_run(self):
