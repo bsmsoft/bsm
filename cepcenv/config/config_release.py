@@ -1,14 +1,11 @@
 import os
-import tempfile
+import sys
 
-from cepcenv.git import list_remote_tag
-from cepcenv.git import Git
+from cepcenv.loader import load_func
 
 from cepcenv.config import load_config
 from cepcenv.config import ConfigError
-
-from cepcenv.util import safe_cpdir
-from cepcenv.util import safe_rmdir
+from cepcenv.config.config_version import HANDLER_MODULE_NAME
 
 
 class ConfigReleaseError(Exception):
@@ -20,6 +17,8 @@ class ConfigRelease(object):
         self.__config_version = config_version
 
         self.__load_config()
+
+        self.__pre_transform()
 
     def __load_config(self):
         self.__config_release = {}
@@ -35,6 +34,23 @@ class ConfigRelease(object):
             except ConfigError as e:
                 raise ConfigReleaseError('Fail to load config file "{0}": {1}'.format(config_file, e))
 
+    def __pre_transform(self):
+        for transformer in self.__config_release.get('setting', {}).get('pre_transform', []):
+            self.transform(transformer)
+
+    def transform(self, transformer):
+        param = {}
+        param['config_release'] = self.__config_release
+
+        sys.path.insert(0, self.__config_version.handler_dir)
+
+        module_name = HANDLER_MODULE_NAME + '.transform.' + transformer
+        f = load_func(module_name, 'run')
+        result = f(param)
+        if result:
+            self.__config_release = result
+
+        sys.path.remove(self.__config_version.handler_dir)
 
     def get(self, key, default_value=None):
         return self.__config_release.get(key, default_value)

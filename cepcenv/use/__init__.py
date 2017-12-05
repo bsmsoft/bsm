@@ -29,20 +29,9 @@ class Use(object):
                 continue
             self.__dag.add_vertex(pkg)
 
-        basic_pkgs = []
         for pkg, pkg_info in self.__pkg_mgr.package_all().items():
             if not pkg_info.get('category', {}).get('set_env'):
                 continue
-            if pkg_info.get('attribute', {}).get('basic'):
-                basic_pkgs.append(pkg)
-
-        for pkg, pkg_info in self.__pkg_mgr.package_all().items():
-            if not pkg_info.get('category', {}).get('set_env'):
-                continue
-
-            if pkg not in basic_pkgs:
-                for bp in basic_pkgs:
-                    self.__dag.add_edge(bp, pkg)
 
             pkgs_dep = ensure_list(pkg_info.get('attribute', {}).get('dep', []))
             for pkg_dep in pkgs_dep:

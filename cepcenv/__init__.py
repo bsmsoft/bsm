@@ -107,13 +107,14 @@ def platform(ctx, all, title, arch, os, compiler, platform, version):
 @cli.command()
 @click.option('--release-repo', '-t', type=str)
 @click.option('--release-infodir', '-i', type=str)
+@click.option('--source', '-f', default='ihep', type=str)
 @click.argument('version', type=str)
 @click.pass_context
-def install(ctx, release_repo, release_infodir, version):
+def install(ctx, release_repo, release_infodir, source, version):
     cmd = Cmd('install')
     ctx.obj['release_repo'] = release_repo
     ctx.obj['release_infodir'] = release_infodir
-    cmd.execute(ctx.obj, version_name=version)
+    cmd.execute(ctx.obj, source=source, version_name=version)
 
 
 @cli.command()

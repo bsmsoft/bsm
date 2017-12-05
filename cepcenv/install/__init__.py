@@ -22,9 +22,10 @@ _logger = get_logger()
 
 
 class Install(object):
-    def __init__(self, config, config_version):
+    def __init__(self, config, config_version, transformers=[]):
         self.__config = config
         self.__config_version = config_version
+        self.__transformers = transformers
 
     def run(self):
         install_definition(self.__config_version)
@@ -32,6 +33,8 @@ class Install(object):
 
         # Must initialize ConfigRelease after install_definition
         self.__config_release = ConfigRelease(self.__config_version)
+        for transformer in self.__transformers:
+            self.__config_release.transform(transformer)
 
         self.__pkg_mgr = PackageManager(self.__config_version, self.__config_release)
 
@@ -39,6 +42,7 @@ class Install(object):
 
         sys.path.insert(0, self.__config_version.handler_dir)
         self.__dag_run()
+        sys.path.remove(self.__config_version.handler_dir)
 
     def __build_dag(self):
         self.__dag = Dag()
@@ -58,20 +62,9 @@ class Install(object):
             self.__dag.add_edge((pkg, 'pre_compile'), (pkg, 'compile'))
             self.__dag.add_edge((pkg, 'compile'), (pkg, 'post_compile'))
 
-        basic_pkgs = []
         for pkg, pkg_info in self.__pkg_mgr.package_all().items():
             if not pkg_info.get('category', {}).get('install'):
                 continue
-            if pkg_info.get('attribute', {}).get('basic'):
-                basic_pkgs.append(pkg)
-
-        for pkg, pkg_info in self.__pkg_mgr.package_all().items():
-            if not pkg_info.get('category', {}).get('install'):
-                continue
-
-            if pkg not in basic_pkgs:
-                for bp in basic_pkgs:
-                    self.__dag.add_edge((bp, 'post_compile'), (pkg, 'download'))
 
             pkgs_dep = ensure_list(pkg_info.get('attribute', {}).get('dep', []))
             for pkg_dep in pkgs_dep:

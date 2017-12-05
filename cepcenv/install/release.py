@@ -44,6 +44,12 @@ def install_handler(config_version):
 
     safe_cpdir(os.path.join(def_dir, 'handler'), handler_module_dir)
 
-    handler_init = os.path.join(handler_module_dir, '__init__.py')
-    if not os.path.exists(handler_init):
-        open(handler_init, 'w').close()
+    handler_init = []
+    handler_init.append(os.path.join(handler_module_dir, '__init__.py'))
+    for d in os.listdir(handler_module_dir):
+        if os.path.isdir(os.path.join(handler_module_dir, d)):
+            handler_init.append(os.path.join(handler_module_dir, d, '__init__.py'))
+
+    for f in handler_init:
+        if not os.path.exists(f):
+            open(f, 'w').close()

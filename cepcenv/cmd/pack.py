@@ -11,20 +11,19 @@ from cepcenv.util import call
 from cepcenv.logger import get_logger
 _logger = get_logger()
 
-def _download_http(url, dst, version):
-    final_url = url.format(version=version)
-    pos = final_url.rfind('/')
+def _download_http(url, dst):
+    pos = url.rfind('/')
     if pos == -1:
-        raise Exception('Can not find file name from url: {0}'.format(final_url))
-    fn = final_url[pos+1:]
+        raise Exception('Can not find file name from url: {0}'.format(url))
+    fn = url[pos+1:]
 
     if os.path.isfile(os.path.join(dst, fn)):
         return fn
 
-    cmd = ['curl', '-f', '-L', '-s', '-S', '-R', '-O', final_url]
+    cmd = ['curl', '-f', '-L', '-s', '-S', '-R', '-O', url]
     ret, out, err = call(cmd, cwd=dst)
     if ret != 0:
-        raise Exception('Download http Failed: {0}'.format(final_url))
+        raise Exception('Download http Failed: {0}'.format(url))
 
     return fn
 
@@ -35,11 +34,10 @@ def _download_svn(url, dst, pkg, version):
     if os.path.isfile(os.path.join(dst, fn)):
         return fn
 
-    final_url = url.format(version=version)
-    cmd = ['svn', 'export', '--force', final_url, name]
+    cmd = ['svn', 'export', '--force', url, name]
     ret, out, err = call(cmd, cwd=dst)
     if ret != 0:
-        raise Exception('Download svn Failed: {0}'.format(final_url))
+        raise Exception('Download svn Failed: {0}'.format(url))
 
     cmd = ['tar', '-czf', fn, name]
     ret, out, err = call(cmd, cwd=dst)
@@ -70,6 +68,7 @@ class Pack(object):
             url = download.get('param', {}).get('url')
             if not url:
                 continue
+            url = url.format(version=version)
 
             pkg_dir = os.path.join(destination, pkg, version)
             safe_mkdir(pkg_dir)
@@ -77,13 +76,15 @@ class Pack(object):
             _logger.info('Packing {0}...'.format(pkg))
 
             if download.get('handler') == 'http':
-                pkg_file = _download_http(download.get('param', {}).get('url', ''), pkg_dir, version)
+                pkg_file = _download_http(url, pkg_dir)
             elif download.get('handler') == 'svn':
-                pkg_file = _download_svn(download.get('param', {}).get('url', ''), pkg_dir, pkg, version)
+                pkg_file = _download_svn(url, pkg_dir, pkg, version)
 
             with open(os.path.join(pkg_dir, 'md5sum.txt'), 'w') as f:
                 call(['md5sum', pkg_file], cwd=pkg_dir, stdout=f)
             with open(os.path.join(pkg_dir, 'sha1sum.txt'), 'w') as f:
                 call(['sha1sum', pkg_file], cwd=pkg_dir, stdout=f)
+            with open(os.path.join(pkg_dir, 'url.txt'), 'w') as f:
+                f.write(url+'\n')
 
             _logger.info('Package {0} packed'.format(pkg))

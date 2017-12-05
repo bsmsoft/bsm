@@ -39,11 +39,10 @@ class Executor(object):
 
         par['package'] = pkg
         par['action'] = action
-        if action in self.__pkg_mgr.package_info(pkg)['install']:
-            handler = self.__pkg_mgr.package_info(pkg)['install'][action].get('handler')
-            if handler:
-                par['action_handler'] = handler
-                par['action_param'] = self.__pkg_mgr.package_info(pkg)['install'][action].get('param', {})
+        handler = self.__pkg_mgr.package_info(pkg)['install'].get(action, {}).get('handler')
+        if handler:
+            par['action_handler'] = handler
+            par['action_param'] = self.__pkg_mgr.package_info(pkg)['install'][action].get('param', {})
 
         par['config'] = self.__config
 
@@ -78,7 +77,7 @@ class Executor(object):
 
         safe_mkdir(param['pkg_info']['dir']['log'])
 
-        module_name = HANDLER_MODULE_NAME + '.' + param['action_handler']
+        module_name = HANDLER_MODULE_NAME + '.install.' + param['action_handler']
         f = load_func(module_name, 'run')
         result_action = f(param)
 
