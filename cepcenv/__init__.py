@@ -140,10 +140,12 @@ def ls_package(ctx):
 
 
 @cli.command()
+@click.option('--destination', '-d', type=str)
+@click.argument('version', type=str)
 @click.pass_context
-def pack(ctx):
+def pack(ctx, destination, version):
     cmd = Cmd('pack')
-    cmd.execute(ctx.obj)
+    cmd.execute(ctx.obj, destination=destination, version_name=version)
 
 
 @cli.command()
