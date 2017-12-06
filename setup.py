@@ -30,13 +30,13 @@ setup(
     version = version,
     description = 'CEPC software management toolkit',
     long_description = long_description,
-    url = 'https://cepcsoft.ihep.ac.cn/',
+    url = 'https://github.com/cepc/cepcenv',
     author = 'Xianghu Zhao',
     author_email = 'zhaoxh@ihep.ac.cn',
     license = 'MIT',
 
     classifiers = [
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
 
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering :: Physics',
