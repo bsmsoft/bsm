@@ -42,8 +42,8 @@ class Install(object):
             check = Check(self.__config_release)
             missing_pkg, pkg_install_name = check.check()
             if missing_pkg:
-                _logger.warn('Missing package(s) found: {0}'.format(', '.join(missing_pkg)))
-                _logger.info('Suggest installing with: {0}'.format(' '.join(check.install_cmd+pkg_install_name)))
+                _logger.warn('Missing package(s): {0}'.format(', '.join(missing_pkg)))
+                _logger.info('Suggest installing with the following command:\n{0}'.format(' '.join(check.install_cmd+pkg_install_name)))
                 _logger.info('If you would like to skip installing these packages and are confirmed they are available, try to use "cepcenv install --force"')
                 return False
 

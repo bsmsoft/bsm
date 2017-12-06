@@ -59,6 +59,7 @@ def safe_mvdir(src, dst):
 def expand_path(path):
     temp_path = os.path.expanduser(path)
     temp_path = os.path.expandvars(temp_path)
+    temp_path = os.path.abspath(temp_path)
     return os.path.normpath(temp_path)
 
 
