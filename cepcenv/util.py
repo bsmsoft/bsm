@@ -71,8 +71,6 @@ def call(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=None, env=N
             stdout=stdout, stderr=stderr, stdin=subprocess.PIPE,
             cwd=cwd, env=env)
     out, err = p.communicate(input=input)
-#    out = out.decode('utf-8')
-#    err = err.decode('utf-8')
     ret = p.returncode
     return (ret, out, err)
 
@@ -86,7 +84,7 @@ def which(program):
         if is_exe(program):
             return program
     else:
-        for path in os.environ["PATH"].split(os.pathsep):
+        for path in os.environ['PATH'].split(os.pathsep):
             path = path.strip('"')
             exe_file = os.path.join(path, program)
             if is_exe(exe_file):

@@ -7,7 +7,7 @@ class Selector(object):
         self.__release_config = release_config
 
         self.__max_total = 8
-        self.__max_extract = 1
+        self.__max_extract = 4
         self.__max_compile = 1
 
     def select(self, running, idle):

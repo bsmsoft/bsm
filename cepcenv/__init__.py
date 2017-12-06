@@ -10,13 +10,11 @@ CEPCENV_HOME = os.path.dirname(os.path.realpath(__file__))
 @click.group()
 @click.option('--config', '-c', type=str, default='~/.cepcenv.conf', help='Configuration file path. Default to "~/.cepcenv.conf"')
 @click.option('--verbose', '-v', is_flag=True, help='Verbose mode')
-@click.option('--shell', '-s', type=str, default='sh', help='Type of the generated shell script. Default to "sh"')
-@click.option('--arch', '-m', type=str, help='Architecture of the machine. e.g. "x86_64"')
-@click.option('--os', '-o', type=str, help='OS of the machine. e.g. "sl6"')
-#@click.option('--compiler', '-l', type=str, help='Compiler type and version. e.g. "gcc49"')
-@click.option('--platform', '-p', type=str, help='Platform (combination of arch and os). e.g. "x86_64-sl6"')
+@click.option('--shell', type=str, default='sh', help='Type of the generated shell script. Default to "sh"')
+@click.option('--arch', type=str, help='Architecture of the machine. e.g. "x86_64"')
+@click.option('--os', type=str, help='OS of the machine. e.g. "sl6"')
+@click.option('--platform', type=str, help='Platform (combination of arch and os). e.g. "x86_64-sl6"')
 @click.option('--software-root', '-r', type=str)
-#@click.option('--work-root', '-w', type=str)
 @click.pass_context
 def cli(ctx, config, verbose, shell, arch, os, platform, software_root):
     ctx.obj['config_file'] = config
@@ -107,14 +105,15 @@ def platform(ctx, all, title, arch, os, compiler, platform, version):
 @cli.command()
 @click.option('--release-repo', '-t', type=str)
 @click.option('--release-infodir', '-i', type=str)
-@click.option('--source', '-f', default='ihep', type=str)
+@click.option('--source', '-e', default='ihep', type=str)
+@click.option('--force', '-f', is_flag=True)
 @click.argument('version', type=str)
 @click.pass_context
-def install(ctx, release_repo, release_infodir, source, version):
+def install(ctx, release_repo, release_infodir, source, force, version):
     cmd = Cmd('install')
     ctx.obj['release_repo'] = release_repo
     ctx.obj['release_infodir'] = release_infodir
-    cmd.execute(ctx.obj, source=source, version_name=version)
+    cmd.execute(ctx.obj, source=source, force=force, version_name=version)
 
 
 @cli.command()

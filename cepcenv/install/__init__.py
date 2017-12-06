@@ -11,6 +11,8 @@ from cepcenv.install.release import install_handler
 from cepcenv.install.selector import Selector as InstallSelector
 from cepcenv.install.executor import Executor as InstallExecutor
 
+from cepcenv.install.check import Check
+
 from cepcenv.config.config_release import ConfigRelease
 
 from cepcenv.package_manager import PackageManager
@@ -27,7 +29,7 @@ class Install(object):
         self.__config_version = config_version
         self.__transformers = transformers
 
-    def run(self):
+    def run(self, force=False):
         install_definition(self.__config_version)
         install_handler(self.__config_version)
 
@@ -35,6 +37,16 @@ class Install(object):
         self.__config_release = ConfigRelease(self.__config_version)
         for transformer in self.__transformers:
             self.__config_release.transform(transformer)
+
+        if not force:
+            check = Check(self.__config_release)
+            missing_pkg, pkg_install_name = check.check()
+            if missing_pkg:
+                _logger.warn('Missing package(s) found: {0}'.format(', '.join(missing_pkg)))
+                _logger.info('Suggest installing with: {0}'.format(' '.join(check.install_cmd+pkg_install_name)))
+                _logger.info('If you would like to skip installing these packages and are confirmed they are available,')
+                _logger.info('try to use "cepcenv install --force"')
+                return
 
         self.__pkg_mgr = PackageManager(self.__config_version, self.__config_release)
 

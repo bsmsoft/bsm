@@ -2,13 +2,22 @@ import os
 import sys
 
 from cepcenv.loader import load_func
+from cepcenv.loader import LoadError
 
 from cepcenv.config import load_config
 from cepcenv.config import ConfigError
 from cepcenv.config.config_version import HANDLER_MODULE_NAME
 
+from cepcenv.logger import get_logger
+_logger = get_logger()
+
+_AVAILABLE_RELEASE_CONFIG = ('version', 'setting', 'package', 'attribute', 'install', 'check')
+
 
 class ConfigReleaseError(Exception):
+    pass
+
+class ConfigReleaseTransformError(ConfigReleaseError):
     pass
 
 
@@ -27,7 +36,7 @@ class ConfigRelease(object):
         if not os.path.exists(config_dir):
             raise ConfigReleaseError('Release definition directory "{0}" not found'.format(config_dir))
 
-        for k in ['version', 'setting', 'package', 'attribute', 'install']:
+        for k in _AVAILABLE_RELEASE_CONFIG:
             config_file = os.path.join(config_dir, k+'.yml')
             try:
                 self.__config_release[k] = load_config(config_file)
@@ -45,10 +54,17 @@ class ConfigRelease(object):
         sys.path.insert(0, self.__config_version.handler_dir)
 
         module_name = HANDLER_MODULE_NAME + '.transform.' + transformer
-        f = load_func(module_name, 'run')
-        result = f(param)
-        if result:
-            self.__config_release = result
+        try:
+            f = load_func(module_name, 'run')
+            result = f(param)
+            if result:
+                self.__config_release = result
+        except LoadError as e:
+            _logger.error('Load transformer "{0}" error: {1}'.format(transformer, e))
+            raise ConfigReleaseTransformError('Load transformer "{0}" error'.format(transformer))
+        except Exception as e:
+            _logger.error('Transformer "{0}" error: {1}'.format(transformer, e))
+            raise
 
         sys.path.remove(self.__config_version.handler_dir)
 

@@ -259,10 +259,11 @@ class Env(object):
 
         final = self.__initial_env.copy()
         for k, v in env_to_update.items():
-            if v is None and k in final:
-                del final[k]
-            else:
+            if v is not None:
                 final[k] = v
+            else:
+                if k in final:
+                    del final[k]
         return final
 
     def env_change(self):
@@ -272,6 +273,13 @@ class Env(object):
         set_env = {}
         unset_env = []
         for k, v in env_to_update.items():
+            if v is not None:
+                if k not in env_origin or v != env_origin[k]:
+                    set_env[k] = v
+            else:
+                if k in env_origin:
+                    unset_env.append(k)
+
             if v is None and k in env_origin:
                 unset_env.append(k)
             elif k not in env_origin or v != env_origin[k]:
