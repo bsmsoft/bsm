@@ -16,14 +16,20 @@ def _download_http(url, dst):
     if pos == -1:
         raise Exception('Can not find file name from url: {0}'.format(url))
     fn = url[pos+1:]
+    fntmp = fn + '.tmp'
 
     if os.path.isfile(os.path.join(dst, fn)):
         return fn
 
-    cmd = ['curl', '-f', '-L', '-s', '-S', '-R', '-O', url]
+    cmd = ['curl', '-f', '-L', '-s', '-S', '-R', '-o', fntmp, url]
     ret, out, err = call(cmd, cwd=dst)
     if ret != 0:
-        raise Exception('Download http Failed: {0}'.format(url))
+        raise Exception('Download http Failed {0} "{1}": {2}'.format(ret, url, out))
+
+    cmd = ['mv', fntmp, fn]
+    ret, out, err = call(cmd, cwd=dst)
+    if ret != 0:
+        raise Exception('Rename Failed {0} "{1}": {2}'.format(ret, fn, out))
 
     return fn
 
@@ -31,7 +37,7 @@ def _download_svn(url, dst, pkg, version):
     name = '{0}-{1}'.format(pkg, version)
     fn = name + '.tar.gz'
 
-    if os.path.isfile(os.path.join(dst, fn)):
+    if os.path.isfile(os.path.join(dst, fn)) and not os.path.isdir(os.path.join(dst, name)):
         return fn
 
     cmd = ['svn', 'export', '--force', url, name]
