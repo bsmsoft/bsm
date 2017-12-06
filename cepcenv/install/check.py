@@ -36,9 +36,16 @@ def _include_dir(env):
 
 def _library_dir(env):
     lib_dir = [x for x in env.get('LD_LIBRARY_PATH', '').split(os.pathsep) if x]
-    ret, out, err = call(['ldconfig', '-v', '-N'], stderr=subprocess.PIPE, env=env)
-    for m in re.finditer('^(.*?):', out, flags=re.MULTILINE):
-        lib_dir.append(m.group(1))
+
+    try:
+        env_new = env.copy()
+        env_new['PATH'] = env['PATH'] + os.pathsep + os.pathsep.join(['/sbin', '/usr/sbin', '/usr/local/sbin'])
+        ret, out, err = call(['ldconfig', '-v', '-N'], stderr=subprocess.PIPE, env=env)
+        for m in re.finditer('^(.*?):', out, flags=re.MULTILINE):
+            lib_dir.append(m.group(1))
+    except Exception as e:
+        _logger.error('Command ldconfig error: {0}'.format(e))
+        lib_dir += ['/lib', '/lib64', '/usr/lib', '/usr/lib64']
     return lib_dir
 
 

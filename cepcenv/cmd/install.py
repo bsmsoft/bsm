@@ -16,5 +16,7 @@ class Install(object):
         except ConfigReleaseTransformError as e:
             _logger.critical('Install source error: {0}'.format(source))
 
-        _logger.info('Installed successfully for version: {0}'.format(config_version.get('version')))
+        _logger.info('-'*16)
+        _logger.info('Installation finished successfully')
+        _logger.info('Version: {0}'.format(config_version.get('version')))
         _logger.info('Software root: {0}'.format(config_version.get('software_root')))
