@@ -10,13 +10,15 @@ class Install(object):
         if source:
             transformer = [source + '_source']
 
+        result = False
         obj = CepcenvInstall(config, config_version, transformer)
         try:
-            obj.run(force)
+            result = obj.run(force)
         except ConfigReleaseTransformError as e:
             _logger.critical('Install source error: {0}'.format(source))
 
-        _logger.info('-'*16)
-        _logger.info('Installation finished successfully')
-        _logger.info('Version: {0}'.format(config_version.get('version')))
-        _logger.info('Software root: {0}'.format(config_version.get('software_root')))
+        if result:
+            _logger.info('-'*16)
+            _logger.info('Installation finished successfully')
+            _logger.info('Version: {0}'.format(config_version.get('version')))
+            _logger.info('Software root: {0}'.format(config_version.get('software_root')))

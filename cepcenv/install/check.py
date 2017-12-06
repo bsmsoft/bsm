@@ -40,7 +40,7 @@ def _library_dir(env):
     try:
         env_new = env.copy()
         env_new['PATH'] = env['PATH'] + os.pathsep + os.pathsep.join(['/sbin', '/usr/sbin', '/usr/local/sbin'])
-        ret, out, err = call(['ldconfig', '-v', '-N'], stderr=subprocess.PIPE, env=env)
+        ret, out, err = call(['ldconfig', '-v', '-N'], stderr=subprocess.PIPE, env=env_new)
         for m in re.finditer('^(.*?):', out, flags=re.MULTILINE):
             lib_dir.append(m.group(1))
     except Exception as e:

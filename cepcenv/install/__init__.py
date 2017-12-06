@@ -45,7 +45,7 @@ class Install(object):
                 _logger.warn('Missing package(s) found: {0}'.format(', '.join(missing_pkg)))
                 _logger.info('Suggest installing with: {0}'.format(' '.join(check.install_cmd+pkg_install_name)))
                 _logger.info('If you would like to skip installing these packages and are confirmed they are available, try to use "cepcenv install --force"')
-                return
+                return False
 
         self.__pkg_mgr = PackageManager(self.__config_version, self.__config_release)
 
@@ -54,6 +54,8 @@ class Install(object):
         sys.path.insert(0, self.__config_version.handler_dir)
         self.__dag_run()
         sys.path.remove(self.__config_version.handler_dir)
+
+        return True
 
     def __build_dag(self):
         self.__dag = Dag()
