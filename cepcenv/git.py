@@ -7,6 +7,9 @@ from cepcenv.util import safe_rmdir
 class GitError(Exception):
     pass
 
+class GitNotFoundError(GitError):
+    pass
+
 
 def _git_cmd(cwd, cmd, *args):
     full_cmd = ['git', cmd] + list(args)
@@ -16,6 +19,8 @@ def _git_cmd(cwd, cmd, *args):
         out = out.decode()
         err = err.decode()
         ret = p.returncode
+    except OSError as e:
+        raise GitNotFoundError('Can not run git command "{0}": {1}'.format(cmd, e))
     except Exception as e:
         raise GitError('Exception while running git command "{0}": {1}'.format(cmd, e))
 

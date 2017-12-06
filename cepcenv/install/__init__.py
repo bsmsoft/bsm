@@ -44,8 +44,7 @@ class Install(object):
             if missing_pkg:
                 _logger.warn('Missing package(s) found: {0}'.format(', '.join(missing_pkg)))
                 _logger.info('Suggest installing with: {0}'.format(' '.join(check.install_cmd+pkg_install_name)))
-                _logger.info('If you would like to skip installing these packages and are confirmed they are available,')
-                _logger.info('try to use "cepcenv install --force"')
+                _logger.info('If you would like to skip installing these packages and are confirmed they are available, try to use "cepcenv install --force"')
                 return
 
         self.__pkg_mgr = PackageManager(self.__config_version, self.__config_release)
