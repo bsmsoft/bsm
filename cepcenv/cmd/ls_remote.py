@@ -5,7 +5,7 @@ from cepcenv.git import list_remote_tag
 from cepcenv.git import GitNotFoundError
 
 class LsRemote(object):
-    def execute(self, config, config_version, shell):
+    def execute(self, config, config_version):
         try:
             tags = list_remote_tag(config_version.get('release_repo'))
         except GitNotFoundError as e:
@@ -14,8 +14,5 @@ class LsRemote(object):
 
         versions = [tag[1:] for tag in tags if tag.startswith('v')]
 
-        script = ''
         for version in versions:
-            script += shell.echo(version)
-
-        click.echo(script, nl=False)
+            click.echo(version)

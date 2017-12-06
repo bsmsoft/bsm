@@ -10,7 +10,7 @@ from cepcenv.logger import get_logger
 _logger = get_logger()
 
 class Ls(object):
-    def execute(self, config, config_version, shell):
+    def execute(self, config, config_version):
         local_versions = []
 
         try:
@@ -50,10 +50,8 @@ class Ls(object):
         _logger.debug('Default release: {0} {1}'.format(default_root, default_version))
 
 
-        script = ''
-
         software_root = config_version.get('software_root')
-        script += shell.echo('(Release root: "{0}")'.format(software_root))
+        click.echo('(Release root: "{0}")'.format(software_root))
 
         for version in local_versions:
             ver_status = []
@@ -66,6 +64,4 @@ class Ls(object):
             if ver_status:
                 version_line += '  ({0})'.format(', '.join(ver_status))
 
-            script += shell.echo(version_line)
-
-        click.echo(script, nl=False)
+            click.echo(version_line)
