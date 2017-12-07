@@ -37,7 +37,7 @@ main() {
 
   rm -rf pypy*
 
-  download_http "$pypy_url" | tar xj
+  download_http "$pypy_url" | tar -xz
 
   cd pypy*
   pypy_dir_name=$(basename "$(pwd)")
