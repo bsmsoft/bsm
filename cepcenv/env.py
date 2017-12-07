@@ -24,6 +24,9 @@ def _parse_package_info(pkg_info_str):
     pkg_info = {}
     for pkg_info_line in pkg_info_str.split(':'):
         pkg_fraction = pkg_info_line.split('@')
+        if len(pkg_fraction) != 4:
+            continue
+
         pkg_name = pkg_fraction[0]
         pkg_info[pkg_name] = {
             'category': pkg_fraction[1],
@@ -279,9 +282,4 @@ class Env(object):
             else:
                 if k in env_origin:
                     unset_env.append(k)
-
-            if v is None and k in env_origin:
-                unset_env.append(k)
-            elif k not in env_origin or v != env_origin[k]:
-                set_env[k] = v
         return set_env, unset_env

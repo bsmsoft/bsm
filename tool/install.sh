@@ -1,6 +1,6 @@
 #!/bin/sh
 
-pypy_url='http://cepcsoft.ihep.ac.cn/package/cepcenv/pypy/pypy-current-linux_x86_64-portable.tar.bz2'
+pypy_url='http://cepcsoft.ihep.ac.cn/package/cepcenv/pypy/pypy-current-linux_x86_64-portable.tar.gz'
 pypy_origin_url='https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.9-linux_x86_64-portable.tar.bz2'
 
 retry_time=5

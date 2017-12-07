@@ -10,11 +10,11 @@ CEPCENV_HOME = os.path.dirname(os.path.realpath(__file__))
 @click.group()
 @click.option('--config', '-c', type=str, default='~/.cepcenv.conf', help='Configuration file path. Default to "~/.cepcenv.conf"')
 @click.option('--verbose', '-v', is_flag=True, help='Verbose mode')
-@click.option('--shell', type=str, default='sh', help='Type of the generated shell script. Default to "sh"')
+@click.option('--shell', type=str, default='sh', help='Type of the generated shell script')
+@click.option('--software-root', '-r', type=str, help='Local installed software root directory')
 @click.option('--arch', type=str, help='Architecture of the machine. e.g. "x86_64"')
 @click.option('--os', type=str, help='OS of the machine. e.g. "sl6"')
 @click.option('--platform', type=str, help='Platform (combination of arch and os). e.g. "x86_64-sl6"')
-@click.option('--software-root', '-r', type=str)
 @click.pass_context
 def cli(ctx, config, verbose, shell, arch, os, platform, software_root):
     ctx.obj['config_file'] = config
@@ -31,6 +31,7 @@ def cli(ctx, config, verbose, shell, arch, os, platform, software_root):
 @cli.command()
 @click.pass_context
 def version(ctx):
+    '''Display version information'''
     cmd = Cmd('version')
     cmd.execute(ctx.obj)
 
@@ -38,6 +39,7 @@ def version(ctx):
 @cli.command()
 @click.pass_context
 def init(ctx):
+    '''Initialize cepcenv environment'''
     cmd = Cmd('init')
     cmd.execute(ctx.obj)
 
@@ -45,6 +47,7 @@ def init(ctx):
 @cli.command()
 @click.pass_context
 def home(ctx):
+    '''Display home directory of cepcenv'''
     cmd = Cmd('home')
     cmd.execute(ctx.obj)
 
@@ -52,6 +55,7 @@ def home(ctx):
 @cli.command()
 @click.pass_context
 def exit(ctx):
+    '''Exit cepcenv environment completely'''
     cmd = Cmd('exit')
     cmd.execute(ctx.obj)
 
@@ -59,6 +63,7 @@ def exit(ctx):
 @cli.command()
 @click.pass_context
 def upgrade(ctx):
+    '''Upgrade cepcenv to the latest version'''
     cmd = Cmd('upgrade')
     cmd.execute(ctx.obj)
 
@@ -67,6 +72,7 @@ def upgrade(ctx):
 @click.option('--example', '-e', is_flag=True)
 @click.pass_context
 def config(ctx, example):
+    '''Display user configuration'''
     cmd = Cmd('config')
     cmd.execute(ctx.obj, output_example=example)
 
@@ -75,6 +81,7 @@ def config(ctx, example):
 @click.argument('version', type=str, required=False)
 @click.pass_context
 def config_version(ctx, version):
+    '''Display configuration of specified release version'''
     cmd = Cmd('config_version')
     cmd.execute(ctx.obj, version_name=version)
 
@@ -83,6 +90,7 @@ def config_version(ctx, version):
 @click.argument('version', type=str)
 @click.pass_context
 def config_release(ctx, version):
+    '''Display release configuration of specified release version'''
     cmd = Cmd('config_release')
     cmd.execute(ctx.obj, version_name=version)
 
@@ -97,6 +105,7 @@ def config_release(ctx, version):
 @click.argument('version', type=str, required=False)
 @click.pass_context
 def platform(ctx, all, title, arch, os, compiler, platform, version):
+    '''Display platform'''
     cmd = Cmd('platform')
     cmd.execute(ctx.obj, output_all=all, output_title=title, output_arch=arch, output_os=os, output_compiler=compiler,
             output_platform=platform, version_name=version)
@@ -105,11 +114,12 @@ def platform(ctx, all, title, arch, os, compiler, platform, version):
 @cli.command()
 @click.option('--release-repo', '-t', type=str)
 @click.option('--release-infodir', '-i', type=str)
-@click.option('--source', '-e', default='ihep', type=str)
+@click.option('--source', '-e', type=str)
 @click.option('--force', '-f', is_flag=True)
 @click.argument('version', type=str)
 @click.pass_context
 def install(ctx, release_repo, release_infodir, source, force, version):
+    '''Install specified release version'''
     cmd = Cmd('install')
     ctx.obj['release_repo'] = release_repo
     ctx.obj['release_infodir'] = release_infodir
@@ -119,6 +129,7 @@ def install(ctx, release_repo, release_infodir, source, force, version):
 @cli.command()
 @click.pass_context
 def ls(ctx):
+    '''List installed release versions'''
     cmd = Cmd('ls')
     cmd.execute(ctx.obj)
 
@@ -127,6 +138,7 @@ def ls(ctx):
 @click.option('--release-repo', '-t', type=str)
 @click.pass_context
 def ls_remote(ctx, release_repo):
+    '''List all available release versions'''
     cmd = Cmd('ls_remote')
     ctx.obj['release_repo'] = release_repo
     cmd.execute(ctx.obj)
@@ -135,6 +147,7 @@ def ls_remote(ctx, release_repo):
 @cli.command(name='ls-package')
 @click.pass_context
 def ls_package(ctx):
+    '''List all packages of the current release versions'''
     cmd = Cmd('ls_package')
     cmd.execute(ctx.obj)
 
@@ -144,6 +157,7 @@ def ls_package(ctx):
 @click.argument('version', type=str)
 @click.pass_context
 def pack(ctx, destination, version):
+    '''Create tar packages for the specified release version'''
     cmd = Cmd('pack')
     cmd.execute(ctx.obj, destination=destination, version_name=version)
 
@@ -153,6 +167,7 @@ def pack(ctx, destination, version):
 @click.argument('version', type=str)
 @click.pass_context
 def use(ctx, default, version):
+    '''Switch environment to given release version'''
     cmd = Cmd('use')
     cmd.execute(ctx.obj, default=default, version_name=version)
 
@@ -160,6 +175,7 @@ def use(ctx, default, version):
 @cli.command()
 @click.pass_context
 def clean(ctx):
+    '''Clean the current release version environment'''
     cmd = Cmd('clean')
     cmd.execute(ctx.obj)
 

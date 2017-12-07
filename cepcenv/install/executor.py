@@ -103,7 +103,7 @@ class Executor(object):
                 self.__env.set_package(path_usage, pkg_info)
 
             if result:
-                _logger.info('Package "{0} - {1}" finished'.format(pkg, action))
+                _logger.info(' > {0} {1} finished'.format(pkg, action))
                 safe_mkdir(self.__pkg_mgr.package_info(pkg)['dir']['status'])
                 self.__pkg_mgr.save_action_status(pkg, action, result['start'], result['end'])
 
