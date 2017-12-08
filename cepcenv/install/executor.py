@@ -46,6 +46,8 @@ class Executor(object):
 
         par['config'] = self.__config
 
+        par['def_dir'] = self.__config_version.def_dir
+
         par['pkg_info'] = self.__pkg_mgr.package_info(pkg)
 
         par['pkg_dir_list'] = self.__pkg_mgr.package_dir_list()

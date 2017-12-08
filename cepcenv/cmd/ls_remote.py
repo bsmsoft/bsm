@@ -4,6 +4,9 @@ import click
 from cepcenv.git import list_remote_tag
 from cepcenv.git import GitNotFoundError
 
+from cepcenv.logger import get_logger
+_logger = get_logger()
+
 class LsRemote(object):
     def execute(self, config, config_version):
         try:

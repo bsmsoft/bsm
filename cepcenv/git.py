@@ -58,6 +58,10 @@ class Git(object):
     def checkout(self, branch):
         out = _git_cmd(self.__repo_path, 'checkout', branch)
 
+    def clone_and_checkout(self, remote_path, branch):
+        out = _git_cmd(None, 'clone', remote_path, self.__repo_path)
+        out = _git_cmd(self.__repo_path, 'checkout', branch)
+
     def clear_git_info(self):
         safe_rmdir(os.path.join(self.__repo_path, '.git'))
 

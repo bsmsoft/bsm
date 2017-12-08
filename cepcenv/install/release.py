@@ -25,8 +25,7 @@ def _install_from_git_repo(src_repo, release_version, dst_dir):
     git = Git(dst_dir)
     git.clone(src_repo)
     git.checkout(release_tag)
-
-    safe_rmdir(os.path.join(dst_dir, '.git'))
+    git.clear_git_info()
 
 
 def install_definition(config_version):
