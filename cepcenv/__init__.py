@@ -114,7 +114,7 @@ def platform(ctx, all, title, arch, os, compiler, platform, version):
 @cli.command()
 @click.option('--release-repo', '-t', type=str)
 @click.option('--release-infodir', '-i', type=str)
-@click.option('--source', '-e', type=str)
+@click.option('--source', '-s', type=str)
 @click.option('--force', '-f', is_flag=True)
 @click.argument('version', type=str)
 @click.pass_context
