@@ -17,6 +17,7 @@ class LsRemote(object):
             sys.exit(1)
 
         versions = [tag[1:] for tag in tags if tag.startswith('v')]
+        versions.sort()
 
         for version in versions:
             click.echo(version)

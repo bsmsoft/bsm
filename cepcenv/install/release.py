@@ -3,7 +3,6 @@ import os
 from cepcenv.util import safe_cpdir
 from cepcenv.util import safe_rmdir
 
-from cepcenv.git import list_remote_tag
 from cepcenv.git import Git
 
 
@@ -16,8 +15,9 @@ def _install_from_dir(src_dir, dst_dir):
 
 
 def _install_from_git_repo(src_repo, release_version, dst_dir):
+    git = Git()
     release_tag = 'v'+release_version
-    if release_tag not in list_remote_tag(src_repo):
+    if release_tag not in git.ls_remote_tags(src_repo):
         raise ReleaseVersionNotExistError('Release version "{0}" does not exist in repo {1}'.format(release_version, src_repo))
 
     safe_rmdir(dst_dir)
