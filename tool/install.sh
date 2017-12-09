@@ -89,14 +89,15 @@ main() {
   rm -f setup.sh setup.csh
 
   if install_gitmini; then
-    echo "export _CEPCENV_GITTEMP='${install_full_dir}/gitmini/gitmini'\n" >> setup.sh
-    echo "setenv _CEPCENV_GITTEMP '${install_full_dir}/gitmini/gitmini'\n" >> setup.csh
+    echo -e "export _CEPCENV_GITTEMP='${install_full_dir}/gitmini/gitmini'\n" >> setup.sh
+    echo -e "setenv _CEPCENV_GITTEMP '${install_full_dir}/gitmini/gitmini'\n" >> setup.csh
   fi
 
   echo "eval \"\$('${install_full_dir}/pypy/bin/cepcenv_cmd' --shell sh init)\"" >> setup.sh
   echo "eval \"\`'${install_full_dir}/pypy/bin/cepcenv_cmd' --shell csh init\`\"" >> setup.csh
 
-  echo "CEPCEnv installed successfully in \"$install_dir\""
+  echo '--------------------------------------------------------------------------------'
+  echo "CEPCEnv installed successfully in \"$install_full_dir\""
 }
 
 main "$@"
