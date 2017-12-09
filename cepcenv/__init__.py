@@ -8,9 +8,9 @@ CEPCENV_HOME = os.path.dirname(os.path.realpath(__file__))
 
 
 @click.group()
-@click.option('--config', '-c', type=str, default='~/.cepcenv.conf', help='Configuration file path. Default to "~/.cepcenv.conf"')
 @click.option('--verbose', '-v', is_flag=True, help='Verbose mode')
-@click.option('--shell', type=str, default='sh', help='Type of the generated shell script')
+@click.option('--config', '-c', type=str, default='~/.cepcenv.conf', help='Configuration file path. Default to "~/.cepcenv.conf"')
+@click.option('--shell', '-l', type=str, default='sh', help='Type of the generated shell script')
 @click.option('--software-root', '-r', type=str, help='Local installed software root directory')
 @click.option('--arch', type=str, help='Architecture of the machine. e.g. "x86_64"')
 @click.option('--os', type=str, help='OS of the machine. e.g. "sl6"')

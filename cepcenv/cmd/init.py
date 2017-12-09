@@ -1,6 +1,7 @@
 import click
 
 from cepcenv.use import Use as CepcenvUse
+from cepcenv.env import Env
 
 from cepcenv.config.config_version import ConfigVersion
 from cepcenv.config.config_release import ConfigRelease
@@ -25,11 +26,15 @@ class Init(object):
 
                 obj = CepcenvUse(config, config_version, config_release)
                 set_env, unset_env = obj.run()
+            else:
+                env = Env()
+                env.clean()
+                set_env, unset_env = env.env_change()
 
-                for e in unset_env:
-                    script += shell.unset_env(e)
-                for k, v in set_env.items():
-                    script += shell.set_env(k, v)
+            for e in unset_env:
+                script += shell.unset_env(e)
+            for k, v in set_env.items():
+                script += shell.set_env(k, v)
         except Exception as e:
             _logger.warn('Cat not load default version: {0}'.format(e))
 

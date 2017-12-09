@@ -6,10 +6,10 @@ class Clean(object):
     def execute(self, config, config_version, shell):
         env = Env()
         env.clean()
-        set_env, unset = env.env_change()
+        set_env, unset_env = env.env_change()
 
         script = ''
-        for e in unset:
+        for e in unset_env:
             script += shell.unset_env(e)
         for k, v in set_env.items():
             script += shell.set_env(k, v)
