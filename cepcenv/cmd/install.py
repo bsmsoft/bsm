@@ -66,6 +66,7 @@ class Install(object):
             _logger.critical('Install source error: {0}'.format(source))
             raise
 
+        click.echo('')
         click.echo('Installation finished successfully')
         click.echo('Version: {0}'.format(config_version.get('version')))
         click.echo('Software root: {0}'.format(config_version.get('software_root')))

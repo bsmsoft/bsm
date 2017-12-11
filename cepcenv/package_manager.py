@@ -86,9 +86,10 @@ class PackageManager(object):
 
             pkg_dir['root'] = package_root
 
-            pkg_dir['status'] = os.path.join(package_root, '_cepcenv', version, 'status')
-            pkg_dir['log'] = os.path.join(package_root, '_cepcenv', version, 'log')
-            pkg_dir['download'] = os.path.join(package_root, '_cepcenv', version, 'download')
+            package_work_root = os.path.join(package_root, '.cepcenv', version)
+            pkg_dir['status'] = os.path.join(package_work_root, 'status')
+            pkg_dir['log'] = os.path.join(package_work_root, 'log')
+            pkg_dir['download'] = os.path.join(package_work_root, 'download')
 
             pkg_dir['source'] = os.path.join(package_root, version, location['source']).rstrip(os.sep)
             pkg_dir['build'] = os.path.join(package_root, version, location['build']).rstrip(os.sep)

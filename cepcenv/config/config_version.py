@@ -138,7 +138,7 @@ class ConfigVersion(object):
     def cepcenv_dir(self):
         if 'software_root' not in self.__config_version:
             raise ConfigVersionError('"software_root" not specified in configuration')
-        return os.path.join(self.__config_version['software_root'], '_cepcenv')
+        return os.path.join(self.__config_version['software_root'], '.cepcenv')
 
     @property
     def main_dir(self):
