@@ -29,6 +29,8 @@ class ConfigRelease(object):
 
         self.__pre_transform()
 
+        self.__check_version()
+
     def __load_config(self):
         self.__config_release = {}
 
@@ -46,6 +48,12 @@ class ConfigRelease(object):
     def __pre_transform(self):
         for transformer in self.__config_release.get('setting', {}).get('pre_transform', []):
             self.transform(transformer)
+
+    def __check_version(self):
+        version = self.__config_version.get('version')
+        version_in_release = self.__config_release.get('version')
+        if version != version_in_release:
+            _logger.warn('Version inconsistency found. Request {0} but receive {1}'.format(version, version_in_release))
 
     def transform(self, transformer):
         param = {}

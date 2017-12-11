@@ -25,7 +25,7 @@ def _output_preview_lines(pkg_list):
             version_max = ver_len
 
     for pkg_single in pkg_list:
-        click.echo('{0:{pmax}} {1:{vmax}} : {2}'.format(*pkg_single, pmax=pkg_max, vmax=version_max))
+        click.echo(' - {0:{pmax}} {1:{vmax}} : {2}'.format(*pkg_single, pmax=pkg_max, vmax=version_max))
 
 class Install(object):
     def execute(self, config, config_version, source, force, yes):
