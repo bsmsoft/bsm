@@ -87,6 +87,7 @@ class Executor(object):
             _logger.critical('"{0} - {1}" execution error. Find log in "{2}"'.format(pkg, action, param['log_file']))
             raise InstallExecutorError('"{0} - {1}" execution error'.format(pkg, action))
 
+        result['log_file'] = param['log_file']
         result['end'] = datetime.datetime.utcnow()
 
         return result

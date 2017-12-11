@@ -1,7 +1,11 @@
 import os
 import click
 
+from cepcenv.install import Install
 from cepcenv.package_manager import PackageManager
+
+from cepcenv.config.config_release import ConfigRelease
+from cepcenv.config.config_release import ConfigReleaseError
 
 from cepcenv.util import expand_path
 from cepcenv.util import safe_mkdir
@@ -55,12 +59,22 @@ def _download_svn(url, dst, pkg, version):
     return fn
 
 class Pack(object):
-    def execute(self, config, config_version, config_release, destination):
+    def execute(self, config, config_version, destination):
+        release_version = config_version.get('version')
+
+        try:
+            config_release = ConfigRelease(config_version)
+        except ConfigReleaseError:
+            _logger.debug('Install release definition: {0}'.format(release_version))
+            install = Install(config, config_version)
+            config_release = install.config_release()
+
         self.__pkg_mgr = PackageManager(config_version, config_release)
 
         if not destination:
             destination = os.getcwd()
         destination = expand_path(destination)
+        pack_dir = os.path.join(destination, 'pack_'+release_version)
 
         for pkg, pkg_info in self.__pkg_mgr.package_all().items():
             version = pkg_info.get('package', {}).get('version')
@@ -76,7 +90,7 @@ class Pack(object):
                 continue
             url = url.format(version=version)
 
-            pkg_dir = os.path.join(destination, pkg, version)
+            pkg_dir = os.path.join(pack_dir, pkg, version)
             safe_mkdir(pkg_dir)
 
             _logger.info('Packing {0}...'.format(pkg))
@@ -94,3 +108,5 @@ class Pack(object):
                 f.write(url+'\n')
 
             _logger.info('Package {0} packed'.format(pkg))
+
+        _logger.info('All packages in version {0} packed in {1}'.format(release_version, pack_dir))

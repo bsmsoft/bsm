@@ -15,14 +15,14 @@ def _install_from_dir(src_dir, dst_dir):
 
 
 def _install_from_git_repo(src_repo, release_version, dst_dir):
-    git = Git()
+    git = Git(dst_dir)
+
     release_tag = 'v'+release_version
     if release_tag not in git.ls_remote_tags(src_repo):
         raise ReleaseVersionNotExistError('Release version "{0}" does not exist in repo {1}'.format(release_version, src_repo))
 
     safe_rmdir(dst_dir)
 
-    git = Git(dst_dir)
     git.clone(src_repo)
     git.checkout(release_tag)
     git.clear_git_info()

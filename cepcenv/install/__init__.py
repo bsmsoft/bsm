@@ -27,35 +27,42 @@ class Install(object):
     def __init__(self, config, config_version, transformers=[]):
         self.__config = config
         self.__config_version = config_version
-        self.__transformers = transformers
 
-    def run(self, force=False):
         install_definition(self.__config_version)
         install_handler(self.__config_version)
 
         # Must initialize ConfigRelease after install_definition
         self.__config_release = ConfigRelease(self.__config_version)
-        for transformer in self.__transformers:
+        for transformer in transformers:
             self.__config_release.transform(transformer)
 
-        if not force:
-            check = Check(self.__config_release)
-            missing_pkg, pkg_install_name = check.check()
-            if missing_pkg:
-                _logger.warn('Missing package(s): {0}'.format(', '.join(missing_pkg)))
-                _logger.info('Suggest installing with the following command:\n{0}'.format(' '.join(check.install_cmd+pkg_install_name)))
-                _logger.info('If you would like to skip installing these packages and are confirmed they are available, try to use "cepcenv install --force"')
-                return False
-
         self.__pkg_mgr = PackageManager(self.__config_version, self.__config_release)
+
+    def config_release(self):
+        return self.__config_release
+
+    def check(self):
+        check = Check(self.__config_release)
+        missing_pkg, pkg_install_name = check.check()
+        return missing_pkg, check.install_cmd, pkg_install_name
+
+    def package_list(self):
+        pkg_list = []
+        for pkg, pkg_info in self.__pkg_mgr.package_all().items():
+            if not pkg_info.get('category', {}).get('install'):
+                continue
+
+            pkg_version = pkg_info['package'].get('version', 'unknown')
+            pkg_list.append((pkg, pkg_version, pkg_info['dir']['root']))
+        return pkg_list
+
+    def install_packages(self):
 
         self.__build_dag()
 
         sys.path.insert(0, self.__config_version.handler_dir)
         self.__dag_run()
         sys.path.remove(self.__config_version.handler_dir)
-
-        return True
 
     def __build_dag(self):
         self.__dag = Dag()
