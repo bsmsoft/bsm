@@ -117,14 +117,16 @@ def platform(ctx, all, title, arch, os, compiler, platform, version):
 @click.option('--source', '-s', type=str)
 @click.option('--force', '-f', is_flag=True)
 @click.option('--yes', '-y', is_flag=True)
+@click.option('--no-clean', is_flag=True)
+@click.option('--clean-only', is_flag=True)
 @click.argument('version', type=str)
 @click.pass_context
-def install(ctx, release_repo, release_infodir, source, force, yes, version):
+def install(ctx, release_repo, release_infodir, source, force, yes, no_clean, clean_only, version):
     '''Install specified release version'''
     cmd = Cmd('install')
     ctx.obj['release_repo'] = release_repo
     ctx.obj['release_infodir'] = release_infodir
-    cmd.execute(ctx.obj, source=source, force=force, yes=yes, version_name=version)
+    cmd.execute(ctx.obj, source=source, force=force, yes=yes, no_clean=no_clean, clean_only=clean_only, version_name=version)
 
 
 @cli.command()

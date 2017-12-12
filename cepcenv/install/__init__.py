@@ -24,15 +24,18 @@ _logger = get_logger()
 
 
 class Install(object):
-    def __init__(self, config, config_version, transformers=[]):
+    def __init__(self, config, config_version, config_release=None, transformers=[]):
         self.__config = config
         self.__config_version = config_version
+        self.__config_release = config_release
 
-        install_definition(self.__config_version)
-        install_handler(self.__config_version)
+        if self.__config_release is None:
+            install_definition(self.__config_version)
+            install_handler(self.__config_version)
 
-        # Must initialize ConfigRelease after install_definition
-        self.__config_release = ConfigRelease(self.__config_version)
+            # Must initialize ConfigRelease after install_definition
+            self.__config_release = ConfigRelease(self.__config_version)
+
         for transformer in transformers:
             self.__config_release.transform(transformer)
 
@@ -76,11 +79,13 @@ class Install(object):
             self.__dag.add_vertex((pkg, 'pre_compile'))
             self.__dag.add_vertex((pkg, 'compile'))
             self.__dag.add_vertex((pkg, 'post_compile'))
+            self.__dag.add_vertex((pkg, 'clean'))
 
             self.__dag.add_edge((pkg, 'download'), (pkg, 'extract'))
             self.__dag.add_edge((pkg, 'extract'), (pkg, 'pre_compile'))
             self.__dag.add_edge((pkg, 'pre_compile'), (pkg, 'compile'))
             self.__dag.add_edge((pkg, 'compile'), (pkg, 'post_compile'))
+            self.__dag.add_edge((pkg, 'post_compile'), (pkg, 'clean'))
 
         for pkg, pkg_info in self.__pkg_mgr.package_all().items():
             if not pkg_info.get('category', {}).get('install'):
