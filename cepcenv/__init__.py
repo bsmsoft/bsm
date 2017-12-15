@@ -69,7 +69,7 @@ def upgrade(ctx):
 
 
 @cli.command()
-@click.option('--example', '-e', is_flag=True)
+@click.option('--example', '-e', is_flag=True, help='Print the configuration example')
 @click.pass_context
 def config(ctx, example):
     '''Display user configuration'''
@@ -112,13 +112,13 @@ def platform(ctx, all, title, arch, os, compiler, platform, version):
 
 
 @cli.command()
-@click.option('--release-repo', '-t', type=str)
-@click.option('--release-infodir', '-i', type=str)
-@click.option('--source', '-s', type=str)
-@click.option('--force', '-f', is_flag=True)
-@click.option('--yes', '-y', is_flag=True)
-@click.option('--no-clean', is_flag=True)
-@click.option('--clean-only', is_flag=True)
+@click.option('--release-repo', '-t', type=str, help='Repository for retrieving release information')
+@click.option('--release-infodir', '-i', type=str, help='Directory for retrieving release information')
+@click.option('--source', '-s', type=str, help='Packages download source')
+@click.option('--force', '-f', is_flag=True, help='Skip checking system requirements')
+@click.option('--yes', '-y', is_flag=True, help='Install without confirmation')
+@click.option('--no-clean', is_flag=True, help='Do not clean intermediate files after installation')
+@click.option('--clean-only', is_flag=True, help='Clean intermediate files without installation')
 @click.argument('version', type=str)
 @click.pass_context
 def install(ctx, release_repo, release_infodir, source, force, yes, no_clean, clean_only, version):
@@ -138,7 +138,7 @@ def ls(ctx):
 
 
 @cli.command(name='ls-remote')
-@click.option('--release-repo', '-t', type=str)
+@click.option('--release-repo', '-t', type=str, help='Repository with release information')
 @click.pass_context
 def ls_remote(ctx, release_repo):
     '''List all available release versions'''
@@ -156,7 +156,7 @@ def ls_package(ctx):
 
 
 @cli.command()
-@click.option('--destination', '-d', type=str)
+@click.option('--destination', '-d', type=str, help='Directory for packing output')
 @click.argument('version', type=str)
 @click.pass_context
 def pack(ctx, destination, version):
@@ -166,7 +166,7 @@ def pack(ctx, destination, version):
 
 
 @cli.command()
-@click.option('--default', '-d', is_flag=True)
+@click.option('--default', '-d', is_flag=True, help='Also set the version as default')
 @click.argument('version', type=str)
 @click.pass_context
 def use(ctx, default, version):
