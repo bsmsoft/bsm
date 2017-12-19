@@ -9,11 +9,11 @@ Install cepcenv
 
 Install ``cepcenv`` with ``curl`` or ``wget`` ::
 
-    \curl -sSL https://github.com/cepc/cepcenv/raw/master/tool/install.sh | sh -s [CEPCENV_DIR]
+    \curl -sSL https://raw.githubusercontent.com/cepc/cepcenv/master/tool/install.sh | sh -s [CEPCENV_DIR]
 
 or ::
 
-    \wget -qO- https://github.com/cepc/cepcenv/raw/master/tool/install.sh | sh -s [CEPCENV_DIR]
+    \wget -qO- https://raw.githubusercontent.com/cepc/cepcenv/master/tool/install.sh | sh -s [CEPCENV_DIR]
 
 If ``CEPCENV_DIR`` is omitted, ``cepcenv`` will be installed in the current directory.
 
