@@ -62,6 +62,7 @@ setup(
         'paradag',
         'click>=6.0,<7.0',
         'PyYAML>=3.0,<4.0',
+        'distro',
     ],
     include_package_data = True,
     tests_require = [

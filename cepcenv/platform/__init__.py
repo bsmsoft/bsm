@@ -1,5 +1,6 @@
 import platform
 import re
+import distro
 
 from cepcenv.util import check_output
 
@@ -8,7 +9,27 @@ def _detect_arch():
     return platform.machine()
 
 def _detect_os():
-    return 'sl6'
+    id = distro.id()
+    name = distro.name()
+    major = distro.major_version()
+    minor = distro.minor_version()
+    if name == 'Scientific Linux':
+        return 'sl'+major
+    if name == 'Red Hat Enterprise Linux Server':
+        return 'rhel'+major
+    if id == 'centos':
+        return 'centos'+major
+    if id == 'arch':
+        return 'arch'
+    if id == 'ubuntu':
+        return 'ubuntu'+major+minor
+    if id == 'fedora':
+        return 'fedora'+major
+    if id == 'gentoo':
+        return 'gentoo'+major+'.'+minor
+    if name.startswith('openSUSE'):
+        return 'opensuse'+major
+    return 'unknown'
 
 def _detect_compiler(compiler='gcc'):
     try:
