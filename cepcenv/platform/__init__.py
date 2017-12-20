@@ -19,14 +19,16 @@ def _detect_os():
         return 'rhel'+major
     if id == 'centos':
         return 'centos'+major
+    if id == 'debian':
+        return 'debian'+major
     if id == 'arch':
         return 'arch'
+    if id == 'gentoo':
+        return 'gentoo'+major+'.'+minor
     if id == 'ubuntu':
         return 'ubuntu'+major+minor
     if id == 'fedora':
         return 'fedora'+major
-    if id == 'gentoo':
-        return 'gentoo'+major+'.'+minor
     if name.startswith('openSUSE'):
         return 'opensuse'+major
     return 'unknown'
