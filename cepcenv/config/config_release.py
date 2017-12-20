@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 
 from cepcenv.loader import load_func
 from cepcenv.loader import LoadError
@@ -11,6 +12,9 @@ from cepcenv.config.config_version import HANDLER_MODULE_NAME
 from cepcenv.logger import get_logger
 _logger = get_logger()
 
+from cepcenv import CEPCENV_VERSION
+
+
 _AVAILABLE_RELEASE_CONFIG = ('version', 'setting', 'package', 'attribute', 'install', 'check')
 
 
@@ -19,6 +23,24 @@ class ConfigReleaseError(Exception):
 
 class ConfigReleaseTransformError(ConfigReleaseError):
     pass
+
+
+def _compare_version(ver1, ver2):
+    for i in range(3):
+        if len(ver1) <= i:
+            c1 = -1
+        else:
+            c1 = ver1[i]
+
+        if len(ver2) <= i:
+            c2 = -1
+        else:
+            c2 = ver2[i]
+
+        if c1 != c2:
+            return c1 - c2
+
+    return 0
 
 
 class ConfigRelease(object):
@@ -30,6 +52,8 @@ class ConfigRelease(object):
         self.__pre_transform()
 
         self.__check_version()
+
+        self.__check_cepcenv_version()
 
     def __load_config(self):
         self.__config_release = {}
@@ -48,6 +72,26 @@ class ConfigRelease(object):
     def __pre_transform(self):
         for transformer in self.__config_release.get('setting', {}).get('pre_transform', []):
             self.transform(transformer)
+
+    def __check_cepcenv_version(self):
+        m = re.match('(\d+)\.(\d+)\.(\d+)', CEPCENV_VERSION)
+        if not m:
+            raise ConfigReleaseError('Can not verify cepcenv version: {0}'.format(CEPCENV_VERSION))
+        major, minor, patch = m.groups()
+        cepcenv_ver_frag = [int(major), int(minor), int(patch)]
+
+        version_require = self.__config_release.get('setting', {}).get('cepcenv', {}).get('require', {})
+        _logger.debug('Version require: {0}'.format(version_require))
+        for comp, ver in version_require.items():
+            ver_frag = [int(i) for i in ver.split('.')]
+            result = _compare_version(cepcenv_ver_frag, ver_frag)
+            if comp == '<' and result >= 0 or \
+                    comp == '<=' and result > 0 or \
+                    comp == '=' and result != 0 or \
+                    comp == '>=' and result < 0 or \
+                    comp == '>' and result <= 0:
+                raise ConfigReleaseError('CEPCEnv version does not follow: {0} {1} {2}'.format(CEPCENV_VERSION, comp, ver))
+
 
     def __check_version(self):
         version = self.__config_version.get('version')

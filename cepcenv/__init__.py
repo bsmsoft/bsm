@@ -1,10 +1,14 @@
 import os
 import click
 
-from cepcenv.cmd import Cmd
-
 
 CEPCENV_HOME = os.path.dirname(os.path.realpath(__file__))
+
+with open(os.path.join(CEPCENV_HOME, 'CEPCENV_VERSION'), 'r') as f:
+    CEPCENV_VERSION = f.read().strip()
+
+
+from cepcenv.cmd import Cmd
 
 
 @click.group()
