@@ -13,9 +13,9 @@ def _detect_os():
     name = distro.name()
     major = distro.major_version()
     minor = distro.minor_version()
-    if name == 'Scientific Linux':
+    if name.startswith('Scientific'):
         return 'sl'+major
-    if name == 'Red Hat Enterprise Linux Server':
+    if name.startswith('Red Hat Enterprise'):
         return 'rhel'+major
     if id == 'centos':
         return 'centos'+major

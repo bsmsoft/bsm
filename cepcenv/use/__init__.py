@@ -56,7 +56,8 @@ class Use(object):
 
         env_change = env.env_change()
 
-        _logger.info('From software root "{0}"'.format(software_root))
-        _logger.info('Using version {0}'.format(release_version))
+        _logger.info('From software root: {0}'.format(software_root))
+        _logger.info('Using version: {0}'.format(release_version))
+        _logger.info('Current platform: {0}'.format(self.__config_version.config['platform']))
 
         return env_change

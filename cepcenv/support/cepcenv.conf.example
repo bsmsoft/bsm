@@ -1,12 +1,16 @@
+# vim: set syntax=yaml:
+
 #verbose: false
 
 #release_repo: https://github.com/cepc/cepc-release
 
-#software_root: ~/cepcsoft
+#software_root: /cvmfs/cepc.ihep.ac.cn/software/cepcsoft
+
 #work_root: ~/mywork
 
-#make_opt: -j4
-
+# Uncomment the following lines to define custom version names
+# Each version name could define its own
+# "version", "software_root", "work_root", "release_repo", etc.
 #versions:
 #  '312':
 #    version: 3.1.2
