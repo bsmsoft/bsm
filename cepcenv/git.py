@@ -101,7 +101,8 @@ class Git(object):
         out = self.__run_cmd('checkout', branch=branch)
 
     def clear_git_info(self):
-        safe_rmdir(os.path.join(self.__path, '.git'))
+        if self.__path is not None:
+            safe_rmdir(os.path.join(self.__path, '.git'))
 
 
     def __parse_ref_list(self, out):

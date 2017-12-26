@@ -33,7 +33,7 @@ class PackageManager(object):
             self.__categories[ctg] = {}
             self.__categories[ctg]['pre_check'] = cfg.get('pre_check', False)
             self.__categories[ctg]['install'] = cfg.get('install', False)
-            self.__categories[ctg]['set_env'] = cfg.get('set_env', False)
+            self.__categories[ctg]['auto_env'] = cfg.get('auto_env', False)
             self.__categories[ctg]['auto_package'] = cfg.get('auto_package', False)
             self.__categories[ctg]['root'] = cfg.get('root')
 
@@ -62,7 +62,7 @@ class PackageManager(object):
         self.__pkg_dir_list = {}
         install_path_name = self.__config_release.get('setting', {}).get('path_usage', {}).get('install', {})
         for pkg, pkg_info in self.__pkgs.items():
-            if not pkg_info['category'].get('set_env'):
+            if not pkg_info['category'].get('auto_env'):
                 continue
 
             for k, v in pkg_info['attribute'].get('path', {}).items():

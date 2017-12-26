@@ -25,17 +25,17 @@ class Use(object):
         self.__dag = Dag()
 
         for pkg, pkg_info in self.__pkg_mgr.package_all().items():
-            if not pkg_info.get('category', {}).get('set_env'):
+            if not pkg_info.get('category', {}).get('auto_env'):
                 continue
             self.__dag.add_vertex(pkg)
 
         for pkg, pkg_info in self.__pkg_mgr.package_all().items():
-            if not pkg_info.get('category', {}).get('set_env'):
+            if not pkg_info.get('category', {}).get('auto_env'):
                 continue
 
             pkgs_dep = ensure_list(pkg_info.get('attribute', {}).get('dep', []))
             for pkg_dep in pkgs_dep:
-                if not self.__pkg_mgr.package_info(pkg_dep).get('category', {}).get('set_env'):
+                if not self.__pkg_mgr.package_info(pkg_dep).get('category', {}).get('auto_env'):
                     continue
                 self.__dag.add_edge(pkg_dep, pkg)
 

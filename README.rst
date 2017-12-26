@@ -21,30 +21,25 @@ If ``CEPCENV_DIR`` is omitted, ``cepcenv`` will be installed in the current dire
 Install cepcsoft with cepcenv
 -----------------------------
 
-``git`` command is necessary for executing the following commands. ``git`` could
-be installed via the package manager::
-
-    yum install -y git
-
 Setup ``cepcenv``::
 
     . <CEPCENV_DIR>/setup.sh
 
-List available ``cepc-release`` version::
+List available CEPC software version::
 
     cepcenv ls-remote
 
-Specified ``cepc-release`` version and where to install::
+Specify CEPC software version and where to install::
 
-    cepcenv [-r <CEPCSOFT_INSTALL_DIR>] install <version>
+    cepcenv [-r <SOFTWARE_ROOT>] install <version>
 
-If ``-r <CEPCSOFT_INSTALL_DIR>`` is not specified, everything will be installed
+If ``-r <SOFTWARE_ROOT>`` is not specified, everything will be installed
 in the current directory.
 
-List local installed ``cepc-release`` version::
+List local installed CEPC software version::
 
-    cepcenv -r <CEPCSOFT_INSTALL_DIR> ls
+    cepcenv -r <SOFTWARE_ROOT> ls
 
-Select local ``cepc-release`` version you would like to use::
+Select local CEPC software version you would like to use::
 
-    cepcenv -r <CEPCSOFT_INSTALL_DIR> use <version>
+    cepcenv -r <SOFTWARE_ROOT> use <version>
