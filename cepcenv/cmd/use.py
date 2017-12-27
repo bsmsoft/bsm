@@ -11,6 +11,13 @@ _logger = get_logger()
 class Use(object):
     def execute(self, config, config_version, config_release, shell, default=False):
         obj = CepcenvUse(config, config_version, config_release)
+
+        missing_pkg, install_cmd, pkg_install_name = obj.check()
+        if missing_pkg:
+            _logger.warn('Missing package(s): {0}'.format(', '.join(missing_pkg)))
+            _logger.warn('Suggest installing with the following command:')
+            _logger.warn(' '.join(install_cmd+pkg_install_name))
+
         set_env, unset_env = obj.run()
 
         script = ''

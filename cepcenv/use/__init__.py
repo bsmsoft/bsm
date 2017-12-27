@@ -5,6 +5,8 @@ from paradag import dag_run
 
 from cepcenv.package_manager import PackageManager
 
+from cepcenv.check import Check
+
 from cepcenv.env import Env
 from cepcenv.util import ensure_list
 
@@ -38,6 +40,11 @@ class Use(object):
                 if not self.__pkg_mgr.package_info(pkg_dep).get('category', {}).get('auto_env'):
                     continue
                 self.__dag.add_edge(pkg_dep, pkg)
+
+    def check(self):
+        check = Check(self.__config_release)
+        missing_pkg, pkg_install_name = check.check('runtime')
+        return missing_pkg, check.install_cmd, pkg_install_name
 
     def run(self):
         sorted_pkgs = dag_run(self.__dag)

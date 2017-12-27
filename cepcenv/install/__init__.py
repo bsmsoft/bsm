@@ -11,11 +11,11 @@ from cepcenv.install.release import install_handler
 from cepcenv.install.selector import Selector as InstallSelector
 from cepcenv.install.executor import Executor as InstallExecutor
 
-from cepcenv.install.check import Check
-
 from cepcenv.config.config_release import ConfigRelease
 
 from cepcenv.package_manager import PackageManager
+
+from cepcenv.check import Check
 
 from cepcenv.util import ensure_list
 
@@ -46,7 +46,7 @@ class Install(object):
 
     def check(self):
         check = Check(self.__config_release)
-        missing_pkg, pkg_install_name = check.check()
+        missing_pkg, pkg_install_name = check.check('install')
         return missing_pkg, check.install_cmd, pkg_install_name
 
     def package_list(self):

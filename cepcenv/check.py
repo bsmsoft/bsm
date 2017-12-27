@@ -89,11 +89,11 @@ class Check(object):
                 return False
         return True
 
-    def check(self):
+    def check(self, pkg_type):
         missing_pkg = []
         pkg_install_name = []
 
-        for pkg, check_cfg in self.__config_release.get('check', {}).items():
+        for pkg, check_cfg in self.__config_release.get('check', {}).get(pkg_type, {}).items():
             _logger.debug('Searching package: {0}'.format(pkg))
             if not self.__check_package(check_cfg.get('check', {})):
                 _logger.debug('Package not available: {0}'.format(pkg))
