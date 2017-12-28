@@ -90,7 +90,7 @@ class Check(object):
                 return False
         return True
 
-    def check(self, pkg_type):
+    def check(self):
         missing_pkg = []
         pkg_install_name = []
 
