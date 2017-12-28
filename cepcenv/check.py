@@ -50,8 +50,9 @@ def _library_dir(env):
 
 
 class Check(object):
-    def __init__(self, config_release):
+    def __init__(self, config_release, pkg_type):
         self.__config_release = config_release
+        self.__pkg_type = pkg_type
         self.__mgr_type = _detect_manager_type()
         self.__load_check_dir()
 
@@ -93,12 +94,12 @@ class Check(object):
         missing_pkg = []
         pkg_install_name = []
 
-        for pkg, check_cfg in self.__config_release.get('check', {}).get(pkg_type, {}).items():
+        for pkg, check_cfg in self.__config_release.get('check', {}).items():
             _logger.debug('Searching package: {0}'.format(pkg))
-            if not self.__check_package(check_cfg.get('check', {})):
+            if not self.__check_package(check_cfg.get(self.__pkg_type, {}).get('check', {})):
                 _logger.debug('Package not available: {0}'.format(pkg))
                 missing_pkg.append(pkg)
-                install_name = check_cfg.get('package_manager', {}).get(self.__mgr_type, [])
+                install_name = check_cfg.get(self.__pkg_type, {}).get('package_manager', {}).get(self.__mgr_type, [])
                 pkg_install_name += ensure_list(install_name)
 
         return missing_pkg, pkg_install_name

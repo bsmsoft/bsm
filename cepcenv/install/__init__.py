@@ -45,8 +45,8 @@ class Install(object):
         return self.__config_release
 
     def check(self):
-        check = Check(self.__config_release)
-        missing_pkg, pkg_install_name = check.check('install')
+        check = Check(self.__config_release, 'install')
+        missing_pkg, pkg_install_name = check.check()
         return missing_pkg, check.install_cmd, pkg_install_name
 
     def package_list(self):
