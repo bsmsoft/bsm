@@ -25,6 +25,10 @@ Setup ``cepcenv``::
 
     . <CEPCENV_DIR>/setup.sh
 
+Create the configuration file if it does not exist::
+
+    [ -e ~/.cepcenv.conf ] || cepcenv config -e > ~/.cepcenv.conf
+
 List available CEPC software version::
 
     cepcenv ls-remote
