@@ -25,10 +25,6 @@ Setup ``cepcenv``::
 
     . <CEPCENV_DIR>/setup.sh
 
-Create the configuration file if it does not exist::
-
-    [ -e ~/.cepcenv.conf ] || cepcenv config -e > ~/.cepcenv.conf
-
 List available CEPC software version::
 
     cepcenv ls-remote
@@ -39,6 +35,24 @@ Specify CEPC software version and where to install::
 
 If ``-r <SOFTWARE_ROOT>`` is not specified, everything will be installed
 in the current directory.
+
+Multiple versions could be installed under the same software root.
+
+
+Configuration
+-------------
+
+Create the configuration file if it does not exist::
+
+    [ -e ~/.cepcenv.conf ] || cepcenv config -e > ~/.cepcenv.conf
+
+Edit `~/.cepcenv.conf` and uncomment `software_root`::
+
+    software_root: <SOFTWARE_ROOT>
+
+
+Select cepcsoft Version
+-----------------------
 
 List local installed CEPC software version::
 
