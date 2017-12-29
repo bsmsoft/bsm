@@ -9,4 +9,4 @@ git commit -a -m "Release version $version"
 git tag -a "v$version" -m "Version $version"
 
 git push origin
-git push origin --tags
+git push origin "v$version"
