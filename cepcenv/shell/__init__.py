@@ -1,21 +1,23 @@
 from cepcenv.loader import load_common
 
 
-def load_shell(shell_name):
-    return load_common(shell_name, 'cepcenv.shell')
-
-
 class Shell(object):
-    def comment(self, content):
-        lines = content.rstrip().split('\n')
-        newlines = map(lambda x:'# '+x, lines)
-        return '\n'.join(newlines) + '\n'
+    def __init__(self, shell_name):
+        self.__shell = load_common(shell_name, 'cepcenv.shell')()
 
-    def echo(self, content):
-        lines = content.rstrip().split('\n')
+        self.__script = ''
 
-        # "\" should be escaped
-        # "'" will be converted into four chars "'\''"
-        newlines = map(lambda x:'echo \'' + x.replace('\\', '\\\\').replace('\'', '\'\\\'\'') + '\'', lines)
+    def clear_script(self):
+        self.__script = ''
 
-        return '\n'.join(newlines) + '\n'
+    def newline(self, line_number=1):
+        self.__script += '\n'*line_number
+
+    def __getattr__(self, name):
+        def method(*args, **kargs):
+            self.__script += getattr(self.__shell, name)(*args, **kargs)
+        return method
+
+    @property
+    def script(self):
+        return self.__script

@@ -20,11 +20,11 @@ class Use(object):
 
         set_env, unset_env = obj.run()
 
-        script = ''
+        shell.clear_script()
         for e in unset_env:
-            script += shell.unset_env(e)
+            shell.unset_env(e)
         for k, v in set_env.items():
-            script += shell.set_env(k, v)
+            shell.set_env(k, v)
 
         if default:
             info = Info()
@@ -34,4 +34,4 @@ class Use(object):
             else:
                 _logger.warn('Could not setup default version')
 
-        click.echo(script, nl=False)
+        click.echo(shell.script, nl=False)

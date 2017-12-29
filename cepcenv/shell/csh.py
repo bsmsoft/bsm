@@ -1,13 +1,13 @@
 import sys
 import os
 
-from cepcenv.shell import Shell
+from cepcenv.shell.base import Base
 
 CUR_DIR = os.path.dirname(os.path.realpath(__file__))
 CSH_INIT = os.path.join(CUR_DIR, 'cepcenv.csh')
 CSH_SCRIPT_INIT = os.path.join(CUR_DIR, 'cepcenv_script.csh')
 
-class Csh(Shell):
+class Csh(Base):
     def echo(self, content):
         lines = content.rstrip().split('\n')
 

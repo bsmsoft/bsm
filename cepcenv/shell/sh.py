@@ -1,8 +1,17 @@
 import sys
 
-from cepcenv.shell import Shell
+from cepcenv.shell.base import Base
 
-class Sh(Shell):
+class Sh(Base):
+    def echo(self, content):
+        lines = content.rstrip().split('\n')
+
+        # "\" should be escaped
+        # "'" will be converted into four chars "'\''"
+        newlines = map(lambda x:'echo \'' + x.replace('\\', '\\\\').replace('\'', '\'\\\'\'') + '\'', lines)
+
+        return '\n'.join(newlines) + '\n'
+
     def set_env(self, env_name, env_value):
         return 'export {0}="{1}"\n'.format(env_name, env_value)
 

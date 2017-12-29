@@ -8,10 +8,10 @@ class Clean(object):
         env.clean()
         set_env, unset_env = env.env_change()
 
-        script = ''
+        shell.clear_script()
         for e in unset_env:
-            script += shell.unset_env(e)
+            shell.unset_env(e)
         for k, v in set_env.items():
-            script += shell.set_env(k, v)
+            shell.set_env(k, v)
 
-        click.echo(script, nl=False)
+        click.echo(shell.script, nl=False)

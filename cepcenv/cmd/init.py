@@ -12,10 +12,10 @@ _logger = get_logger()
 
 class Init(object):
     def execute(self, config, shell):
-        script = ''
+        shell.clear_script()
 
-        script += shell.define_cepcenv()
-        script += '\n'
+        shell.define_cepcenv()
+        shell.newline()
 
         try:
             info = Info()
@@ -32,10 +32,10 @@ class Init(object):
                 set_env, unset_env = env.env_change()
 
             for e in unset_env:
-                script += shell.unset_env(e)
+                shell.unset_env(e)
             for k, v in set_env.items():
-                script += shell.set_env(k, v)
+                shell.set_env(k, v)
         except Exception as e:
             _logger.warn('Cat not load default version: {0}'.format(e))
 
-        click.echo(script, nl=False)
+        click.echo(shell.script, nl=False)

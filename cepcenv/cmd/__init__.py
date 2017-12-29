@@ -14,7 +14,7 @@ from cepcenv.config.config_version import ConfigVersion
 from cepcenv.config.config_release import ConfigRelease
 from cepcenv.config.config_release import ConfigReleaseError
 
-from cepcenv.shell import load_shell
+from cepcenv.shell import Shell
 
 
 _logger = get_logger()
@@ -102,6 +102,6 @@ class Cmd(object):
         self.__shell = None
         if self.__cmd_output_shell:
             try:
-                self.__shell = load_shell(shell_name)()
+                self.__shell = Shell(shell_name)
             except Exception as e:
                 raise CmdError('Can not load shell: {0}'.format(e))
