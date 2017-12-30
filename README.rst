@@ -15,7 +15,8 @@ or ::
 
     wget -qO- http://cepcsoft.ihep.ac.cn/package/cepcenv/script/install.sh | sh -s [CEPCENV_DIR]
 
-If ``CEPCENV_DIR`` is omitted, ``cepcenv`` will be installed in the current directory.
+If ``CEPCENV_DIR`` is omitted, ``cepcenv`` will be installed in the
+current directory.
 
 
 Install cepcsoft with cepcenv
@@ -33,10 +34,11 @@ Specify CEPC software version and where to install::
 
     cepcenv [-r <SOFTWARE_ROOT>] install <version>
 
-If ``-r <SOFTWARE_ROOT>`` is not specified, everything will be installed
-in the current directory.
+If ``-r <SOFTWARE_ROOT>`` is not specified, everything will be
+installed in the current directory.
 
-Multiple versions could be installed under the same software root.
+Multiple versions could be installed under the same software root
+directory.
 
 
 Configuration
