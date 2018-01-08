@@ -1,6 +1,4 @@
 import os
-import time
-import random
 import datetime
 
 from cepcenv.env import Env
@@ -9,8 +7,6 @@ from cepcenv.package_manager import PackageManager
 from cepcenv.loader import load_func
 from cepcenv.util import safe_mkdir
 
-from cepcenv.config import load_config
-from cepcenv.config import dump_config
 from cepcenv.config.config_version import HANDLER_MODULE_NAME
 
 from cepcenv.logger import get_logger

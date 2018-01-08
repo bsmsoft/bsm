@@ -60,7 +60,6 @@ class Install(object):
         return pkg_list
 
     def install_packages(self):
-
         self.__build_dag()
 
         sys.path.insert(0, self.__config_version.handler_dir)
