@@ -40,10 +40,9 @@ def _install(config, config_version, source, force, yes, no_clean):
     if not force:
         missing_pkg, install_cmd, pkg_install_name = install.check()
         if missing_pkg:
-            click.echo('Missing package(s): {0}'.format(', '.join(missing_pkg)))
-            click.echo('Suggest installing with the following command:')
-            click.echo(' '.join(install_cmd+pkg_install_name))
-            click.echo('If you would like to skip installing these packages and are confirmed they are available, try to use "cepcenv install --force"')
+            _logger.warn('Missing package(s): {0}'.format(', '.join(missing_pkg)))
+            _logger.info('If you are confirmed these packages are available and would like to skip installing them, try to use "cepcenv install --force"')
+            _logger.info('The missing package(s) could be installed with the following command:\n' + ' '.join(install_cmd+pkg_install_name))
             return
 
 
