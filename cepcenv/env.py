@@ -51,15 +51,15 @@ class Env(object):
 
         self.__init_release()
         self.__init_package_info()
-        self.__init_package_path()
+        self.__init_path()
         self.__init_os_path()
-        self.__init_package_env()
+        self.__init_solo()
 
         self.__software_root = self.__initial_software_root
         self.__release_version = self.__initial_release_version
         self.__pkg_info = copy.deepcopy(self.__initial_pkg_info)
-        self.__pkg_path = copy.deepcopy(self.__initial_pkg_path)
-        self.__pkg_env = copy.deepcopy(self.__initial_pkg_env)
+        self.__path = copy.deepcopy(self.__initial_path)
+        self.__solo = copy.deepcopy(self.__initial_solo)
 
 
     def __init_release(self):
@@ -75,16 +75,16 @@ class Env(object):
         if PACKAGE_INFO_ENV_NAME in self.__initial_env:
             self.__initial_pkg_info = _parse_package_info(self.__initial_env[PACKAGE_INFO_ENV_NAME])
 
-    def __init_package_path(self):
-        self.__initial_pkg_path = {}
+    def __init_path(self):
+        self.__initial_path = {}
         if PATH_LIST_ENV_NAME in self.__initial_env:
             for path_name in self.__initial_env[PATH_LIST_ENV_NAME].split():
                 path_str = self.__initial_env.get(PATH_ENV_PREFIX+path_name, '')
-                self.__initial_pkg_path[path_name] = _parse_path(path_str)
+                self.__initial_path[path_name] = _parse_path(path_str)
 
     def __init_os_path(self):
         self.__initial_os_path = {}
-        for k, v in self.__initial_pkg_path.items():
+        for k, v in self.__initial_path.items():
             if k not in self.__initial_env:
                 continue
 
@@ -95,11 +95,11 @@ class Env(object):
 
             self.__initial_os_path[k] = os_path
 
-    def __init_package_env(self):
-        self.__initial_pkg_env = {}
+    def __init_solo(self):
+        self.__initial_solo = {}
         if ENV_LIST_ENV_NAME in self.__initial_env:
             for env_name in self.__initial_env[ENV_LIST_ENV_NAME].split():
-                self.__initial_pkg_env[env_name] = self.__initial_env.get(env_name, '')
+                self.__initial_solo[env_name] = self.__initial_env.get(env_name, '')
 
 
     @property
@@ -120,21 +120,19 @@ class Env(object):
         self.__release_version = None
         self.__pkg_info = {}
 
-        # Do not use "self.__pkg_path = {}, self.__pkg_env = {}" here
+        # Do not use "self.__path = {}, self.__solo = {}" here
         # We need to know which paths and envs ever exist
-        for k in self.__pkg_path:
-            self.__pkg_path[k] = []
-        for k in self.__pkg_env:
-            self.__pkg_env[k] = None
+        for k in self.__path:
+            self.__path[k] = []
+        for k in self.__solo:
+            self.__solo[k] = None
 
     def set_release(self, rel_root, rel_ver):
         self.__software_root = rel_root
         self.__release_version = rel_ver
 
-    # TODO: global envs are from setting.yml
-    def set_global_env(self, env):
-        for k, v in env.items():
-            self.__pkg_env[k] = v.format(**pkg_format)
+    def set_global(self, env):
+        self.__solo.update(env)
 
     # TODO: delete old_pkg env
     def remove_package(self, path_usage, pkg_info):
@@ -163,9 +161,9 @@ class Env(object):
             multi_env_path_name = path_usage.get('multi_env', {})
             if k in multi_env_path_name:
                 path_name = multi_env_path_name[k]
-                if path_name not in self.__pkg_path:
-                    self.__pkg_path[path_name] = []
-                self.__pkg_path[path_name].insert(0, v.format(**pkg_dir))
+                if path_name not in self.__path:
+                    self.__path[path_name] = []
+                self.__path[path_name].insert(0, v.format(**pkg_dir))
 
     def __set_package_env(self, path_usage, pkg_name, attribute, pkg_dir):
         all_path = attribute.get('path', {})
@@ -173,11 +171,11 @@ class Env(object):
             single_env_path_name = path_usage.get('single_env', {})
             if k in single_env_path_name:
                 env_name = single_env_path_name[k].format(package=pkg_name)
-                self.__pkg_env[env_name] = v.format(**pkg_dir)
+                self.__solo[env_name] = v.format(**pkg_dir)
 
-        all_env = attribute.get('env', {})
-        for k, v in all_env.items():
-            self.__pkg_env[k] = v.format(**pkg_dir)
+        all_solo = attribute.get('env', {})
+        for k, v in all_solo.items():
+            self.__solo[k] = v.format(**pkg_dir)
 
 
     def __env_release(self):
@@ -194,11 +192,11 @@ class Env(object):
             env[PACKAGE_INFO_ENV_NAME] = None
         return env
 
-    def __env_package_path(self):
+    def __env_path(self):
         env = {}
 
-        for k in self.__initial_pkg_path:
-            if k not in self.__pkg_path:
+        for k in self.__initial_path:
+            if k not in self.__path:
                 if k in self.__initial_os_path and self.__initial_os_path[k]:
                     env[k] = _emit_path(self.__initial_os_path[k])
                 else:
@@ -206,7 +204,7 @@ class Env(object):
                 env[PATH_ENV_PREFIX+k] = None
 
         path_list = []
-        for k, v in self.__pkg_path.items():
+        for k, v in self.__path.items():
             if k in self.__initial_os_path:
                 path_full = v + self.__initial_os_path[k]
             elif k in self.__initial_env:
@@ -232,11 +230,11 @@ class Env(object):
 
         return env
 
-    def __env_package_env(self):
+    def __env_solo(self):
         env = {}
 
         env_list = []
-        for k, v in self.__pkg_env.items():
+        for k, v in self.__solo.items():
             if v is not None:
                 env_list.append(k)
             env[k] = v
@@ -252,8 +250,8 @@ class Env(object):
         env_all = {}
         env_all.update(self.__env_release())
         env_all.update(self.__env_package_info())
-        env_all.update(self.__env_package_path())
-        env_all.update(self.__env_package_env())
+        env_all.update(self.__env_path())
+        env_all.update(self.__env_solo())
         return env_all
 
 
