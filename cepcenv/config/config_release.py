@@ -15,7 +15,7 @@ _logger = get_logger()
 from cepcenv import CEPCENV_VERSION
 
 
-_AVAILABLE_RELEASE_CONFIG = ('version', 'setting', 'package', 'attribute', 'install', 'check')
+_AVAILABLE_RELEASE_CONFIG = ('version', 'setting')
 
 
 class ConfigReleaseError(Exception):
@@ -67,7 +67,20 @@ class ConfigRelease(object):
             try:
                 self.__config_release[k] = load_config(config_file)
             except ConfigError as e:
-                raise ConfigReleaseError('Fail to load config file "{0}": {1}'.format(config_file, e))
+                _logger.warn('Fail to load config file "{0}": {1}'.format(config_file, e))
+
+        package_dir = os.path.join(config_dir, 'package')
+        self.__load_package_config(package_dir)
+
+    def __load_package_config(self, package_dir):
+        self.__config_release['package'] = {}
+        for root, dirs, files in os.walk(package_dir):
+            for f in files:
+                if not f.endswith('.yml') and not f.endswith('.yaml'):
+                    continue
+                pkg_name = os.path.splitext(f)[0]
+                full_path = os.path.join(root, f)
+                self.__config_release['package'][pkg_name] = load_config(full_path)
 
     def __pre_transform(self):
         for transformer in self.__config_release.get('setting', {}).get('pre_transform', []):
