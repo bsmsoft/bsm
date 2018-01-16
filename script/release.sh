@@ -2,7 +2,7 @@
 
 cd $(dirname "$0")/..
 
-version=$(cat cepcenv/CEPCENV_VERSION)
+version=$(cat bsm/BSM_VERSION)
 
 git commit -a -m "Release version $version"
 

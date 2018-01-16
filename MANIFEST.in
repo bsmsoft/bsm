@@ -1,4 +1,4 @@
-include cepcenv/CEPCENV_VERSION
-include cepcenv/support/cepcenv.conf.example
-include cepcenv/shell/cepcenv.csh
-include cepcenv/shell/cepcenv_script.csh
+include bsm/BSM_VERSION
+include bsm/support/bsm.conf.example
+include bsm/shell/bsm.csh
+include bsm/shell/bsm_script.csh
