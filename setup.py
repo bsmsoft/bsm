@@ -12,7 +12,7 @@ with open(os.path.join(here, 'README.rst')) as f:
     long_description = f.read()
 
 setup(
-    name = 'BSM',
+    name = 'bsm',
     version = version,
     description = 'Bundled software manager',
     long_description = long_description,
