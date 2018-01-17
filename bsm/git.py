@@ -16,6 +16,9 @@ class GitNotFoundError(GitError):
 class GitUnknownCommandError(GitError):
     pass
 
+class GitEmptyUrlError(GitError):
+    pass
+
 
 COMMAND_MAP = {
     'git': {
@@ -125,10 +128,14 @@ class Git(object):
             refs.append(name_short)
         return refs
 
-    def ls_remote_branches(self, url):
-        out = self.__run_cmd('ls-remote-branches', url=url)
+    def __ls_remote(self, url, ls_type):
+        if not url:
+            raise GitEmptyUrlError('Git url not specified')
+        out = self.__run_cmd('ls-remote-'+ls_type, url=url)
         return self.__parse_remote_list(out)
 
+    def ls_remote_branches(self, url):
+        return self.__ls_remote(url, 'branches')
+
     def ls_remote_tags(self, url):
-        out = self.__run_cmd('ls-remote-tags', url=url)
-        return self.__parse_remote_list(out)
+        return self.__ls_remote(url, 'tags')

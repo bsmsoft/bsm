@@ -93,6 +93,8 @@ main() {
     echo "setenv _BSM_GITTEMP '${install_full_dir}/gitmini/gitmini'" >> setup.csh
   fi
 
+  echo "export BSM_RELEASE_REPO='https://github.com/cepc/cepc-release'" >> setup.sh
+  echo "setenv BSM_RELEASE_REPO 'https://github.com/cepc/cepc-release'" >> setup.csh
   echo "eval \"\$('${install_full_dir}/pypy/bin/bsm_cmd' --shell sh init)\"" >> setup.sh
   echo "eval \"\`'${install_full_dir}/pypy/bin/bsm_cmd' --shell csh init\`\"" >> setup.csh
 

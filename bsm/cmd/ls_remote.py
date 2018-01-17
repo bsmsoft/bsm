@@ -3,6 +3,7 @@ import click
 
 from bsm.git import Git
 from bsm.git import GitNotFoundError
+from bsm.git import GitEmptyUrlError
 
 from bsm.logger import get_logger
 _logger = get_logger()
@@ -12,8 +13,11 @@ class LsRemote(object):
         try:
             git = Git()
             tags = git.ls_remote_tags(config_version.get('release_repo'))
-        except GitNotFoundError as e:
+        except GitNotFoundError:
             _logger.error('Git is not found. Please install "git" first')
+            raise
+        except GitEmptyUrlError:
+            _logger.error('No release repository found. Please setup "release_repo" in "$HOME/.bsm.conf" first')
             raise
 
         versions = [tag[1:] for tag in tags if tag.startswith('v')]

@@ -25,7 +25,7 @@ _PATH_ITEMS = ('software_root', 'release_infodir')
 
 _DEFAULT_ITEMS = {
         'software_root': os.getcwd(),
-        'release_repo': 'https://github.com/cepc/cepc-release',
+        'release_repo': os.environ.get('BSM_RELEASE_REPO', ''),
 }
 
 
