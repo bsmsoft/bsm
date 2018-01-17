@@ -1,38 +1,38 @@
-cepcenv
-=======
+BSM
+===
 
-CEPC software management toolkit
+Bundled software manager
 
 
-Install cepcenv
----------------
+Installation
+------------
 
-Install ``cepcenv`` with ``curl`` or ``wget`` ::
+Install ``BSM`` with ``curl`` or ``wget`` ::
 
-    curl -sSL http://cepcsoft.ihep.ac.cn/package/cepcenv/script/install.sh | sh -s [CEPCENV_DIR]
+    curl -sSL https://raw.githubusercontent.com/bsmhep/bsm/master/script/install.sh | sh -s [BSM_DIR]
 
 or ::
 
-    wget -qO- http://cepcsoft.ihep.ac.cn/package/cepcenv/script/install.sh | sh -s [CEPCENV_DIR]
+    wget -qO- https://raw.githubusercontent.com/bsmhep/bsm/master/script/install.sh | sh -s [BSM_DIR]
 
-If ``CEPCENV_DIR`` is omitted, ``cepcenv`` will be installed in the
+If ``BSM_DIR`` is omitted, ``BSM`` will be installed in the
 current directory.
 
 
-Install cepcsoft with cepcenv
------------------------------
+Install Software with BSM
+-------------------------
 
-Setup ``cepcenv``::
+Setup ``BSM``::
 
-    . <CEPCENV_DIR>/setup.sh
+    . <BSM_DIR>/setup.sh
 
-List available CEPC software version::
+List available software version::
 
-    cepcenv ls-remote
+    bsm ls-remote
 
-Specify CEPC software version and where to install::
+Specify software version and where to install::
 
-    cepcenv [-r <SOFTWARE_ROOT>] install <version>
+    bsm [-r <SOFTWARE_ROOT>] install <version>
 
 If ``-r <SOFTWARE_ROOT>`` is not specified, everything will be
 installed in the current directory.
@@ -46,20 +46,20 @@ Configuration
 
 Create the configuration file if it does not exist::
 
-    [ -e ~/.cepcenv.conf ] || cepcenv config -e > ~/.cepcenv.conf
+    [ -e ~/.bsm.conf ] || bsm config -e > ~/.bsm.conf
 
-Edit `~/.cepcenv.conf` and uncomment `software_root`::
+Edit `~/.bsm.conf` and uncomment `software_root`::
 
     software_root: <SOFTWARE_ROOT>
 
 
-Select cepcsoft Version
+Select Software Version
 -----------------------
 
-List local installed CEPC software version::
+List local installed software version::
 
-    cepcenv -r <SOFTWARE_ROOT> ls
+    bsm -r <SOFTWARE_ROOT> ls
 
-Select local CEPC software version you would like to use::
+Select local software version you would like to use::
 
-    cepcenv -r <SOFTWARE_ROOT> use <version>
+    bsm -r <SOFTWARE_ROOT> use <version>

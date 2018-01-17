@@ -1,0 +1,24 @@
+# vim: set syntax=yaml:
+
+#verbose: false
+
+# Setup os manually if:
+# 1. OS not correctly detected,
+# 2. You want to use installation from other OS
+#os: sl6
+
+#release_repo: https://github.com/cepc/cepc-release
+
+#software_root: /cvmfs/cepc.ihep.ac.cn/software/cepcsoft
+
+#work_root: ~/mywork
+
+# Uncomment the following lines to define custom version names
+# Each version name could define its own
+# "version", "software_root", "work_root", "release_repo", "os", etc.
+#versions:
+#  1.2.3:
+#    work_root: ~/mywork123
+#  test:
+#    version: 1.2.1
+#    software_root: ~/cepcsoft_test
