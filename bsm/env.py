@@ -30,7 +30,7 @@ def _parse_package_info(pkg_info_str):
         pkg_name = pkg_fraction[0]
         pkg_info[pkg_name] = {
             'category': pkg_fraction[1],
-            'path': pkg_fraction[2],
+            'subdir': pkg_fraction[2],
             'version': pkg_fraction[3],
         }
     return pkg_info
@@ -38,7 +38,7 @@ def _parse_package_info(pkg_info_str):
 def _emit_package_info(pkg_info):
     pkg_info_list = []
     for pkg_name, info in pkg_info.items():
-        info_str = pkg_name + '@' + info['category'] + '@' + info['path'] + '@' + info['version']
+        info_str = pkg_name + '@' + info['category'] + '@' + info['subdir'] + '@' + info['version']
         pkg_info_list.append(info_str)
     return ':'.join(pkg_info_list)
 
@@ -140,40 +140,39 @@ class Env(object):
 
     def set_package(self, path_usage, pkg_info):
         pkg_name = pkg_info['name']
+        pkg_config = pkg_info.get('config', {})
         pkg_dir = pkg_info.get('dir', {})
-        package = pkg_info.get('package', {})
-        attribute = pkg_info.get('attribute', {})
 
-        self.__set_package_info(pkg_name, package)
-        self.__set_package_path(path_usage, pkg_name, attribute, pkg_dir)
-        self.__set_package_env(path_usage, pkg_name, attribute, pkg_dir)
+        self.__set_package_info(pkg_name, pkg_config)
+        self.__set_package_path(path_usage, pkg_name, pkg_config, pkg_dir)
+        self.__set_package_env(path_usage, pkg_name, pkg_config, pkg_dir)
 
-    def __set_package_info(self, pkg_name, package):
+    def __set_package_info(self, pkg_name, pkg_config):
         if pkg_name not in self.__pkg_info:
             self.__pkg_info[pkg_name] = {}
-        self.__pkg_info[pkg_name]['category'] = package.get('category', 'unknown')
-        self.__pkg_info[pkg_name]['path'] = package.get('path', '')
-        self.__pkg_info[pkg_name]['version'] = package.get('version', 'empty')
+        self.__pkg_info[pkg_name]['category'] = pkg_config.get('category', 'unknown')
+        self.__pkg_info[pkg_name]['subdir'] = pkg_config.get('subdir', '')
+        self.__pkg_info[pkg_name]['version'] = pkg_config.get('version', 'empty')
 
-    def __set_package_path(self, path_usage, pkg_name, attribute, pkg_dir):
-        all_path = attribute.get('path', {})
+    def __set_package_path(self, path_usage, pkg_name, pkg_config, pkg_dir):
+        all_path = pkg_config.get('path', {})
         for k, v in all_path.items():
-            multi_env_path_name = path_usage.get('multi_env', {})
-            if k in multi_env_path_name:
-                path_name = multi_env_path_name[k]
+            path_env_path_name = path_usage.get('path_env', {})
+            if k in path_env_path_name:
+                path_name = path_env_path_name[k]
                 if path_name not in self.__path:
                     self.__path[path_name] = []
                 self.__path[path_name].insert(0, v.format(**pkg_dir))
 
-    def __set_package_env(self, path_usage, pkg_name, attribute, pkg_dir):
-        all_path = attribute.get('path', {})
+    def __set_package_env(self, path_usage, pkg_name, pkg_config, pkg_dir):
+        all_path = pkg_config.get('path', {})
         for k, v in all_path.items():
-            single_env_path_name = path_usage.get('single_env', {})
-            if k in single_env_path_name:
-                env_name = single_env_path_name[k].format(package=pkg_name)
+            solo_env_path_name = path_usage.get('solo_env', {})
+            if k in solo_env_path_name:
+                env_name = solo_env_path_name[k].format(package=pkg_name)
                 self.__solo[env_name] = v.format(**pkg_dir)
 
-        all_solo = attribute.get('env', {})
+        all_solo = pkg_config.get('env', {})
         for k, v in all_solo.items():
             self.__solo[k] = v.format(**pkg_dir)
 
@@ -270,6 +269,8 @@ class Env(object):
     def env_change(self):
         env_origin = self.__initial_env
         env_to_update = self.__env_all()
+        _logger.debug('Original env: {0}'.format(env_origin))
+        _logger.debug('Updated env: {0}'.format(env_to_update))
 
         set_env = {}
         unset_env = []
@@ -280,4 +281,8 @@ class Env(object):
             else:
                 if k in env_origin:
                     unset_env.append(k)
+
+        _logger.debug('Changed set_env: {0}'.format(set_env))
+        _logger.debug('Changed unset_env: {0}'.format(unset_env))
+
         return set_env, unset_env

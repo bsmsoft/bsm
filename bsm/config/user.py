@@ -3,7 +3,7 @@ from bsm.util import expand_path
 from bsm.config import load_config
 
 
-def load_main(options_common):
+def load_config_user(options_common):
     config = {}
 
     config_file = options_common.get('config_file')

@@ -1,7 +1,12 @@
 import sys
 import inspect
 
+from bsm.config.config_version import HANDLER_MODULE_NAME
+
 from bsm.util import snake_to_camel
+
+from bsm.logger import get_logger
+_logger = get_logger()
 
 
 class LoadError(Exception):
@@ -87,3 +92,22 @@ def load_relative(module_name, attr_name):
         raise AttributeNotFoundError('Attribute "{0}" not found in module "{1}": {2}'.format(attr_name, module_name, e))
 
     return c
+
+
+def run_handler(handler_name, param, handler_dir=''):
+    if handler_dir:
+        sys.path.insert(0, handler_dir)
+
+    module_name = HANDLER_MODULE_NAME + '.' + handler_name
+    try:
+        f = load_func(module_name, 'run')
+        return f(param)
+    except LoadError as e:
+        _logger.error('Load handler "{0}" error: {1}'.format(handler_name, e))
+        raise
+    except Exception as e:
+        _logger.error('Handler "{0}" run error: {1}'.format(handler_name, e))
+        raise
+    finally:
+        if handler_dir:
+            sys.path.remove(handler_dir)

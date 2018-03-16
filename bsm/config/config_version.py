@@ -6,8 +6,6 @@ import datetime
 from bsm.util import expand_path
 from bsm.util import ensure_list
 
-from bsm.platform import Platform
-
 
 class ConfigVersionError(Exception):
     pass
@@ -18,8 +16,7 @@ HANDLER_MODULE_NAME = '_bsm_handler_run_avoid_conflict'
 
 
 _VERSION_ITEMS = ('version', 'software_root',
-        'release_infodir', 'release_repo',
-        'platform', 'os', 'arch', 'compiler')
+        'release_infodir', 'release_repo')
 
 _PATH_ITEMS = ('software_root', 'release_infodir')
 
@@ -39,49 +36,37 @@ def _temp_version():
 
 
 class ConfigVersion(object):
-    def __init__(self, config, version_name=None, version_config_cmd={}, extra_config=[]):
-        self.__config = config
+    def __init__(self, config_user, version_name=None, version_cmd={}, extra_config=[]):
+        self.__config_user = config_user
         self.__version_name = version_name
-        self.__config_version_cmd = version_config_cmd
+        self.__version_cmd = version_cmd
 
         self.__items = list(_VERSION_ITEMS) + ensure_list(extra_config)
 
         self.__load_config()
 
 
-    def __process_platform(self):
-        sp = Platform(self.__config_version.get('arch'), self.__config_version.get('os'), self.__config_version.get('compiler'))
-        if 'arch' not in self.__config_version or not self.__config_version['arch']:
-            self.__config_version['arch'] = sp.arch
-        if 'os' not in self.__config_version or not self.__config_version['os']:
-            self.__config_version['os'] = sp.os
-        if 'compiler' not in self.__config_version or not self.__config_version['compiler']:
-            self.__config_version['compiler'] = sp.compiler
-        if 'platform' not in self.__config_version or not self.__config_version['platform']:
-            self.__config_version['platform'] = sp.platform
-
     def __process_default(self):
         for k, v in _DEFAULT_ITEMS.items():
-            if k not in self.__config_version or not self.__config_version[k]:
-                self.__config_version[k] = v
+            if k not in self.__config or not self.__config[k]:
+                self.__config[k] = v
 
     def __format_config(self):
-        for k, v in self.__config_version.items():
-            self.__config_version[k] = v.format(**self.__config_version)
+        for k, v in self.__config.items():
+            self.__config[k] = v.format(**self.__config)
 
     def __expand_path(self):
         for k in _PATH_ITEMS:
-            if k in self.__config_version:
-                self.__config_version[k] = expand_path(self.__config_version[k])
+            if k in self.__config:
+                self.__config[k] = expand_path(self.__config[k])
 
     def __process_config(self):
         if self.__version_name:
-            self.__config_version['version_name'] = self.__version_name
+            self.__config['version_name'] = self.__version_name
 
-        if 'version' not in self.__config_version:
-            self.__config_version['version'] = _temp_version()
+        if 'version' not in self.__config:
+            self.__config['version'] = _temp_version()
 
-        self.__process_platform()
         self.__process_default()
         self.__format_config()
         self.__expand_path()
@@ -99,13 +84,13 @@ class ConfigVersion(object):
         return version_config
 
     def __config_global(self):
-        return self.__filter_version_config(self.__config)
+        return self.__filter_version_config(self.__config_user)
 
     def __config_specific(self):
         config_temp = {}
 
-        if 'versions' in self.__config and self.__version_name in self.__config['versions']:
-            config_temp.update(self.__filter_version_config(self.__config['versions'][self.__version_name]))
+        if 'versions' in self.__config_user and self.__version_name in self.__config_user['versions']:
+            config_temp.update(self.__filter_version_config(self.__config_user['versions'][self.__version_name]))
 
         if 'version' not in config_temp:
             config_temp['version'] = self.__version_name
@@ -113,36 +98,36 @@ class ConfigVersion(object):
         return config_temp
 
     def __config_cmd(self):
-        return self.__filter_version_config(self.__config_version_cmd)
+        return self.__filter_version_config(self.__version_cmd)
 
 
     def __load_config(self):
-        self.__config_version = self.__config_global()
+        self.__config = self.__config_global()
 
         if self.__version_name:
-            self.__config_version.update(self.__config_specific())
+            self.__config.update(self.__config_specific())
 
-        self.__config_version.update(self.__config_cmd())
+        self.__config.update(self.__config_cmd())
 
         self.__process_config()
 
 
     def get(self, key, default_value=None):
-        return self.__config_version.get(key, default_value)
+        return self.__config.get(key, default_value)
 
     @property
     def config(self):
-        return self.__config_version
+        return self.__config
 
     @property
     def bsm_dir(self):
-        if 'software_root' not in self.__config_version:
+        if 'software_root' not in self.__config:
             raise ConfigVersionError('"software_root" not specified in configuration')
-        return os.path.join(self.__config_version['software_root'], '.bsm')
+        return os.path.join(self.__config['software_root'], '.bsm')
 
     @property
     def main_dir(self):
-        return os.path.join(self.bsm_dir, self.__config_version['version'])
+        return os.path.join(self.bsm_dir, self.__config['version'])
 
     @property
     def def_dir(self):

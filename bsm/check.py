@@ -114,7 +114,8 @@ class Check(object):
         self.__check_dir['library'] = _library_dir(env_final)
         self.__check_dir['executable'] = _executable_dir(env_final)
 
-        _logger.debug('Package checking directories: {0}'.format(self.__check_dir))
+        for check_type, check_dir in self.__check_dir.items():
+            _logger.debug('Package checking directories for {0}: {1}'.format(check_type, check_dir))
 
     @property
     def install_cmd(self):

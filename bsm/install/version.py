@@ -52,3 +52,7 @@ def install_handler(config_version):
     for f in handler_init:
         if not os.path.exists(f):
             open(f, 'w').close()
+
+def install_version(config_version):
+    install_definition(config_version)
+    install_handler(config_version)

@@ -11,7 +11,7 @@ from bsm.logger import get_logger
 _logger = get_logger()
 
 class Init(object):
-    def execute(self, config, shell):
+    def execute(self, config_user, shell):
         shell.clear_script()
 
         shell.define_bsm()
@@ -21,10 +21,10 @@ class Init(object):
             info = Info()
             default_version = info.default_version
             if default_version:
-                config_version = ConfigVersion(config, default_version)
+                config_version = ConfigVersion(config_user, default_version)
                 config_release = ConfigRelease(config_version)
 
-                obj = BsmUse(config, config_version, config_release)
+                obj = BsmUse(config_user, config_version, config_release)
                 set_env, unset_env = obj.run()
             else:
                 env = Env()

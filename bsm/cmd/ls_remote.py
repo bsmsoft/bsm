@@ -9,7 +9,7 @@ from bsm.logger import get_logger
 _logger = get_logger()
 
 class LsRemote(object):
-    def execute(self, config, config_version):
+    def execute(self, config_version):
         try:
             git = Git()
             tags = git.ls_remote_tags(config_version.get('release_repo'))

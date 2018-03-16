@@ -59,14 +59,14 @@ def _download_svn(url, dst, pkg, version):
     return fn
 
 class Pack(object):
-    def execute(self, config, config_version, destination):
+    def execute(self, config_user, config_version, destination):
         release_version = config_version.get('version')
 
         try:
             config_release = ConfigRelease(config_version)
         except ConfigReleaseError:
             _logger.debug('Install release definition: {0}'.format(release_version))
-            install = Install(config, config_version)
+            install = Install(config_user, config_version)
             config_release = install.config_release()
 
         self.__pkg_mgr = PackageManager(config_version, config_release)

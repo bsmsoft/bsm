@@ -45,8 +45,6 @@ def _git_cmd(cwd, exe, *args):
     try:
         p = subprocess.Popen(full_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd)
         out, err = p.communicate()
-#        out = out.decode()
-#        err = err.decode()
         ret = p.returncode
     except Exception as e:
         raise GitError('Exception while running git command "{0}": {1}'.format(full_cmd, e))
@@ -124,7 +122,7 @@ class Git(object):
         refs = []
         for line in out.splitlines():
             name = line.strip().split()[1]
-            name_short = line.split('/')[2]
+            name_short = name.split('/')[2]
             refs.append(name_short)
         return refs
 

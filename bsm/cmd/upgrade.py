@@ -3,7 +3,7 @@ import click
 from pip import main
 
 class Upgrade(object):
-    def execute(self, config):
+    def execute(self):
         def pip_install(package):
             main(['install', '--upgrade', package])
 

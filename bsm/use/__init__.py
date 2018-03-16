@@ -14,8 +14,8 @@ from bsm.logger import get_logger
 _logger = get_logger()
 
 class Use(object):
-    def __init__(self, config, config_version, config_release):
-        self.__config = config
+    def __init__(self, config_user, config_version, config_release):
+        self.__config_user = config_user
         self.__config_version = config_version
         self.__config_release = config_release
 
@@ -27,17 +27,17 @@ class Use(object):
         self.__dag = Dag()
 
         for pkg, pkg_info in self.__pkg_mgr.package_all().items():
-            if not pkg_info.get('category', {}).get('auto_env'):
+            if not pkg_info.get('config_category', {}).get('auto_env'):
                 continue
             self.__dag.add_vertex(pkg)
 
         for pkg, pkg_info in self.__pkg_mgr.package_all().items():
-            if not pkg_info.get('category', {}).get('auto_env'):
+            if not pkg_info.get('config_category', {}).get('auto_env'):
                 continue
 
-            pkgs_dep = ensure_list(pkg_info.get('attribute', {}).get('dep', []))
+            pkgs_dep = ensure_list(pkg_info.get('config', {}).get('dep', []))
             for pkg_dep in pkgs_dep:
-                if not self.__pkg_mgr.package_info(pkg_dep).get('category', {}).get('auto_env'):
+                if not self.__pkg_mgr.package_info(pkg_dep).get('config_category', {}).get('auto_env'):
                     continue
                 self.__dag.add_edge(pkg_dep, pkg)
 
@@ -71,6 +71,5 @@ class Use(object):
 
         _logger.info('From software root: {0}'.format(software_root))
         _logger.info('Using version: {0}'.format(release_version))
-        _logger.info('Current platform: {0}'.format(self.__config_version.config['platform']))
 
         return env_change

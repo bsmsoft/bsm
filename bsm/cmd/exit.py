@@ -3,7 +3,7 @@ import click
 from bsm.env import Env
 
 class Exit(object):
-    def execute(self, config, shell):
+    def execute(self, shell):
         shell.clear_script()
 
         env = Env()

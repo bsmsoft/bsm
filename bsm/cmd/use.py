@@ -9,8 +9,8 @@ from bsm.logger import get_logger
 _logger = get_logger()
 
 class Use(object):
-    def execute(self, config, config_version, config_release, shell, default=False):
-        obj = BsmUse(config, config_version, config_release)
+    def execute(self, config_user, config_version, config_release, shell, default=False):
+        obj = BsmUse(config_user, config_version, config_release)
 
         missing_pkg, install_cmd, pkg_install_name = obj.check()
         if missing_pkg:

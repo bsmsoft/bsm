@@ -10,7 +10,7 @@ from bsm.logger import get_logger
 _logger = get_logger()
 
 class Ls(object):
-    def execute(self, config, config_version):
+    def execute(self, config_user, config_version):
         local_versions = []
 
         try:
@@ -42,7 +42,7 @@ class Ls(object):
         default_root = None
         default_version = None
         if default_version_name:
-            config_version_default = ConfigVersion(config, default_version_name)
+            config_version_default = ConfigVersion(config_user, default_version_name)
             default_root = config_version_default.get('software_root')
             default_version = config_version_default.get('version')
 

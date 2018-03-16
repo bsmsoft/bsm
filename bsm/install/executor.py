@@ -1,4 +1,5 @@
 import os
+import copy
 import datetime
 
 from bsm.env import Env
@@ -18,10 +19,11 @@ class InstallExecutorError(Exception):
 
 
 class Executor(object):
-    def __init__(self, config, config_version, config_release):
-        self.__config = config
+    def __init__(self, config_user, config_version, config_release, step_info):
+        self.__config_user = config_user
         self.__config_version = config_version
         self.__config_release = config_release
+        self.__step_info = step_info
 
         self.__env = Env()
         self.__env.clean()
@@ -29,30 +31,24 @@ class Executor(object):
         self.__pkg_mgr = PackageManager(config_version, config_release)
 
     def param(self, vertex):
-        pkg, action = vertex
+        pkg, action, sub_action = vertex
 
         par = {}
 
         par['package'] = pkg
         par['action'] = action
-        handler = self.__pkg_mgr.package_info(pkg)['install'].get(action, {}).get('handler')
-        if handler:
-            par['action_handler'] = handler
-            par['action_param'] = self.__pkg_mgr.package_info(pkg)['install'][action].get('param', {})
+        par['sub_action'] = sub_action
 
-        par['config'] = self.__config
+        step = self.__step_info.package_step(pkg, action, sub_action)
+        par['action_handler'] = step.get('handler')
+        par['action_param'] = step.get('param')
 
+        par['config_user'] = copy.deepcopy(self.__config_user)
         par['def_dir'] = self.__config_version.def_dir
-
-        par['pkg_info'] = self.__pkg_mgr.package_info(pkg)
-
-        par['pkg_dir_list'] = self.__pkg_mgr.package_dir_list()
-
-        par['log_file'] = os.path.join(self.__pkg_mgr.package_info(pkg)['dir']['log'], '{0}_{1}.log'.format(action, pkg))
-
-        par['env'] = self.__env.env_final()
-
-        par['finished'] = self.__pkg_mgr.is_ready(pkg, action)
+        par['pkg_info'] = copy.deepcopy(self.__pkg_mgr.package_info(pkg))
+        par['pkg_dir_list'] = copy.deepcopy(self.__pkg_mgr.package_dir_list())
+        par['log_file'] = os.path.join(self.__pkg_mgr.package_info(pkg)['dir']['log'], '{0}_{1}_{2}.log'.format(pkg, action, sub_action))
+        par['env'] = copy.deepcopy(self.__env.env_final())
 
         return par
 
@@ -60,14 +56,12 @@ class Executor(object):
     def execute(self, param):
         pkg = param['package']
         action = param['action']
+        sub_action = param['sub_action']
 
-        if 'action_handler' not in param:
-            _logger.debug('No handler: {0} - {1}'.format(pkg, action))
-            return None
-
-        if param['finished']:
-            _logger.debug('Skip doing: {0} - {1}'.format(pkg, action))
-            return None
+        if sub_action == 0:
+            action_full_name = '{0} - {1}'.format(pkg, action)
+        else:
+            action_full_name = '{0} - {1} - {2}'.format(pkg, action, sub_action)
 
         result = {}
 
@@ -76,14 +70,26 @@ class Executor(object):
         safe_mkdir(param['pkg_info']['dir']['log'])
 
         module_name = HANDLER_MODULE_NAME + '.install.' + param['action_handler']
-        f = load_func(module_name, 'run')
+        func_name = 'run'
+        try:
+            f = load_func(module_name, func_name)
+        except Exception as e:
+            _logger.critical('"{0}" install handler error: {1}'.format(action_full_name, e))
+            raise
         result_action = f(param)
 
-        if result_action is not None and not result_action:
-            _logger.critical('"{0} - {1}" execution error. Find log in "{2}"'.format(pkg, action, param['log_file']))
-            raise InstallExecutorError('"{0} - {1}" execution error'.format(pkg, action))
+        result['success'] = False
+        if isinstance(result_action, bool) and result_action:
+            result['success'] = True
+        if isinstance(result_action, dict) and 'success' in result_action and result_action['success']:
+            result['success'] = True
+        if not result['success']:
+            if isinstance(result_action, dict) and 'message' in result_action:
+                _logger.error('"{0}" execution error: {1}'.format(action_full_name, result_action['message']))
+            _logger.critical('"{0}" execution error. Find log in "{1}"'.format(action_full_name, param['log_file']))
+            raise InstallExecutorError('"{0}" execution error'.format(action_full_name))
 
-        result['log_file'] = param['log_file']
+        result['action'] = result_action
         result['end'] = datetime.datetime.utcnow()
 
         return result
@@ -93,24 +99,33 @@ class Executor(object):
 
     def report_finish(self, vertice_result):
         for vertex, result in vertice_result:
-            pkg, action = vertex
+            pkg, action, sub_action = vertex
 
-            # TODO: post_compile may be absent, find out a secure way
-            if action == 'post_compile':
+            if isinstance(result['action'], dict) and 'env_package' in result['action'] and result['action']['env_package']:
                 path_usage = self.__config_release.config['setting'].get('path_usage', {})
                 pkg_info = self.__pkg_mgr.package_info(pkg)
                 self.__env.set_package(path_usage, pkg_info)
 
-            if result:
-                _logger.info(' > {0} {1} finished'.format(pkg, action))
-                safe_mkdir(self.__pkg_mgr.package_info(pkg)['dir']['status'])
-                self.__pkg_mgr.save_action_status(pkg, action, result['start'], result['end'])
+            if isinstance(result['action'], dict) and 'save_release_status' in result['action'] and result['action']['save_release_status']:
+                self.__pkg_mgr.save_release_status(pkg, result['end'])
+
+            if result['success']:
+                _logger.info(' > {0} {1} {2} finished'.format(pkg, action, sub_action))
+                if self.__step_info.is_last_sub_action(pkg, action, sub_action):
+                    self.__pkg_mgr.save_action_status(pkg, action, result['start'], result['end'])
 
     def report_running(self, vertice):
         if not vertice:
             return
-        running_vertice = ', '.join(['{0}({1})'.format(*v) for v in vertice])
-        _logger.info('Running: ' + running_vertice)
+
+        running_vertice = []
+        for v in vertice:
+            if v[2] == 0:
+                action_full_name = '{0}({1})'
+            else:
+                action_full_name = '{0}({1}.{2})'
+            running_vertice.append(action_full_name.format(*v))
+        _logger.info('Running: ' + ', '.join(running_vertice))
 
     def deliver(self, vertex, result):
         pass
