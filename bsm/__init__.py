@@ -11,9 +11,9 @@ with open(os.path.join(BSM_HOME, 'BSM_VERSION'), 'r') as f:
 from bsm.cmd import Cmd
 
 
-@click.group()
+@click.group(context_settings=dict(help_option_names=['-h', '--help']))
 @click.option('--verbose', '-v', is_flag=True, help='Verbose mode')
-@click.option('--config', '-c', type=str, default='~/.bsm.conf', help='Configuration file path. Default to "~/.bsm.conf"')
+#@click.option('--config', '-c', type=str, default='~/.bsm.conf', help='Configuration file path. Default to "~/.bsm.conf"')
 @click.option('--shell', type=str, default='sh', help='Type of the generated shell script')
 @click.option('--software-root', '-r', type=str, help='Local installed software root directory')
 @click.pass_context
