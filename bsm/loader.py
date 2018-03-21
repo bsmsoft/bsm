@@ -103,10 +103,10 @@ def run_handler(handler_name, param, handler_dir=''):
         f = load_func(module_name, 'run')
         return f(param)
     except LoadError as e:
-        _logger.error('Load handler "{0}" error: {1}'.format(handler_name, e))
+        _logger.debug('Load handler "{0}" error: {1}'.format(handler_name, e))
         raise
     except Exception as e:
-        _logger.error('Handler "{0}" run error: {1}'.format(handler_name, e))
+        _logger.debug('Handler "{0}" run error: {1}'.format(handler_name, e))
         raise
     finally:
         if handler_dir:

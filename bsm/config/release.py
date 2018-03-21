@@ -3,6 +3,7 @@ import sys
 import re
 
 from bsm.loader import run_handler
+from bsm.loader import LoadError
 
 from bsm.config import load_config
 from bsm.config import ConfigError
@@ -87,9 +88,15 @@ class ConfigRelease(object):
         param['config_release'] = self.__config
         param['option'] = self.__option
 
-        result = run_handler('transformer', param, self.__config_version.handler_dir)
-        if isinstance(result, dict):
-            self.__config = result
+        try:
+            result = run_handler('transformer', param, self.__config_version.handler_dir)
+            if isinstance(result, dict):
+                self.__config = result
+        except LoadError as e:
+            _logger.debug('Transformer load failed: {0}'.format(e))
+        except Exception as e:
+            _logger.error('Transformer run error: {0}'.format(e))
+            raise
 
     def __check_bsm_version(self):
         m = re.match('(\d+)\.(\d+)\.(\d+)', BSM_VERSION)

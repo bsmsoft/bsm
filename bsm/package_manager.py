@@ -148,7 +148,7 @@ class PackageManager(object):
         safe_mkdir(self.__pkgs[pkg]['dir']['status'])
         dump_config(install_status, self.__install_status_file(pkg))
 
-    def save_release_status(self, pkg, time):
+    def save_release_status(self, pkg, end_time):
         if pkg not in self.__pkgs:
             raise PackageNotFoundError('Package {0} not found'.format(pkg))
         if not self.__pkgs[pkg]['config_category'].get('install'):

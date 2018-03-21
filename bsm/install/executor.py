@@ -1,6 +1,7 @@
 import os
 import copy
 import datetime
+import traceback
 
 from bsm.env import Env
 from bsm.package_manager import PackageManager
@@ -69,14 +70,13 @@ class Executor(object):
 
         safe_mkdir(param['pkg_info']['dir']['log'])
 
-        module_name = HANDLER_MODULE_NAME + '.install.' + param['action_handler']
-        func_name = 'run'
         try:
-            f = load_func(module_name, func_name)
+            result_action = run_handler('install.'+param['action_handler'], param)
         except Exception as e:
             _logger.critical('"{0}" install handler error: {1}'.format(action_full_name, e))
+            if param['config_user']['verbose']:
+                _logger.critical('\n{0}'.format(traceback.format_exc()))
             raise
-        result_action = f(param)
 
         result['success'] = False
         if isinstance(result_action, bool) and result_action:

@@ -1,4 +1,5 @@
 from bsm.loader import run_handler
+from bsm.loader import LoadError
 
 class Selector(object):
     def __init__(self, config_user, config_version, config_release):
@@ -14,4 +15,12 @@ class Selector(object):
         param['running'] = running
         param['idle'] = idle
 
-        return run_handler('selector', param)
+        try:
+            return run_handler('selector', param)
+        except LoadError as e:
+            _logger.debug('Selector load failed: {0}'.format(e))
+            _logger.debug('Will randomly select one')
+            return [next(iter(idle))]
+        except Exception as e:
+            _logger.error('Selector run error: {0}'.format(e))
+            raise
