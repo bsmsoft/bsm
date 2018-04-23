@@ -71,7 +71,7 @@ class Install(object):
         click.echo('')
 
 
-        if not yes and not click.confirm('Proceed with installation?', default=True):
+        if not yes and not click.confirm('Proceed with installation?', default=True, err=True):
             return
 
 

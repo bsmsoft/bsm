@@ -7,9 +7,9 @@
 # 2. You want to use installation from other OS
 #os: sl6
 
-#release_repo: https://github.com/cepc/cepc-release
+#release_repo: https://github.com/bsmhep/bsmdemo
 
-#software_root: /cvmfs/cepc.ihep.ac.cn/software/cepcsoft
+#software_root: ~/bsmsoft
 
 #work_root: ~/mywork
 
@@ -21,4 +21,4 @@
 #    work_root: ~/mywork123
 #  'test':
 #    version: '1.2.1'
-#    software_root: ~/cepcsoft_test
+#    software_root: ~/soft_test

@@ -15,6 +15,6 @@ class Exit(object):
         for k, v in set_env.items():
             shell.set_env(k, v)
 
-        shell.undefine_bsm()
+        shell.undefine_command()
 
         click.echo(shell.script, nl=False)

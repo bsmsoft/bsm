@@ -74,7 +74,7 @@ class Cmd(object):
             if self.__cmd_config_release:
                 config_release = ConfigRelease(self.__config_user, config_version, option_release)
 
-                extra_config = config_release.get('setting', {}).get('category', {}).get('extra_config', [])
+                extra_config = config_release.get('setting', {}).get('extra_config', [])
                 if extra_config:
                     config_version = ConfigVersion(self.__config_user, cmd_kwargs.get('version_name'), version_cmd, extra_config)
 

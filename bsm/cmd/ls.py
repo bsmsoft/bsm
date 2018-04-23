@@ -51,7 +51,7 @@ class Ls(object):
 
 
         software_root = config_version.get('software_root')
-        click.echo('(Software root: "{0}")'.format(software_root))
+        _logger.info('(Software root: "{0}")'.format(software_root))
 
         for version in local_versions:
             ver_status = []

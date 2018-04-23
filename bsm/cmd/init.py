@@ -14,7 +14,7 @@ class Init(object):
     def execute(self, config_user, shell):
         shell.clear_script()
 
-        shell.define_bsm()
+        shell.define_command()
         shell.newline()
 
         try:

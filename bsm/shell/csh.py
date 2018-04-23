@@ -26,7 +26,7 @@ class Csh(Base):
     def source(self, script_path):
         return 'source {0};\n'.format(script_path)
 
-    def define_bsm(self):
+    def define_command(self):
         python_exe = sys.executable or 'python'
 
         common_alias = '''\
@@ -45,7 +45,7 @@ eval "exit $_bsm_exit"\
 
         return bsm_alias + bsm_script_alias
 
-    def undefine_bsm(self):
+    def undefine_command(self):
         bsm_exit = '''\
 unalias bsm_script;
 unalias bsm;

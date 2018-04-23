@@ -44,12 +44,13 @@ class Executor(object):
         par['action_handler'] = step.get('handler')
         par['action_param'] = step.get('param')
 
+        par['log_file'] = os.path.join(self.__pkg_mgr.package_info(pkg)['dir']['log'], '{0}_{1}_{2}.log'.format(pkg, action, sub_action))
+        par['env'] = copy.deepcopy(self.__env.env_final())
+
         par['config_user'] = copy.deepcopy(self.__config_user)
         par['def_dir'] = self.__config_version.def_dir
         par['pkg_info'] = copy.deepcopy(self.__pkg_mgr.package_info(pkg))
         par['pkg_dir_list'] = copy.deepcopy(self.__pkg_mgr.package_dir_list())
-        par['log_file'] = os.path.join(self.__pkg_mgr.package_info(pkg)['dir']['log'], '{0}_{1}_{2}.log'.format(pkg, action, sub_action))
-        par['env'] = copy.deepcopy(self.__env.env_final())
 
         return par
 

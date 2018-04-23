@@ -56,7 +56,7 @@ setup(
     ],
     entry_points = {
         'console_scripts': [
-            'bsm_cmd = bsm:main',
+            'bsm_cmd = bsm.cli:main',
         ],
     },
 )

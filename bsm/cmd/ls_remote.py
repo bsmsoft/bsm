@@ -25,7 +25,7 @@ class LsRemote(object):
 
 
         release_repo = config_version.get('release_repo')
-        click.echo('(Release repository: "{0}")'.format(release_repo))
+        _logger.info('(Release repository: "{0}")'.format(release_repo))
 
         for version in versions:
             click.echo(version)
