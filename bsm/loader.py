@@ -1,7 +1,7 @@
 import sys
 import inspect
 
-from bsm.config.config_version import HANDLER_MODULE_NAME
+from bsm import HANDLER_MODULE_NAME
 
 from bsm.util import snake_to_camel
 

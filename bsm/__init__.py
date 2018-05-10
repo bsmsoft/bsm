@@ -1,8 +1,18 @@
+import os
+
 
 BSM_HOME = os.path.dirname(os.path.realpath(__file__))
 
+# This name is very long in order to avoid conflicts with other modules
+HANDLER_MODULE_NAME = '_bsm_handler_run_avoid_conflict'
+
+
 with open(os.path.join(BSM_HOME, 'BSM_VERSION'), 'r') as f:
     BSM_VERSION = f.read().strip()
+
+
+from bsm.config import Config
+from bsm.env import Env
 
 
 class BSM(object):
@@ -29,7 +39,7 @@ class BSM(object):
         self.__config = Config(self.__config_entry)
 
     def app(self):
-        return self.__config.app.get('id', 'bsm')
+        return self.__config['app']['id']
 
     def init_script(self, shell):
         pass

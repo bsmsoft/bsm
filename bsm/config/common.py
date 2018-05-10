@@ -1,11 +1,11 @@
 import collections
 import copy
 
+from bsm.config import ConfigNoDirectModError
+
 from bsm.util.config import load_config
 from bsm.util.config import dump_config
 from bsm.util.config import ConfigError
-
-from bsm.config import ConfigNoDirectModError
 
 from bsm.logger import get_logger
 _logger = get_logger()

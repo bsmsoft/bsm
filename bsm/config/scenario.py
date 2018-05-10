@@ -3,12 +3,12 @@ import random
 import string
 import datetime
 
+from bsm.config.common import Common
+
 from bsm.util import expand_path
 from bsm.util import ensure_list
 
-
-# This name is very long in order to avoid conflicts with other modules
-HANDLER_MODULE_NAME = '_bsm_handler_run_avoid_conflict'
+from bsm import HANDLER_MODULE_NAME
 
 
 __TEMP_VERSION_PREFIX = ''
@@ -37,7 +37,7 @@ class ConfigScenarioError(Exception):
     pass
 
 
-class ConfigScenario(object):
+class Scenario(Common):
     __SCENARIO_GLOBAL_ITEMS = ('software_root', 'release_repo')
     __SCENARIO_ENTRY_ITEMS = ('software_root', 'release_repo', 'release_infodir')
 

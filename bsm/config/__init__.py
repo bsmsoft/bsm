@@ -1,11 +1,5 @@
 import collections
 
-from bsm.config.common import Common as ConfigCommon
-from bsm.config.app import App as ConfigApp
-from bsm.config.user import User as ConfigUser
-from bsm.config.release import Release as ConfigRelease
-from bsm.config.package import Package as ConfigPackage
-
 from bsm.util import expand_path
 
 
@@ -14,6 +8,13 @@ class ConfigNotValidError(Exception):
 
 class ConfigNoDirectModError(Exception):
     pass
+
+
+from bsm.config.common import Common as ConfigCommon
+from bsm.config.app import App as ConfigApp
+from bsm.config.scenario import Scenario as ConfigScenario
+from bsm.config.release import Release as ConfigRelease
+from bsm.config.package import Package as ConfigPackage
 
 
 class Config(collections.MutableMapping):

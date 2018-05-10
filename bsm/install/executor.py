@@ -9,7 +9,7 @@ from bsm.package_manager import PackageManager
 from bsm.loader import load_func
 from bsm.util import safe_mkdir
 
-from bsm.config.config_version import HANDLER_MODULE_NAME
+from bsm import HANDLER_MODULE_NAME
 
 from bsm.logger import get_logger
 _logger = get_logger()

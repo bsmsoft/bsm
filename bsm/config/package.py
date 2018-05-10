@@ -1,7 +1,9 @@
 import os
 
-from bsm.config import load_config
-from bsm.config import dump_config
+from bsm.config.common import Common
+
+from bsm.util.config import load_config
+from bsm.util.config import dump_config
 
 from bsm.util import safe_mkdir
 
@@ -11,7 +13,7 @@ _logger = get_logger()
 class PackageNotFoundError(Exception):
     pass
 
-class Package(object):
+class Package(Common):
     def load_package(self, config_release, config_category):
         self.__load_packages(config_release, config_category)
         self.__load_package_dir_list()

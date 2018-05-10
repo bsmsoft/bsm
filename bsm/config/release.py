@@ -2,12 +2,13 @@ import os
 import re
 import copy
 
+from bsm.config.common import Common
+
 from bsm.loader import run_handler
 from bsm.loader import LoadError
 
-from bsm.config import load_config
-from bsm.config import ConfigError
-from bsm.config.config_version import HANDLER_MODULE_NAME
+from bsm.util.config import load_config
+from bsm.util.config import ConfigError
 
 from bsm.logger import get_logger
 _logger = get_logger()
@@ -37,7 +38,7 @@ def _compare_version(ver1, ver2):
     return 0
 
 
-class ConfigRelease(object):
+class Release(Common):
     __AVAILABLE_RELEASE_CONFIG = ('version', 'setting')
 
     def load_release(self, config_scenario, config_app):
