@@ -6,9 +6,11 @@ with open(os.path.join(BSM_HOME, 'BSM_VERSION'), 'r') as f:
 
 
 class BSM(object):
-    def __init__(self, app):
-        self.__config_app = ConfigApp(app)
-        self.__config_user = ConfigUser(self.__config_app)
+    def __init__(self, config_entry={}):
+        self.__config_entry = config_entry
+
+        self.__config = Config(self.__config_entry)
+        self.__env = Env()
 
     @staticmethod
     def version():
@@ -18,7 +20,15 @@ class BSM(object):
     def home():
         return BSM_HOME
 
-    def app():
+    def reload(self, config_entry, update_config=False):
+        if update_config:
+            self.__config_entry.update(config_entry)
+        else:
+            self.__config_entry = config_entry
+
+        self.__config = Config(self.__config_entry)
+
+    def app(self):
         return self.__config.app.get('id', 'bsm')
 
     def init_script(self, shell):
@@ -42,8 +52,8 @@ class BSM(object):
     def ls(self):
         pass
 
-    def use(self, shell=None):
-        pass
+    def use(self):
+        self.__env.update()
 
     def env(self):
         pass

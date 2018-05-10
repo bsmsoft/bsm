@@ -1,34 +1,37 @@
+from bsm.config.common import Common
+
 from bsm import BSM_HOME
 
-class App(object):
-    def __init__(self, config):
-        self.__config = config
-
+class App(Common):
+    def load_app(self):
         self.__load_bsm()
         self.__set_default()
 
     def __load_bsm(self):
-        if 'id' in self.__config:
+        if 'id' in self:
             return
-        self.__config['id'] = 'bsm'
-        self.__config['name'] = 'BSM'
-        self.__config['description'] = 'Bundled Software Manager'
+        self['id'] = 'bsm'
+        self['name'] = 'BSM'
+        self['description'] = 'Bundled Software Manager'
 
     def __set_default(self):
-        app_id = self.__config['id']
+        app_id = self['id']
 
-        self.__config.setdefault('description', 'Application of BSM')
-        self.__config.setdefault('site', 'https://bsmhep.github.io/')
+        self.setdefault('description', 'Application of BSM')
+        self.setdefault('site', 'https://bsmhep.github.io/')
 
-        self.__config.setdefault('command', app_id)
-        self.__config.setdefault('gittemp', '')
-        self.__config.setdefault('logger_name', 'BSM')
-        self.__config.setdefault('env_prefix', app_id.upper()+'_')
-        self.__config.setdefault('user_config_file', '~/.'+app_id+'.conf')
-        self.__config.setdefault('user_info_file', '~/.'+app_id+'.info')
-        self.__config.setdefault('example_config_user', os.path.join(BSM_HOME, 'support', 'bsm.conf.example'))
-        self.__config.setdefault('release_collection_dir', '.bsm')
-        self.__config.setdefault('package_info_dir', '.bsm')
+        self.setdefault('command', app_id)
+        self.setdefault('gittemp', '')
+        self.setdefault('logger_name', 'BSM')
+        self.setdefault('env_prefix', app_id.upper()+'_')
+        self.setdefault('config_user_file', '~/.'+app_id+'.conf')
+        self.setdefault('config_info_file', '~/.'+app_id+'.info')
+        self.setdefault('example_config_user', os.path.join(BSM_HOME, 'support', 'bsm.conf.example'))
+        self.setdefault('release_dir', '.bsm')
+        self.setdefault('package_info_dir', '.bsm')
+        self.setdefault('solo_env', {})
+        self.setdefault('path_env', {})
+        self.setdefault('extra_config_scenario', [])
 
-        self.__config.setdefault('default_release_repo', 'https://github.com/bsmhep/bsmdemo')
-        self.__config.setdefault('default_software_root', os.getcwd())
+        self.setdefault('release_repo', 'https://github.com/bsmhep/bsmdemo')
+        self.setdefault('software_root', os.getcwd())

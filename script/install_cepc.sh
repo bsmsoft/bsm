@@ -40,6 +40,7 @@ install_pypy() {
   pypy/bin/pip install -U pip wheel
 
   pypy/bin/pip install bsm
+  pypy/bin/pip install distro
 }
 
 install_gitmini() {

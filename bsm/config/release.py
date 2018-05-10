@@ -15,9 +15,6 @@ _logger = get_logger()
 from bsm import BSM_VERSION
 
 
-_AVAILABLE_RELEASE_CONFIG = ('version', 'setting')
-
-
 class ConfigReleaseError(Exception):
     pass
 
@@ -41,30 +38,26 @@ def _compare_version(ver1, ver2):
 
 
 class ConfigRelease(object):
-    def __init__(self, config_user, config_version, option):
-        self.__config_user = config_user
-        self.__config_version = config_version
-        self.__option = option
+    __AVAILABLE_RELEASE_CONFIG = ('version', 'setting')
 
-        self.__load_config()
+    def load_release(self, config_scenario, config_app):
+        self.__load_config(config_scenario)
 
-        self.__transform()
-
-        self.__check_version()
+        self.__transform(config_scenario, config_app)
 
         self.__check_bsm_version()
 
-    def __load_config(self):
-        self.__config = {}
+        self.__check_version_consistency(config_scenario)
 
-        config_dir = os.path.join(self.__config_version.def_dir, 'config')
+    def __load_config(self, config_scenario):
+        config_dir = os.path.join(config_scenario.version_path['def_dir'], 'config')
         if not os.path.exists(config_dir):
             raise ConfigReleaseError('Release definition directory "{0}" not found'.format(config_dir))
 
-        for k in _AVAILABLE_RELEASE_CONFIG:
+        for k in __AVAILABLE_RELEASE_CONFIG:
             config_file = os.path.join(config_dir, k+'.yml')
             try:
-                self.__config[k] = load_config(config_file)
+                self[k] = load_config(config_file)
             except ConfigError as e:
                 _logger.warn('Fail to load config file "{0}": {1}'.format(config_file, e))
 
@@ -72,26 +65,26 @@ class ConfigRelease(object):
         self.__load_package_config(package_dir)
 
     def __load_package_config(self, package_dir):
-        self.__config['package'] = {}
+        self['package'] = {}
         for root, dirs, files in os.walk(package_dir):
             for f in files:
                 if not f.endswith('.yml') and not f.endswith('.yaml'):
                     continue
                 pkg_name = os.path.splitext(f)[0]
                 full_path = os.path.join(root, f)
-                self.__config['package'][pkg_name] = load_config(full_path)
+                self['package'][pkg_name] = load_config(full_path)
 
-    def __transform(self):
+    def __transform(self, config_scenario, config_app):
         param = {}
-        param['config_user'] = self.__config_user
-        param['config_version'] = self.__config_version.config
-        param['config_release'] = self.__config
-        param['option'] = self.__option
+        param['config_scenario'] = config_scenario.data_copy
+        param['config_app'] = config_app.data_copy
+        param['config_release'] = self.data_copy
 
         try:
-            result = run_handler('transformer', param, self.__config_version.handler_dir)
+            result = run_handler('transformer', param, config_scenario.version_path['handler_dir'])
             if isinstance(result, dict):
-                self.__config = result
+                self.clear()
+                self.update(result)
         except LoadError as e:
             _logger.debug('Transformer load failed: {0}'.format(e))
         except Exception as e:
@@ -105,7 +98,7 @@ class ConfigRelease(object):
         major, minor, patch = m.groups()
         bsm_ver_frag = [int(major), int(minor), int(patch)]
 
-        version_require = self.__config.get('setting', {}).get('bsm', {}).get('require', {})
+        version_require = self.get('setting', {}).get('bsm', {}).get('require', {})
         _logger.debug('Version require: {0}'.format(version_require))
         for comp, ver in version_require.items():
             ver_frag = [int(i) for i in ver.split('.')]
@@ -117,16 +110,8 @@ class ConfigRelease(object):
                     comp == '>' and result <= 0:
                 raise ConfigReleaseError('BSM version does not follow: {0} {1} {2}'.format(BSM_VERSION, comp, ver))
 
-
-    def __check_version(self):
-        version = self.__config_version.get('version')
-        version_in_release = self.__config.get('version')
+    def __check_version_consistency(self, config_scenario):
+        version = config_scenario.get('version')
+        version_in_release = self.get('version')
         if version != version_in_release:
             _logger.warn('Version inconsistency found. Request {0} but receive {1}'.format(version, version_in_release))
-
-    def get(self, key, default_value=None):
-        return self.__config.get(key, default_value)
-
-    @property
-    def config(self):
-        return self.__config
