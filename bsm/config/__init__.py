@@ -96,6 +96,27 @@ class Config(collections.MutableMapping):
         self.__config['release'] = ConfigRelease()
         self['release'].load_release(self['scenario'], self['user'], self['app'])
 
+    def __load_category(self):
+        self.__config['category'] = ConfigCommon()
+
+        for ctg, cfg in self['release'].get('setting', {}).get('category', {}).get('categories', {}).items():
+            self['category'][ctg] = {}
+            self['category'][ctg]['pre_check'] = cfg.get('pre_check', False)
+            self['category'][ctg]['install'] = cfg.get('install', False)
+            self['category'][ctg]['auto_env'] = cfg.get('auto_env', False)
+            self['category'][ctg]['auto_package'] = cfg.get('auto_package', False)
+            self['category'][ctg]['root'] = cfg.get('root')
+
+            if 'root' in cfg:
+                self['category'][ctg]['root'] = cfg['root'].format(**self['scenario'])
+            else:
+                self['category'][ctg]['install'] = False
+                self['category'][ctg]['auto_package'] = False
+
+    def __load_package(self):
+        self.__config['package'] = ConfigPackage()
+        self['package'].load_package(self['release'], self['category'])
+
 
     @property
     def config(self):

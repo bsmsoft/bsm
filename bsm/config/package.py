@@ -12,60 +12,30 @@ class PackageNotFoundError(Exception):
     pass
 
 class Package(object):
-    def __init__(self, config_version, config_release):
-        self.__config_version = config_version
-        self.__config_release = config_release
-
-        self.__load_categories()
-        self.__load_packages()
+    def load_package(self, config_release, config_category):
+        self.__load_packages(config_release, config_category)
         self.__load_package_dir_list()
 
-    def __load_categories(self):
-        self.__categories = {}
-        for ctg, cfg in self.__config_release.config['setting']['category']['categories'].items():
-            required_config = cfg.get('required_config', [])
-            required_config_not_found = False
-            for i in required_config:
-                if i not in self.__config_version.config:
-                    _logger.debug('Required config "{0}" not found for category "{1}"'.format(i, ctg))
-                    required_config_not_found = True
-                    break
-            if required_config_not_found:
-                _logger.debug('Category "{0}" will be omitted'.format(ctg))
+    def __load_packages(self, config_release, config_category):
+        for pkg, pkg_config in config_release.get('package', {}).items():
+            category = pkg_config.get('category')
+            if category not in config_category:
+                _logger.error('Category "{0}" does not exist for package "{1}"'.format(category, pkg))
                 continue
 
-            self.__categories[ctg] = {}
-            self.__categories[ctg]['pre_check'] = cfg.get('pre_check', False)
-            self.__categories[ctg]['install'] = cfg.get('install', False)
-            self.__categories[ctg]['auto_env'] = cfg.get('auto_env', False)
-            self.__categories[ctg]['auto_package'] = cfg.get('auto_package', False)
-            self.__categories[ctg]['root'] = cfg.get('root')
-
-            if 'root' in cfg:
-                self.__categories[ctg]['root'] = cfg['root'].format(**self.__config_version.config)
-            else:
-                self.__categories[ctg]['install'] = False
-                self.__categories[ctg]['auto_package'] = False
-
-    def __load_packages(self):
-        self.__pkgs = {}
-        for pkg, pkg_config in self.__config_release.get('package', {}).items():
             pkg_info = {'name': pkg}
 
-            category = pkg_config.get('category')
-            if category not in self.__categories:
-                _logger.warn('Category "{0}" does not exist for package "{1}"'.format(category, pkg))
-            pkg_info['config_category'] = self.__categories.get(category, {})
+            pkg_info['config_category'] = config_category[category]
 
             pkg_info['config'] = pkg_config
             pkg_info['dir'] = self.__package_dir(pkg_info)
 
-            self.__pkgs[pkg] = pkg_info
+            self[pkg] = pkg_info
 
     def __load_package_dir_list(self):
         self.__pkg_dir_list = {}
         install_path_name = self.__config_release.get('setting', {}).get('path_usage', {}).get('install', {})
-        for pkg, pkg_info in self.__pkgs.items():
+        for pkg, pkg_info in self.items():
             if not pkg_info.get('config_category', {}).get('auto_env'):
                 continue
 
@@ -74,6 +44,7 @@ class Package(object):
                     continue
                 path_key = install_path_name[k].format(package=pkg)
                 self.__pkg_dir_list[path_key] = v.format(**pkg_info['dir'])
+
 
     def __package_dir(self, pkg_info):
         def _package_root(pkg_info):
@@ -104,10 +75,10 @@ class Package(object):
 
 
     def __install_status_file(self, pkg):
-        return os.path.join(self.__pkgs[pkg]['dir']['status'], 'install.yml')
+        return os.path.join(self[pkg]['dir']['status'], 'install.yml')
 
     def __release_status_file(self, pkg):
-        return os.path.join(self.__pkgs[pkg]['dir']['status'], 'release.yml')
+        return os.path.join(self[pkg]['dir']['status'], 'release.yml')
 
     def __load_status(self, status_file):
         try:
@@ -119,7 +90,7 @@ class Package(object):
             return {}
 
     def is_finished(self, pkg, action):
-        if not self.__pkgs[pkg]['config_category'].get('install'):
+        if not self[pkg]['config_category'].get('install'):
             return False
 
         install_status = self.__load_status(self.__install_status_file(pkg))
@@ -129,9 +100,9 @@ class Package(object):
                 install_status['steps'][action]['finished']
 
     def save_action_status(self, pkg, action, start, end):
-        if pkg not in self.__pkgs:
+        if pkg not in self:
             raise PackageNotFoundError('Package {0} not found'.format(pkg))
-        if not self.__pkgs[pkg]['config_category'].get('install'):
+        if not self[pkg]['config_category'].get('install'):
             _logger.warn('Will not save install status for: {0}.{1}'.format(pkg, action))
             return
 
@@ -145,13 +116,13 @@ class Package(object):
         install_status['steps'][action]['start'] = start
         install_status['steps'][action]['end'] = end
 
-        safe_mkdir(self.__pkgs[pkg]['dir']['status'])
+        safe_mkdir(self[pkg]['dir']['status'])
         dump_config(install_status, self.__install_status_file(pkg))
 
     def save_release_status(self, pkg, end_time):
-        if pkg not in self.__pkgs:
+        if pkg not in self:
             raise PackageNotFoundError('Package {0} not found'.format(pkg))
-        if not self.__pkgs[pkg]['config_category'].get('install'):
+        if not self[pkg]['config_category'].get('install'):
             _logger.warn('Will not save release status for: {0}'.format(pkg))
             return
 
@@ -163,15 +134,16 @@ class Package(object):
         if release_version and release_version not in release_status['version']:
             release_status['version'].append(release_version)
 
-        safe_mkdir(self.__pkgs[pkg]['dir']['status'])
+        safe_mkdir(self[pkg]['dir']['status'])
         dump_config(release_status, self.__release_status_file(pkg))
 
 
-    def package_all(self):
-        return self.__pkgs
+#    def package_all(self):
+#        return self.__pkgs
 
     def package_info(self, pkg):
-        return self.__pkgs.get(pkg, {})
+        return self.get(pkg, {})
 
+    @property
     def package_dir_list(self):
         return self.__pkg_dir_list

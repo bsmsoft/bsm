@@ -1,6 +1,6 @@
 import os
-import sys
 import re
+import copy
 
 from bsm.loader import run_handler
 from bsm.loader import LoadError
@@ -76,7 +76,7 @@ class ConfigRelease(object):
 
     def __transform(self, config_scenario, config_app):
         param = {}
-        param['config_scenario'] = config_scenario.data_copy
+        param['config_scenario'] = copy.deepcopy(config_scenario)
         param['config_app'] = config_app.data_copy
         param['config_release'] = self.data_copy
 
