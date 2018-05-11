@@ -42,7 +42,7 @@ class Scenario(Common):
     __SCENARIO_ENTRY_ITEMS = ('software_root', 'release_repo', 'release_infodir')
 
     def __init__(self):
-        super(ConfigScenario, self).__init__()
+        super(Scenario, self).__init__()
 
         self.__version_path = {}
 

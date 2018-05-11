@@ -28,7 +28,7 @@ class Config(collections.MutableMapping):
             raise ConfigNotValidError('No such config: {0}'.format(key))
 
         if key not in self.__config:
-            load_method = getattr(self, '__load_' + key, method_not_found)
+            load_method = getattr(self, '_Config__load_' + key, method_not_found)
             load_method()
 
         return self.__config[key]
@@ -65,7 +65,7 @@ class Config(collections.MutableMapping):
         config_user_file = self['app']['config_user_file']
         if 'config_user_file' in self['entry']:
             config_user_file = self['entry']['config_user_file']
-        self['user'].load_from_file(expand_path(self['entry']['config_user_file']))
+        self['user'].load_from_file(expand_path(config_user_file))
 
         if 'config_user' in self['entry']:
             self['user'].update(self['entry']['config_user'])

@@ -47,8 +47,9 @@ class BSM(object):
     def exit_script(self, shell):
         pass
 
-    def config(self):
-        pass
+    def config(self, config_type, scenario):
+        self.reload({'scenario': scenario}, True)
+        return dict(self.__config[config_type])
 
     def config_user_example(self):
         pass
