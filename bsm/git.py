@@ -122,7 +122,7 @@ class Git(object):
         refs = []
         for line in out.splitlines():
             name = line.strip().split()[1]
-            name_short = name.split('/')[2]
+            name_short = name.split(b'/')[2]
             refs.append(name_short)
         return refs
 

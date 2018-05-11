@@ -15,6 +15,8 @@ _logger = get_logger()
 
 from bsm import BSM_VERSION
 
+_AVAILABLE_RELEASE_CONFIG = ('version', 'setting')
+
 
 class ConfigReleaseError(Exception):
     pass
@@ -39,7 +41,6 @@ def _compare_version(ver1, ver2):
 
 
 class Release(Common):
-    __AVAILABLE_RELEASE_CONFIG = ('version', 'setting')
 
     def load_release(self, config_scenario, config_app):
         self.__load_config(config_scenario)
@@ -53,9 +54,9 @@ class Release(Common):
     def __load_config(self, config_scenario):
         config_dir = os.path.join(config_scenario.version_path['def_dir'], 'config')
         if not os.path.exists(config_dir):
-            raise ConfigReleaseError('Release definition directory "{0}" not found'.format(config_dir))
+            raise ConfigReleaseError('Release version "{0}" not found'.format(config_scenario['version']))
 
-        for k in __AVAILABLE_RELEASE_CONFIG:
+        for k in _AVAILABLE_RELEASE_CONFIG:
             config_file = os.path.join(config_dir, k+'.yml')
             try:
                 self[k] = load_config(config_file)

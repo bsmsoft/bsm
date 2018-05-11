@@ -14,13 +14,25 @@ with open(os.path.join(BSM_HOME, 'BSM_VERSION'), 'r') as f:
 from bsm.config import Config
 from bsm.env import Env
 
+from bsm.git import Git
+from bsm.git import GitNotFoundError
+from bsm.git import GitEmptyUrlError
+
+from bsm.logger import add_stream_logger
+
 
 class BSM(object):
     def __init__(self, config_entry={}):
         self.__config_entry = config_entry
 
         self.__config = Config(self.__config_entry)
+
+        self.__initialize_logger()
+
         self.__env = Env()
+
+    def __initialize_logger(self):
+        add_stream_logger(self.__config['output']['verbose'])
 
     @staticmethod
     def version():
@@ -47,15 +59,29 @@ class BSM(object):
     def exit_script(self, shell):
         pass
 
-    def config(self, config_type, scenario):
-        self.reload({'scenario': scenario}, True)
+    def config(self, config_type, scenario=None):
+        if scenario:
+            self.reload({'scenario': scenario}, True)
         return dict(self.__config[config_type])
 
     def config_user_example(self):
         pass
 
     def ls_remote(self):
-        pass
+        try:
+            git = Git()
+            tags = git.ls_remote_tags(self.__config['scenario']['release_repo'])
+        except GitNotFoundError:
+            _logger.error('Git is not found. Please install "git" first')
+            raise
+        except GitEmptyUrlError:
+            _logger.error('No release repository found. Please setup "release_repo" first')
+            raise
+
+        versions = [tag[1:] for tag in tags if tag.startswith(b'v')]
+        versions.sort()
+
+        return versions
 
     def install(self):
         pass

@@ -32,8 +32,8 @@ def install_definition(config_version):
     cv = config_version.config
     def_dir = config_version.def_dir
 
-    if 'release_infodir' in cv and cv['release_infodir']:
-        _install_from_dir(cv['release_infodir'], def_dir)
+    if 'release_source' in cv and cv['release_source']:
+        _install_from_dir(cv['release_source'], def_dir)
     elif 'version' in cv and cv['version']:
         _install_from_git_repo(cv['release_repo'], cv['version'], def_dir)
 

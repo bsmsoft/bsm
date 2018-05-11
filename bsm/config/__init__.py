@@ -87,7 +87,7 @@ class Config(collections.MutableMapping):
 
     def __load_info(self):
         self.__config['info'] = ConfigCommon()
-        self['info'].load_from_file(expand_path(self['app']['user_info_file']))
+        self['info'].load_from_file(expand_path(self['app']['config_info_file']))
 
     def __load_scenario(self):
         self.__config['scenario'] = ConfigScenario()
@@ -95,7 +95,7 @@ class Config(collections.MutableMapping):
 
     def __load_release(self):
         self.__config['release'] = ConfigRelease()
-        self['release'].load_release(self['scenario'], self['user'], self['app'])
+        self['release'].load_release(self['scenario'], self['app'])
 
     def __load_category(self):
         self.__config['category'] = ConfigCommon()

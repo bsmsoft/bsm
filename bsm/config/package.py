@@ -10,11 +10,13 @@ from bsm.util import safe_mkdir
 from bsm.logger import get_logger
 _logger = get_logger()
 
-class PackageNotFoundError(Exception):
+class ConfigPackageError(Exception):
     pass
 
 class Package(Common):
-    def load_package(self, config_release, config_category):
+    def load_package(self, config_app, config_release, config_category):
+        self.__package_work_dir = config_app['package_work_dir']
+
         self.__load_packages(config_release, config_category)
         self.__load_package_dir_list()
 
@@ -64,7 +66,7 @@ class Package(Common):
             package_root = _package_root(pkg_info)
             pkg_dir['root'] = package_root
 
-            package_work_root = os.path.join(package_root, '.bsm', version)
+            package_work_root = os.path.join(package_root, self.__package_work_dir, version)
             pkg_dir['status'] = os.path.join(package_work_root, 'status')
             pkg_dir['log'] = os.path.join(package_work_root, 'log')
             pkg_dir['download'] = os.path.join(package_work_root, 'download')
@@ -103,7 +105,7 @@ class Package(Common):
 
     def save_action_status(self, pkg, action, start, end):
         if pkg not in self:
-            raise PackageNotFoundError('Package {0} not found'.format(pkg))
+            raise ConfigPackageError('Package {0} not found'.format(pkg))
         if not self[pkg]['config_category'].get('install'):
             _logger.warn('Will not save install status for: {0}.{1}'.format(pkg, action))
             return
@@ -123,7 +125,7 @@ class Package(Common):
 
     def save_release_status(self, pkg, end_time):
         if pkg not in self:
-            raise PackageNotFoundError('Package {0} not found'.format(pkg))
+            raise ConfigPackageError('Package {0} not found'.format(pkg))
         if not self[pkg]['config_category'].get('install'):
             _logger.warn('Will not save release status for: {0}'.format(pkg))
             return

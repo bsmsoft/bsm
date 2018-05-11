@@ -1,4 +1,3 @@
-import sys
 import click
 
 from bsm.git import Git

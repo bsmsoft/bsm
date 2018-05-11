@@ -11,6 +11,10 @@ from bsm.util import ensure_list
 from bsm import HANDLER_MODULE_NAME
 
 
+_SCENARIO_GLOBAL_ITEMS = ('software_root', 'release_repo')
+_SCENARIO_ENTRY_ITEMS = ('software_root', 'release_repo', 'release_source')
+
+
 __TEMP_VERSION_PREFIX = ''
 __TEMP_VERSION_LENGTH = 6
 
@@ -38,9 +42,6 @@ class ConfigScenarioError(Exception):
 
 
 class Scenario(Common):
-    __SCENARIO_GLOBAL_ITEMS = ('software_root', 'release_repo')
-    __SCENARIO_ENTRY_ITEMS = ('software_root', 'release_repo', 'release_infodir')
-
     def __init__(self):
         super(Scenario, self).__init__()
 
@@ -49,9 +50,9 @@ class Scenario(Common):
     def load_scenario(self, config_entry, config_user, config_app):
         self['option'] = {}
 
-        self.update(_filter_scenario_config(config_app, __SCENARIO_GLOBAL_ITEMS))
+        self.update(_filter_scenario_config(config_app, _SCENARIO_GLOBAL_ITEMS))
 
-        self.update(_filter_scenario_config(config_user, __SCENARIO_GLOBAL_ITEMS))
+        self.update(_filter_scenario_config(config_user, _SCENARIO_GLOBAL_ITEMS))
         self.__update_option(config_user)
 
         if 'scenario' in config_entry:
@@ -65,7 +66,7 @@ class Scenario(Common):
             if 'version' not in self:
                 self['version'] = scenario
 
-        self.update(_filter_scenario_config(config_entry, __SCENARIO_ENTRY_ITEMS))
+        self.update(_filter_scenario_config(config_entry, _SCENARIO_ENTRY_ITEMS))
         self.__update_option(config_entry)
 
         if 'version' not in self:

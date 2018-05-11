@@ -91,7 +91,8 @@ def config_release(ctx, version):
 
 @cli.command()
 @click.option('--release-repo', '-t', type=str, help='Repository for retrieving release information')
-@click.option('--release-infodir', '-i', type=str, help='Directory for retrieving release information')
+@click.option('--release-source', '-i', type=str, help='Directory for retrieving release information. '
+        'This will take precedence over "release-repo". Use this option only for debugging')
 @click.option('--option', '-o', type=str, multiple=True, help='Options for installation')
 @click.option('--reinstall', is_flag=True, help='Reinstall all packages')
 @click.option('--update', is_flag=True, help='Update version information before installation')
@@ -99,11 +100,11 @@ def config_release(ctx, version):
 @click.option('--yes', '-y', is_flag=True, help='Install without confirmation')
 @click.argument('version', type=str)
 @click.pass_context
-def install(ctx, release_repo, release_infodir, option, reinstall, update, force, yes, version):
+def install(ctx, release_repo, release_source, option, reinstall, update, force, yes, version):
     '''Install specified release version'''
     cmd = Cmd('install')
     ctx.obj['release_repo'] = release_repo
-    ctx.obj['release_infodir'] = release_infodir
+    ctx.obj['release_source'] = release_source
     cmd.execute(ctx.obj, option_list=option, reinstall=reinstall, update=update, force=force, yes=yes, version_name=version)
 
 

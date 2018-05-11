@@ -24,16 +24,14 @@ class App(Common):
 
         self.setdefault('command', app_id)
         self.setdefault('gittemp', '')
-        self.setdefault('logger_name', 'BSM')
         self.setdefault('env_prefix', app_id.upper()+'_')
         self.setdefault('config_user_file', '~/.'+app_id+'.conf')
         self.setdefault('config_info_file', '~/.'+app_id+'.info')
         self.setdefault('example_config_user', os.path.join(BSM_HOME, 'support', 'bsm.conf.example'))
         self.setdefault('release_dir', '.bsm')
-        self.setdefault('package_info_dir', '.bsm')
+        self.setdefault('package_work_dir', '.bsm')
         self.setdefault('solo_env', {})
         self.setdefault('path_env', {})
-        self.setdefault('extra_config_scenario', [])
 
         self.setdefault('release_repo', 'https://github.com/bsmhep/bsmdemo')
         self.setdefault('software_root', os.getcwd())
