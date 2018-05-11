@@ -14,9 +14,7 @@ with open(os.path.join(BSM_HOME, 'BSM_VERSION'), 'r') as f:
 from bsm.config import Config
 from bsm.env import Env
 
-from bsm.git import Git
-from bsm.git import GitNotFoundError
-from bsm.git import GitEmptyUrlError
+from bsm.operation import Operation
 
 from bsm.logger import add_stream_logger
 
@@ -30,6 +28,8 @@ class BSM(object):
         self.__initialize_logger()
 
         self.__env = Env()
+
+        self.__operation = Operation(self.__config, self.__env)
 
     def __initialize_logger(self):
         add_stream_logger(self.__config['output']['verbose'])
@@ -68,20 +68,7 @@ class BSM(object):
         pass
 
     def ls_remote(self):
-        try:
-            git = Git()
-            tags = git.ls_remote_tags(self.__config['scenario']['release_repo'])
-        except GitNotFoundError:
-            _logger.error('Git is not found. Please install "git" first')
-            raise
-        except GitEmptyUrlError:
-            _logger.error('No release repository found. Please setup "release_repo" first')
-            raise
-
-        versions = [tag[1:] for tag in tags if tag.startswith(b'v')]
-        versions.sort()
-
-        return versions
+        return self.__operation.execute('ls_remote')
 
     def install(self):
         pass

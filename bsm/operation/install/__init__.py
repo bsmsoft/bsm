@@ -5,9 +5,9 @@ from paradag import dag_run
 from paradag.sequential_processor import SequentialProcessor
 from paradag.multi_thread_processor import MultiThreadProcessor
 
-from bsm.install.selector import Selector as InstallSelector
-from bsm.install.executor import Executor as InstallExecutor
-from bsm.install.step import Step
+from bsm.operation.install.selector import Selector as InstallSelector
+from bsm.operation.install.executor import Executor as InstallExecutor
+from bsm.operation.install.step import Step
 
 from bsm.config.config_release import ConfigRelease
 
