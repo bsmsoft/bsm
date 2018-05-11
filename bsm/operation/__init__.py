@@ -16,4 +16,4 @@ class Operation(object):
         except Exception as e:
             raise OperationError('Can not load operation "{0}": {1}'.format(op_name, e))
 
-        return op.execute(*args, **kargs)
+        return {'value': op.execute(*args, **kargs), 'env': self.__env.xxx()}

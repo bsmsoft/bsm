@@ -79,10 +79,21 @@ class BSM(object):
     def use(self):
         self.__env.update()
 
+        ##############################################################3
+        if 'value' in output and output['value'] is not None:
+            print(output['value'])
+        else:
+            print(output['env'])
+
     def env(self):
         pass
 
     def ls_package(self):
+        pass
+
+    def run_release_command(self, command, args):
+        # run customized commands defined in release
+        # like bsm run pack version
         pass
 
     def default_load(self, shell=None):

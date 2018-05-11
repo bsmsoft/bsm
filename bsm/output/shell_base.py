@@ -1,0 +1,2 @@
+class ShellBase(object):
+    pass
