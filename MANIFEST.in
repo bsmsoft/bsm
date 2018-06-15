@@ -1,4 +1,4 @@
-include bsm/BSM_VERSION
+include bsm/VERSION
 include bsm/support/bsm.conf.example
 include bsm/shell/bsm.csh
 include bsm/shell/bsm_script.csh

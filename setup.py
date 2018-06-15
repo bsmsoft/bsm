@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(here, 'bsm', 'BSM_VERSION')) as version_file:
+with open(os.path.join(here, 'bsm', 'VERSION')) as version_file:
     version = version_file.read().strip()
 
 with open(os.path.join(here, 'README.rst')) as f:

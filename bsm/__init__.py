@@ -7,7 +7,7 @@ BSM_HOME = os.path.dirname(os.path.realpath(__file__))
 HANDLER_MODULE_NAME = '_bsm_handler_run_avoid_conflict'
 
 
-with open(os.path.join(BSM_HOME, 'BSM_VERSION'), 'r') as f:
+with open(os.path.join(BSM_HOME, 'VERSION'), 'r') as f:
     BSM_VERSION = f.read().strip()
 
 
