@@ -19,20 +19,26 @@ from bsm.operation import Operation
 from bsm.logger import add_stream_logger
 
 
+def output_env():
+    def inner(method):
+        method()
+        output_format = load(self.__config['output']['format'])
+        return self.__env
+    return inner
+
+
 class BSM(object):
     def __init__(self, config_entry={}):
         self.__config_entry = config_entry
 
         self.__config = Config(self.__config_entry)
 
-        self.__initialize_logger()
+        add_stream_logger(self.__config['output']['verbose'])
 
         self.__env = Env()
 
         self.__operation = Operation(self.__config, self.__env)
 
-    def __initialize_logger(self):
-        add_stream_logger(self.__config['output']['verbose'])
 
     @staticmethod
     def version():
@@ -41,6 +47,15 @@ class BSM(object):
     @staticmethod
     def home():
         return BSM_HOME
+
+
+    def __env_result(self):
+        env_result = {}
+        env_result['bsm'] = self.__env.env_all()
+        env_result['final'] = self.__env.env_final()
+        env_result['change'] = self.__env.env_change()
+        return env_result
+
 
     def reload(self, config_entry, update_config=False):
         if update_config:
@@ -76,14 +91,9 @@ class BSM(object):
     def ls(self):
         pass
 
-    def use(self):
-        self.__env.update()
-
-        ##############################################################3
-        if 'value' in output and output['value'] is not None:
-            print(output['value'])
-        else:
-            print(output['env'])
+    def use(self, scenario):
+        self.__operation.execute('use', scenario=scenario)
+        return self.__env_result()
 
     def env(self):
         pass

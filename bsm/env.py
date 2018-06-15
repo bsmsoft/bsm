@@ -246,7 +246,7 @@ class Env(object):
 
         return env
 
-    def __env_all(self):
+    def env_all(self):
         env_all = {}
         env_all.update(self.__env_release())
         env_all.update(self.__env_package_info())
@@ -256,7 +256,7 @@ class Env(object):
 
 
     def env_final(self):
-        env_to_update = self.__env_all()
+        env_to_update = self.env_all()
 
         final = self.__initial_env.copy()
         for k, v in env_to_update.items():
@@ -269,7 +269,7 @@ class Env(object):
 
     def env_change(self):
         env_origin = self.__initial_env
-        env_to_update = self.__env_all()
+        env_to_update = self.env_all()
         _logger.debug('Original env: {0}'.format(env_origin))
         _logger.debug('Updated env: {0}'.format(env_to_update))
 
