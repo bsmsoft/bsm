@@ -103,7 +103,7 @@ class BSM(object):
 
     def run_release_command(self, command, args):
         # run customized commands defined in release
-        # like bsm run pack version
+        # like bsm run pack (only in current version)
         pass
 
     def default_load(self, shell=None):

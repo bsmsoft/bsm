@@ -7,8 +7,8 @@ from bsm import BSM
 
 
 @click.group(context_settings=dict(help_option_names=['-h', '--help']))
-@click.option('--verbose', '-v', is_flag=True, help='Verbose mode')
-@click.option('--quiet', '-q', is_flag=True, help='Quiet mode')
+@click.option('--verbose', '-v', is_flag=True, help='Verbose mode, also print debug information')
+@click.option('--quiet', '-q', is_flag=True, help='Quiet mode, only print error information')
 @click.option('--app', '-a', type=str, help='Application ID')
 @click.option('--config-app', type=str, help='Application configuration file path')
 @click.option('--config-user', type=str, help='User configuration file path')
@@ -16,9 +16,10 @@ from bsm import BSM
 @click.option('--output-format', type=str, default='auto', help='Output format')
 @click.option('--software-root', '-r', type=str, help='Local installed software root directory')
 @click.pass_context
-def cli(ctx, config, verbose, shell, software_root):
+def cli(ctx, config, verbose, quiet, shell, software_root):
     ctx.obj['config_file'] = config
     ctx.obj['verbose'] = verbose
+    ctx.obj['quiet'] = quiet
     ctx.obj['shell_name'] = shell
     ctx.obj['software_root'] = software_root
 
