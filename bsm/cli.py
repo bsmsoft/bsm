@@ -8,6 +8,7 @@ from bsm import BSM
 
 @click.group(context_settings=dict(help_option_names=['-h', '--help']))
 @click.option('--verbose', '-v', is_flag=True, help='Verbose mode')
+@click.option('--quiet', '-q', is_flag=True, help='Quiet mode')
 @click.option('--app', '-a', type=str, help='Application ID')
 @click.option('--config-app', type=str, help='Application configuration file path')
 @click.option('--config-user', type=str, help='User configuration file path')

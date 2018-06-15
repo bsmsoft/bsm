@@ -80,6 +80,13 @@ class Config(collections.MutableMapping):
         if 'verbose' in self['entry']:
             self['output']['verbose'] = self['entry']['verbose']
 
+        # quiet
+        self['output']['quiet'] = False
+        if 'quiet' in self['user']:
+            self['output']['quiet'] = self['user']['quiet']
+        if 'quiet' in self['entry']:
+            self['output']['quiet'] = self['entry']['quiet']
+
         # format
         self['output']['format'] = 'python'
         if 'output_format' in self['entry']:

@@ -33,7 +33,7 @@ class BSM(object):
 
         self.__config = Config(self.__config_entry)
 
-        add_stream_logger(self.__config['output']['verbose'])
+        add_stream_logger(self.__config['output']['verbose'], self.__config['output']['quiet'])
 
         self.__env = Env()
 
