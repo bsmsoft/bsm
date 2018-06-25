@@ -12,16 +12,16 @@ from bsm import BSM
 @click.option('--app', '-a', type=str, help='Application ID')
 @click.option('--config-app', type=str, help='Application configuration file path')
 @click.option('--config-user', type=str, help='User configuration file path')
-@click.option('--shell', type=str, default='sh', help='Type of the generated shell script')
 @click.option('--output-format', type=str, default='command', help='Output format')
 @click.pass_context
-def cli(ctx, config, verbose, quiet, shell):
-    ctx.obj['config_file'] = config
-    ctx.obj['verbose'] = verbose
-    ctx.obj['quiet'] = quiet
-    ctx.obj['shell_name'] = shell
-    if ctx.obj['output_format'] is None:
-        ctx.obj['output_format'] = output_format
+def cli(ctx, verbose, quiet, app, config_app, config_user, output_format):
+    ctx.obj['config_entry'] = {}
+    ctx.obj['config_entry']['verbose'] = verbose
+    ctx.obj['config_entry']['quiet'] = quiet
+    ctx.obj['config_entry']['app_id'] = app
+    ctx.obj['config_entry']['config_app_file'] = config_app
+    ctx.obj['config_entry']['config_user_file'] = config_user
+    ctx.obj['config_entry']['output_format'] = output_format
 
 
 @cli.command()
@@ -92,10 +92,10 @@ def config_release(ctx, version):
 
 
 @cli.command()
+@click.option('--software-root', '-r', type=str, help='Local installed software root directory')
 @click.option('--release-repo', '-t', type=str, help='Repository for retrieving release information')
 @click.option('--release-source', '-i', type=str, help='Directory for retrieving release information. '
         'This will take precedence over "release-repo". Use this option only for debugging')
-@click.option('--software-root', '-r', type=str, help='Local installed software root directory')
 @click.option('--option', '-o', type=str, multiple=True, help='Options for installation')
 @click.option('--reinstall', is_flag=True, help='Reinstall all packages')
 @click.option('--update', is_flag=True, help='Update version information before installation')
@@ -103,13 +103,15 @@ def config_release(ctx, version):
 @click.option('--yes', '-y', is_flag=True, help='Install without confirmation')
 @click.argument('version', type=str)
 @click.pass_context
-def install(ctx, release_repo, release_source, software_root, option, reinstall, update, force, yes, version):
+def install(ctx, software_root, release_repo, release_source, option, reinstall, update, force, yes, version):
     '''Install specified release version'''
     cmd = Cmd('install')
-    ctx.obj['release_repo'] = release_repo
-    ctx.obj['release_source'] = release_source
-    ctx.obj['software_root'] = software_root
-    cmd.execute(ctx.obj, option_list=option, reinstall=reinstall, update=update, force=force, yes=yes, version_name=version)
+    ctx.obj['config_entry']['software_root'] = software_root
+    ctx.obj['config_entry']['release_repo'] = release_repo
+    ctx.obj['config_entry']['release_source'] = release_source
+    ctx.obj['config_entry']['option'] = parse_option(option)
+    ctx.obj['config_entry']['scenario'] = version
+    cmd.execute(ctx.obj, reinstall=reinstall, update=update, force=force, yes=yes)
 
 
 @cli.command()
@@ -170,5 +172,5 @@ def clean(ctx):
     cmd.execute(ctx.obj)
 
 
-def main(output_format=None):
-    cli(prog_name='bsm', obj={'output_format': output_format})
+def main(output_for_shell=False):
+    cli(prog_name='bsm', obj={'output_for_shell': output_for_shell})

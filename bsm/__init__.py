@@ -19,14 +19,6 @@ from bsm.output import Output
 from bsm.logger import add_stream_logger
 
 
-def output_env():
-    def inner(method):
-        method()
-        output_format = load(self.__config['output']['format'])
-        return self.__env
-    return inner
-
-
 class BSM(object):
     def __init__(self, config_entry={}):
         self.__config_entry = config_entry
@@ -42,12 +34,10 @@ class BSM(object):
         self.__output = Output(self.__config['output']['format'])
 
 
-    @staticmethod
-    def version():
+    def version(self):
         return BSM_VERSION
 
-    @staticmethod
-    def home():
+    def home(self):
         return BSM_HOME
 
 
@@ -85,7 +75,7 @@ class BSM(object):
         pass
 
     def ls_remote(self):
-        return self.__output.dump(self.__operation.execute('ls_remote'))
+        return self.__operation.execute('ls_remote')
 
     def install(self):
         pass
@@ -110,3 +100,16 @@ class BSM(object):
 
     def default_load(self, shell=None):
         pass
+
+
+def _bsm_output_format(method):
+    def inner(self, *args, **kargs):
+        return self._BSM__output.dump(method(self, *args, **kargs), env=self._BSM__env)
+    return inner
+
+def _decorate_bsm_methods():
+    for attr in dir(BSM):
+        if not attr.startswith('_') and callable(getattr(BSM, attr)):
+            setattr(BSM, attr, _bsm_output_format(getattr(BSM, attr)))
+
+_decorate_bsm_methods()
