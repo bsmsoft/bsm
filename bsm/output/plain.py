@@ -1,3 +1,3 @@
 class Plain(object):
-    # ignore env
-    pass
+    def dump(self, value):
+        return str(value)

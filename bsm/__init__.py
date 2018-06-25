@@ -13,8 +13,8 @@ with open(os.path.join(BSM_HOME, 'VERSION'), 'r') as f:
 
 from bsm.config import Config
 from bsm.env import Env
-
 from bsm.operation import Operation
+from bsm.output import Output
 
 from bsm.logger import add_stream_logger
 
@@ -38,6 +38,8 @@ class BSM(object):
         self.__env = Env()
 
         self.__operation = Operation(self.__config, self.__env)
+
+        self.__output = Output(self.__config['output']['format'])
 
 
     @staticmethod
@@ -83,7 +85,7 @@ class BSM(object):
         pass
 
     def ls_remote(self):
-        return self.__operation.execute('ls_remote')
+        return self.__output.dump(self.__operation.execute('ls_remote'))
 
     def install(self):
         pass

@@ -16,7 +16,7 @@ class LsRemote(Base):
             _logger.error('No release repository found. Please setup "release_repo" first')
             raise
 
-        versions = [tag[1:] for tag in tags if tag.startswith(b'v')]
+        versions = [tag[1:] for tag in tags if tag.startswith('v')]
         versions.sort()
 
         return versions

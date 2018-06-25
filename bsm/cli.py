@@ -13,15 +13,15 @@ from bsm import BSM
 @click.option('--config-app', type=str, help='Application configuration file path')
 @click.option('--config-user', type=str, help='User configuration file path')
 @click.option('--shell', type=str, default='sh', help='Type of the generated shell script')
-@click.option('--output-format', type=str, default='auto', help='Output format')
-@click.option('--software-root', '-r', type=str, help='Local installed software root directory')
+@click.option('--output-format', type=str, default='command', help='Output format')
 @click.pass_context
-def cli(ctx, config, verbose, quiet, shell, software_root):
+def cli(ctx, config, verbose, quiet, shell):
     ctx.obj['config_file'] = config
     ctx.obj['verbose'] = verbose
     ctx.obj['quiet'] = quiet
     ctx.obj['shell_name'] = shell
-    ctx.obj['software_root'] = software_root
+    if ctx.obj['output_format'] is None:
+        ctx.obj['output_format'] = output_format
 
 
 @cli.command()
@@ -95,6 +95,7 @@ def config_release(ctx, version):
 @click.option('--release-repo', '-t', type=str, help='Repository for retrieving release information')
 @click.option('--release-source', '-i', type=str, help='Directory for retrieving release information. '
         'This will take precedence over "release-repo". Use this option only for debugging')
+@click.option('--software-root', '-r', type=str, help='Local installed software root directory')
 @click.option('--option', '-o', type=str, multiple=True, help='Options for installation')
 @click.option('--reinstall', is_flag=True, help='Reinstall all packages')
 @click.option('--update', is_flag=True, help='Update version information before installation')
@@ -102,19 +103,22 @@ def config_release(ctx, version):
 @click.option('--yes', '-y', is_flag=True, help='Install without confirmation')
 @click.argument('version', type=str)
 @click.pass_context
-def install(ctx, release_repo, release_source, option, reinstall, update, force, yes, version):
+def install(ctx, release_repo, release_source, software_root, option, reinstall, update, force, yes, version):
     '''Install specified release version'''
     cmd = Cmd('install')
     ctx.obj['release_repo'] = release_repo
     ctx.obj['release_source'] = release_source
+    ctx.obj['software_root'] = software_root
     cmd.execute(ctx.obj, option_list=option, reinstall=reinstall, update=update, force=force, yes=yes, version_name=version)
 
 
 @cli.command()
+@click.option('--software-root', '-r', type=str, help='Local installed software root directory')
 @click.pass_context
-def ls(ctx):
+def ls(ctx, software_root):
     '''List installed release versions'''
     cmd = Cmd('ls')
+    ctx.obj['software_root'] = software_root
     cmd.execute(ctx.obj)
 
 
@@ -147,12 +151,14 @@ def pack(ctx, destination, version):
 
 
 @cli.command()
+@click.option('--software-root', '-r', type=str, help='Local installed software root directory')
 @click.option('--default', '-d', is_flag=True, help='Also set the version as default')
 @click.argument('version', type=str)
 @click.pass_context
-def use(ctx, default, version):
+def use(ctx, software_root, default, version):
     '''Switch environment to given release version'''
     cmd = Cmd('use')
+    ctx.obj['software_root'] = software_root
     cmd.execute(ctx.obj, default=default, version_name=version)
 
 
@@ -164,5 +170,5 @@ def clean(ctx):
     cmd.execute(ctx.obj)
 
 
-def main(check_output=False):
-    cli(prog_name='bsm', obj={'check_output': check_output})
+def main(output_format=None):
+    cli(prog_name='bsm', obj={'output_format': output_format})

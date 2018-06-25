@@ -52,7 +52,7 @@ def _git_cmd(cwd, exe, *args):
     if ret != 0:
         raise GitError('Git command "{0}" failed with exit code {1}: {2}'.format(' '.join(full_cmd), ret, err))
 
-    return out
+    return out.decode()
 
 def _find_git():
     try:
@@ -122,7 +122,7 @@ class Git(object):
         refs = []
         for line in out.splitlines():
             name = line.strip().split()[1]
-            name_short = name.split(b'/')[2]
+            name_short = name.split('/')[2]
             refs.append(name_short)
         return refs
 
