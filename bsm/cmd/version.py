@@ -3,6 +3,8 @@ import click
 
 from bsm import BSM_VERSION
 
-class Version(object):
+from bsm.cmd.base import Base
+
+class Version(Base):
     def execute(self):
-        click.echo('bsm {0}'.format(BSM_VERSION))
+        return self.__bsm.version()click.echo('bsm {0}'.format(BSM_VERSION))

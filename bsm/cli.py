@@ -1,9 +1,8 @@
 import os
 import click
 
-
 from bsm.cmd import Cmd
-from bsm import BSM
+from bsm.util.option import parse_lines
 
 
 @click.group(context_settings=dict(help_option_names=['-h', '--help']))
@@ -21,7 +20,7 @@ def cli(ctx, verbose, quiet, app, config_app, config_user, output_format):
     ctx.obj['config_entry']['app_id'] = app
     ctx.obj['config_entry']['config_app_file'] = config_app
     ctx.obj['config_entry']['config_user_file'] = config_user
-    ctx.obj['config_entry']['output_format'] = output_format
+    ctx.obj['output_format'] = output_format
 
 
 @cli.command()
@@ -109,9 +108,9 @@ def install(ctx, software_root, release_repo, release_source, option, reinstall,
     ctx.obj['config_entry']['software_root'] = software_root
     ctx.obj['config_entry']['release_repo'] = release_repo
     ctx.obj['config_entry']['release_source'] = release_source
-    ctx.obj['config_entry']['option'] = parse_option(option)
-    ctx.obj['config_entry']['scenario'] = version
-    cmd.execute(ctx.obj, reinstall=reinstall, update=update, force=force, yes=yes)
+    ctx.obj['config_entry']['option'] = parse_lines(option)
+    # scenario is not put in config_entry because it need to be installed
+    cmd.execute(ctx.obj, scenario=version, reinstall=reinstall, update=update, force=force, yes=yes)
 
 
 @cli.command()

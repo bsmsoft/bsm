@@ -87,11 +87,6 @@ class Config(collections.MutableMapping):
         if 'quiet' in self['entry']:
             self['output']['quiet'] = self['entry']['quiet']
 
-        # format
-        self['output']['format'] = 'python'
-        if 'output_format' in self['entry']:
-            self['output']['format'] = self['entry']['output_format']
-
     def __load_info(self):
         self.__config['info'] = ConfigCommon()
         self['info'].load_from_file(expand_path(self['app']['config_info_file']))

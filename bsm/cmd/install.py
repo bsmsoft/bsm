@@ -46,8 +46,8 @@ def _get_config_release(config_user, config_version, option, update):
 
 
 class Install(object):
-    def execute(self, config_user, config_version, option, reinstall, update, force, yes):
-        config_release = _get_config_release(config_user, config_version, option, update)
+    def execute(self, scenario, reinstall, update, force, yes):
+        config_release = _get_config_release(scenario, update)
 
         install = BsmInstall(config_user, config_version, config_release)
 

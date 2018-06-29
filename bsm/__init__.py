@@ -34,6 +34,14 @@ class BSM(object):
         self.__output = Output(self.__config['output']['format'])
 
 
+    def __output_value(self, value):
+        if self.__config['output']['env']:
+            final_value = {'value': value, 'env': self.__env}
+        else:
+            final_value = value
+        return self.__output.dump(final_value)
+
+
     def version(self):
         return BSM_VERSION
 
@@ -77,7 +85,10 @@ class BSM(object):
     def ls_remote(self):
         return self.__operation.execute('ls_remote')
 
-    def install(self):
+    def install_release_definition(self):
+        pass
+
+    def install_release(self):
         pass
 
     def ls(self):
@@ -104,7 +115,7 @@ class BSM(object):
 
 def _bsm_output_format(method):
     def inner(self, *args, **kargs):
-        return self._BSM__output.dump(method(self, *args, **kargs), env=self._BSM__env)
+        return self._BSM__output_value(method(self, *args, **kargs))
     return inner
 
 def _decorate_bsm_methods():
