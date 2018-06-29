@@ -1,7 +1,5 @@
-import click
+from bsm.cmd.base import Base
 
-from bsm import BSM_HOME
-
-class Home(object):
+class Home(Base):
     def execute(self):
-        click.echo(BSM_HOME)
+        return self._bsm.home()

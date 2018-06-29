@@ -7,6 +7,8 @@ class OutputError(Exception):
 
 class Output(object):
     def __init__(self, fmt):
+        if not fmt:
+            fmt = 'direct'
         try:
             self.__output = load_common(fmt, 'bsm.output')()
         except Exception as e:

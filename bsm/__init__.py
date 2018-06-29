@@ -31,16 +31,6 @@ class BSM(object):
 
         self.__operation = Operation(self.__config, self.__env)
 
-        self.__output = Output(self.__config['output']['format'])
-
-
-    def __output_value(self, value):
-        if self.__config['output']['env']:
-            final_value = {'value': value, 'env': self.__env}
-        else:
-            final_value = value
-        return self.__output.dump(final_value)
-
 
     def version(self):
         return BSM_VERSION
@@ -68,10 +58,10 @@ class BSM(object):
     def app(self):
         return self.__config['app']['id']
 
-    def init_script(self, shell):
+    def shell_init_script(self, shell):
         pass
 
-    def exit_script(self, shell):
+    def shell_exit_script(self, shell):
         pass
 
     def config(self, config_type, scenario=None):
@@ -99,7 +89,7 @@ class BSM(object):
         return self.__env_result()
 
     def env(self):
-        pass
+        return self.__env
 
     def ls_package(self):
         pass
@@ -111,16 +101,3 @@ class BSM(object):
 
     def default_load(self, shell=None):
         pass
-
-
-def _bsm_output_format(method):
-    def inner(self, *args, **kargs):
-        return self._BSM__output_value(method(self, *args, **kargs))
-    return inner
-
-def _decorate_bsm_methods():
-    for attr in dir(BSM):
-        if not attr.startswith('_') and callable(getattr(BSM, attr)):
-            setattr(BSM, attr, _bsm_output_format(getattr(BSM, attr)))
-
-_decorate_bsm_methods()

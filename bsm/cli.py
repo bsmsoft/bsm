@@ -11,32 +11,37 @@ from bsm.util.option import parse_lines
 @click.option('--app', '-a', type=str, help='Application ID')
 @click.option('--config-app', type=str, help='Application configuration file path')
 @click.option('--config-user', type=str, help='User configuration file path')
-@click.option('--output-format', type=str, default='command', help='Output format')
+@click.option('--output-format', type=str, default='plain', help='Output format')
+@click.option('--output-env', is_flag=True, help='Also utput environment')
 @click.pass_context
-def cli(ctx, verbose, quiet, app, config_app, config_user, output_format):
+def cli(ctx, verbose, quiet, app, config_app, config_user, output_format, output_env):
     ctx.obj['config_entry'] = {}
     ctx.obj['config_entry']['verbose'] = verbose
     ctx.obj['config_entry']['quiet'] = quiet
-    ctx.obj['config_entry']['app_id'] = app
-    ctx.obj['config_entry']['config_app_file'] = config_app
-    ctx.obj['config_entry']['config_user_file'] = config_user
-    ctx.obj['output_format'] = output_format
+    if app is not None:
+        ctx.obj['config_entry']['app_id'] = app
+    if config_app is not None:
+        ctx.obj['config_entry']['config_app_file'] = config_app
+    if config_user is not None:
+        ctx.obj['config_entry']['config_user_file'] = config_user
+    ctx.obj['output']['format'] = output_format
+    ctx.obj['output']['env'] = output_env
 
 
 @cli.command()
 @click.pass_context
 def version(ctx):
     '''Display version information'''
-    cmd = Cmd('version')
-    cmd.execute(ctx.obj)
+    cmd = Cmd()
+    cmd.execute('version', ctx.obj)
 
 
 @cli.command()
 @click.pass_context
 def home(ctx):
     '''Display home directory of bsm'''
-    cmd = Cmd('home')
-    cmd.execute(ctx.obj)
+    cmd = Cmd()
+    cmd.execute('home', ctx.obj)
 
 
 @cli.command()
@@ -128,9 +133,9 @@ def ls(ctx, software_root):
 @click.pass_context
 def ls_remote(ctx, release_repo):
     '''List all available release versions'''
-    cmd = Cmd('ls_remote')
+    cmd = Cmd()
     ctx.obj['release_repo'] = release_repo
-    cmd.execute(ctx.obj)
+    cmd.execute('ls-remote', ctx.obj)
 
 
 @cli.command(name='ls-package')
@@ -171,5 +176,5 @@ def clean(ctx):
     cmd.execute(ctx.obj)
 
 
-def main(output_for_shell=False):
-    cli(prog_name='bsm', obj={'output_for_shell': output_for_shell})
+def main(cmd_name='bsm', output_for_shell=False):
+    cli(prog_name=cmd_name, obj={'output': {'shell': output_for_shell}})
