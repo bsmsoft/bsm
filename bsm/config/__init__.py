@@ -14,7 +14,7 @@ from bsm.config.common import Common as ConfigCommon
 from bsm.config.app import App as ConfigApp
 from bsm.config.scenario import Scenario as ConfigScenario
 from bsm.config.release import Release as ConfigRelease
-from bsm.config.package import Package as ConfigPackage
+from bsm.config.packages import Packages as ConfigPackages
 
 
 class Config(collections.MutableMapping):
@@ -104,11 +104,11 @@ class Config(collections.MutableMapping):
 
         for ctg, cfg in self['release'].get('setting', {}).get('category', {}).get('categories', {}).items():
             self['category'][ctg] = {}
+            self['category'][ctg]['name'] = ctg
             self['category'][ctg]['pre_check'] = cfg.get('pre_check', False)
             self['category'][ctg]['install'] = cfg.get('install', False)
             self['category'][ctg]['auto_env'] = cfg.get('auto_env', False)
             self['category'][ctg]['auto_package'] = cfg.get('auto_package', False)
-            self['category'][ctg]['root'] = cfg.get('root')
 
             if 'root' in cfg:
                 self['category'][ctg]['root'] = cfg['root'].format(**self['scenario'])
@@ -116,9 +116,9 @@ class Config(collections.MutableMapping):
                 self['category'][ctg]['install'] = False
                 self['category'][ctg]['auto_package'] = False
 
-    def __load_package(self):
-        self.__config['package'] = ConfigPackage()
-        self['package'].load_package(self['release'], self['category'])
+    def __load_packages(self):
+        self.__config['packages'] = ConfigPackages()
+        self['packages'].load_packages(self['app'], self['release'], self['category'])
 
 
     @property

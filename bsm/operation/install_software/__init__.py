@@ -1,9 +1,9 @@
 import sys
 
-from paradag import Dag
-from paradag import dag_run
-from paradag.sequential_processor import SequentialProcessor
-from paradag.multi_thread_processor import MultiThreadProcessor
+from bsm.paradag import Dag
+from bsm.paradag import dag_run
+from bsm.paradag.sequential_processor import SequentialProcessor
+from bsm.paradag.multi_thread_processor import MultiThreadProcessor
 
 from bsm.operation.install.selector import Selector as InstallSelector
 from bsm.operation.install.executor import Executor as InstallExecutor
@@ -13,13 +13,21 @@ from bsm.config.config_release import ConfigRelease
 
 from bsm.package_manager import PackageManager
 
-from bsm.check import Check
-
 from bsm.util import ensure_list
+
+from bsm.operation.base import Base
 
 from bsm.logger import get_logger
 _logger = get_logger()
 
+
+class Install(Base):
+    def execute(self, install_type):
+        if install_type == 'release':
+            self.__install_release()
+        elif install_type == 'software':
+            self.__install_software()
+        else:
 
 class Install(object):
     def __init__(self, config_user, config_version, config_release):

@@ -21,23 +21,19 @@ class Sh(Base):
     def source(self, script_path):
         return '. {0}\n'.format(script_path)
 
-    def define_command(self):
+    def init_script(self, command):
         python_exe = sys.executable or 'python'
 
         bsm_func = '''\
-bsm() {{
-  local _check_shell="$('{python_exe}' -c 'from bsm import main;main(check_shell=True)' "$*" 2>/dev/null)"
-
-  if [ "$_check_shell" = 'BSM:OUTPUT_IS_SHELL' ]; then
-    local _script="$('{python_exe}' -c 'from bsm import main;main()' --shell sh "$*")"
-    local _exit_code=$?
-    [ $_exit_code -eq 0 ] && eval "$_script"
-  else
-    '{python_exe}' -c 'from bsm import main;main()' "$*"
-    local _exit_code=$?
+{command}() {{
+  _command_result=$('{python_exe}' -c 'from bsm.cli import main;main(cmd_name='{command}',output_for_shell=True)' "$*")
+  _{command}_bsm_exit_code=$?
+  if [ $_{command}_bsm_exit_code -eq 0 ]; then
+    echo "$_command_result" | 
   fi
+  unset _command_result
 
-  return "$_exit_code"
+  return "$_{command}_bsm_exit_code"
 }}
 
 bsm_script() {{
@@ -50,13 +46,14 @@ bsm_script() {{
     return 2
   fi
 }}
-'''.format(python_exe=python_exe)
+'''.format(command=command, python_exe=python_exe)
 
         return bsm_func
 
-    def undefine_command(self):
+    def exit_script(self, command):
         bsm_exit = '''\
-unset -f bsm_script
-unset -f bsm
-'''
+#unset _{command}_bsm_exit_code
+unset -f {command}_script
+unset -f {command}
+'''.format(command=command)
         return bsm_exit

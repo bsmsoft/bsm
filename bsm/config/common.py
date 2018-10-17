@@ -33,6 +33,10 @@ class Common(collections.MutableMapping):
         return len(self.__data)
 
 
+    def __repr__(self):
+        return repr(self.__data)
+
+
     @property
     def data(self):
         return self.__data

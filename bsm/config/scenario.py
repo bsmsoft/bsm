@@ -13,6 +13,7 @@ from bsm import HANDLER_MODULE_NAME
 
 _SCENARIO_GLOBAL_ITEMS = ('software_root', 'release_repo')
 _SCENARIO_ENTRY_ITEMS = ('software_root', 'release_repo', 'release_source')
+_SCENARIO_PATH_ITEMS = ('software_root', 'release_source')
 
 
 __TEMP_VERSION_PREFIX = ''
@@ -24,6 +25,9 @@ def _temp_version():
             + ''.join(random.SystemRandom().choice(string.ascii_lowercase + string.digits) for _ in range(__TEMP_VERSION_LENGTH))
 
 def _filter_scenario_config(config, items, veto=False):
+    ''' If veto is False, config only in items will be included
+        If veto is True, all config except in items will be included
+    '''
     scenario_config = {}
 
     for k, v in config.items():
@@ -72,6 +76,7 @@ class Scenario(Common):
         if 'version' not in self:
             self['version'] = _temp_version()
 
+        self.__expand_path()
         self.__load_version_path(config_app)
 
 
@@ -83,6 +88,10 @@ class Scenario(Common):
         if isinstance(config_option, dict):
             self['option'].update(config_option)
 
+    def __expand_path(self):
+        for k in _SCENARIO_PATH_ITEMS:
+            if k in self:
+                self[k] = expand_path(self[k])
 
     def __load_version_path(self, config_app):
         self.__version_path = {}
@@ -93,8 +102,10 @@ class Scenario(Common):
         self.__version_path['release_dir'] = os.path.join(self['software_root'], config_app['release_dir'])
         self.__version_path['main_dir'] = os.path.join(self.__version_path['release_dir'], self['version'])
         self.__version_path['def_dir'] = os.path.join(self.__version_path['main_dir'], 'def')
-        self.__version_path['handler_dir'] = os.path.join(self.__version_path['main_dir'], 'handler')
-        self.__version_path['handler_module_dir'] = os.path.join(self.__version_path['handler_dir'], HANDLER_MODULE_NAME)
+        self.__version_path['config_dir'] = os.path.join(self.__version_path['def_dir'], 'config')
+        self.__version_path['handler_dir'] = os.path.join(self.__version_path['def_dir'], 'handler')
+        self.__version_path['handler_python_dir'] = os.path.join(self.__version_path['main_dir'], 'handler')
+        self.__version_path['handler_module_dir'] = os.path.join(self.__version_path['main_dir'], 'handler', HANDLER_MODULE_NAME)
         self.__version_path['status_dir'] = os.path.join(self.__version_path['main_dir'], 'status')
         self.__version_path['install_status_file'] = os.path.join(self.__version_path['status_dir'], 'install.yml')
 

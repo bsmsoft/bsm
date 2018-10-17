@@ -136,17 +136,17 @@ class Env(object):
         self.__solo.update(env)
 
     # TODO: delete old_pkg env
-    def remove_package(self, path_usage, pkg_info):
+    def remove_package(self, path_def, pkg_info):
         pass
 
-    def set_package(self, path_usage, pkg_info):
+    def set_package(self, path_def, pkg_info):
         pkg_name = pkg_info['name']
         pkg_config = pkg_info.get('config', {})
         pkg_dir = pkg_info.get('dir', {})
 
         self.__set_package_info(pkg_name, pkg_config)
-        self.__set_package_path(path_usage, pkg_name, pkg_config, pkg_dir)
-        self.__set_package_env(path_usage, pkg_name, pkg_config, pkg_dir)
+        self.__set_package_path(path_def, pkg_name, pkg_config, pkg_dir)
+        self.__set_package_env(path_def, pkg_name, pkg_config, pkg_dir)
 
     def __set_package_info(self, pkg_name, pkg_config):
         if pkg_name not in self.__pkg_info:
@@ -155,20 +155,20 @@ class Env(object):
         self.__pkg_info[pkg_name]['subdir'] = pkg_config.get('subdir', '')
         self.__pkg_info[pkg_name]['version'] = pkg_config.get('version', 'empty')
 
-    def __set_package_path(self, path_usage, pkg_name, pkg_config, pkg_dir):
+    def __set_package_path(self, path_def, pkg_name, pkg_config, pkg_dir):
         all_path = pkg_config.get('path', {})
         for k, v in all_path.items():
-            path_env_path_name = path_usage.get('path_env', {})
+            path_env_path_name = path_def.get('path_env', {})
             if k in path_env_path_name:
                 path_name = path_env_path_name[k]
                 if path_name not in self.__path:
                     self.__path[path_name] = []
                 self.__path[path_name].insert(0, v.format(**pkg_dir))
 
-    def __set_package_env(self, path_usage, pkg_name, pkg_config, pkg_dir):
+    def __set_package_env(self, path_def, pkg_name, pkg_config, pkg_dir):
         all_path = pkg_config.get('path', {})
         for k, v in all_path.items():
-            solo_env_path_name = path_usage.get('solo_env', {})
+            solo_env_path_name = path_def.get('solo_env', {})
             if k in solo_env_path_name:
                 env_name = solo_env_path_name[k].format(package=pkg_name)
                 self.__solo[env_name] = v.format(**pkg_dir)

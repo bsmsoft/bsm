@@ -26,6 +26,7 @@ class Executor(object):
         self.__config_release = config_release
         self.__step_info = step_info
 
+        # Create independent env for installation
         self.__env = Env()
         self.__env.clean()
 
@@ -103,9 +104,9 @@ class Executor(object):
             pkg, action, sub_action = vertex
 
             if isinstance(result['action'], dict) and 'env_package' in result['action'] and result['action']['env_package']:
-                path_usage = self.__config_release.config['setting'].get('path_usage', {})
+                path_def = self.__config_release.config['setting'].get('path_def', {})
                 pkg_info = self.__pkg_mgr.package_info(pkg)
-                self.__env.set_package(path_usage, pkg_info)
+                self.__env.set_package(path_def, pkg_info)
 
             if isinstance(result['action'], dict) and 'save_release_status' in result['action'] and result['action']['save_release_status']:
                 self.__pkg_mgr.save_release_status(pkg, result['end'])

@@ -45,7 +45,6 @@ setup(
     keywords = 'bsm',
     packages = find_packages(exclude=[]),
     install_requires = [
-        'paradag',
         'click>=6.0,<7.0',
         'PyYAML>=3.0,<4.0',
     ],
@@ -55,7 +54,7 @@ setup(
     ],
     entry_points = {
         'console_scripts': [
-            'bsm_cmd = bsm.cli:main',
+            'bsmcli = bsm.cli:main',
         ],
     },
 )

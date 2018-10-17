@@ -176,5 +176,5 @@ def clean(ctx):
     cmd.execute(ctx.obj)
 
 
-def main(cmd_name='bsm', output_for_shell=False):
+def main(cmd_name=None, output_for_shell=False):
     cli(prog_name=cmd_name, obj={'output': {'shell': output_for_shell}})

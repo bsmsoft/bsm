@@ -1,7 +1,7 @@
 import os
 
-from paradag import Dag
-from paradag import dag_run
+from bsm.paradag import Dag
+from bsm.paradag import dag_run
 
 from bsm.package_manager import PackageManager
 
@@ -62,10 +62,10 @@ class Use(object):
             new_global_env[k] = v.format(**self.__config_version.config)
         env.set_global(new_global_env)
 
-        path_usage = self.__config_release.get('setting', {}).get('path_usage', {})
+        path_def = self.__config_release.get('setting', {}).get('path_def', {})
         for pkg in sorted_pkgs:
             pkg_info = self.__pkg_mgr.package_info(pkg)
-            env.set_package(path_usage, pkg_info)
+            env.set_package(path_def, pkg_info)
 
         env_change = env.env_change()
 

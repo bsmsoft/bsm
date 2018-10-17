@@ -1,6 +1,5 @@
 import os
 import re
-import copy
 
 from bsm.config.common import Common
 
@@ -41,7 +40,6 @@ def _compare_version(ver1, ver2):
 
 
 class Release(Common):
-
     def load_release(self, config_scenario, config_app):
         self.__load_config(config_scenario)
 
@@ -52,8 +50,8 @@ class Release(Common):
         self.__check_version_consistency(config_scenario)
 
     def __load_config(self, config_scenario):
-        config_dir = os.path.join(config_scenario.version_path['def_dir'], 'config')
-        if not os.path.exists(config_dir):
+        config_dir = os.path.join(config_scenario.version_path['config_dir'])
+        if not os.path.isdir(config_dir):
             raise ConfigReleaseError('Release version "{0}" not found'.format(config_scenario['version']))
 
         for k in _AVAILABLE_RELEASE_CONFIG:
@@ -78,12 +76,12 @@ class Release(Common):
 
     def __transform(self, config_scenario, config_app):
         param = {}
-        param['config_scenario'] = copy.deepcopy(config_scenario)
+        param['config_scenario'] = config_scenario.data_copy
         param['config_app'] = config_app.data_copy
         param['config_release'] = self.data_copy
 
         try:
-            result = run_handler('transformer', param, config_scenario.version_path['handler_dir'])
+            result = run_handler('transformer', param, config_scenario.version_path['handler_python_dir'])
             if isinstance(result, dict):
                 self.clear()
                 self.update(result)
@@ -94,14 +92,17 @@ class Release(Common):
             raise
 
     def __check_bsm_version(self):
+        version_require = self.get('setting', {}).get('bsm', {}).get('require', {})
+        _logger.debug('Version require: {0}'.format(version_require))
+        if not version_require:
+            return
+
         m = re.match('(\d+)\.(\d+)\.(\d+)', BSM_VERSION)
         if not m:
             raise ConfigReleaseError('Can not verify bsm version: {0}'.format(BSM_VERSION))
         major, minor, patch = m.groups()
         bsm_ver_frag = [int(major), int(minor), int(patch)]
 
-        version_require = self.get('setting', {}).get('bsm', {}).get('require', {})
-        _logger.debug('Version require: {0}'.format(version_require))
         for comp, ver in version_require.items():
             ver_frag = [int(i) for i in ver.split('.')]
             result = _compare_version(bsm_ver_frag, ver_frag)
