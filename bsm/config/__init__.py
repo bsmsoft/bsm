@@ -1,4 +1,5 @@
 import collections
+import copy
 
 from bsm.util import expand_path
 
@@ -53,7 +54,7 @@ class Config(collections.MutableMapping):
         if 'config_app_file' in self['entry']:
             self['app'].load_from_file(expand_path(self['entry']['config_app_file']))
         if 'config_app' in self['entry']:
-            self['app'].update(self['entry']['config_app'])
+            self['app'] = copy.deepcopy(self['entry']['config_app'])
         if 'app_id' in self['entry']:
             self['app']['id'] = self['entry']['app_id']
 
@@ -68,7 +69,7 @@ class Config(collections.MutableMapping):
         self['user'].load_from_file(expand_path(config_user_file))
 
         if 'config_user' in self['entry']:
-            self['user'].update(self['entry']['config_user'])
+            self['user'] = copy.deepcopy(self['entry']['config_user'])
 
     def __load_output(self):
         self.__config['output'] = ConfigCommon()

@@ -12,7 +12,7 @@ from bsm.util.option import parse_lines
 @click.option('--config-app', type=str, help='Application configuration file path')
 @click.option('--config-user', type=str, help='User configuration file path')
 @click.option('--output-format', type=str, default='plain', help='Output format')
-@click.option('--output-env', is_flag=True, help='Also utput environment')
+@click.option('--output-env', is_flag=True, help='Also output environment')
 @click.pass_context
 def cli(ctx, verbose, quiet, app, config_app, config_user, output_format, output_env):
     ctx.obj['config_entry'] = {}

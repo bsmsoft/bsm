@@ -32,6 +32,7 @@ class App(Common):
         self.setdefault('package_work_dir', '.bsm')
         self.setdefault('solo_env', {})
         self.setdefault('path_env', {})
+        self.setdefault('alias', {})
 
         self.setdefault('release_repo', 'https://github.com/bsmhep/bsmdemo')
         self.setdefault('software_root', os.getcwd())
