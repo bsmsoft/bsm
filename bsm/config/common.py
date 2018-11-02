@@ -1,14 +1,26 @@
 import collections
 import copy
 
-from bsm.config import ConfigNoDirectModError
-
 from bsm.util.config import load_config
 from bsm.util.config import dump_config
 from bsm.util.config import ConfigError
 
 from bsm.logger import get_logger
 _logger = get_logger()
+
+
+def _config_from_file(config_file):
+    try:
+        loaded_data = load_config(config_file)
+        if isinstance(loaded_data, dict):
+            return loaded_data
+        else:
+            _logger.warn('Config file is not a dict: {0}'.format(config_file))
+            _logger.warn('Use empty dict instead')
+    except ConfigError as e:
+        _logger.debug('Load config file "{0}" failed: {1}'.format(config_file, e))
+        _logger.debug('Use empty dict instead')
+    return dict()
 
 
 class Common(collections.MutableMapping):
@@ -47,17 +59,10 @@ class Common(collections.MutableMapping):
 
 
     def load_from_file(self, config_file):
-        self.__data = dict()
-        try:
-            loaded_data = load_config(config_file)
-            if isinstance(loaded_data, dict):
-                self.__data = loaded_data
-            else:
-                _logger.warn('Config file is not a dict: {0}'.format(config_file))
-                _logger.warn('Use empty dict instead')
-        except ConfigError as e:
-            _logger.debug('Load config file "{0}" failed: {1}'.format(config_file, e))
-            _logger.debug('Use empty dict instead')
+        self.__data = _config_from_file(config_file)
+
+    def update_from_file(self, config_file):
+        self.__data.update(_config_from_file(config_file))
 
     def save_to_file(self, config_file):
         dump_config(self.__data, config_file)

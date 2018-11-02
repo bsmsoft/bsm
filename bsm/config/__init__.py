@@ -48,10 +48,22 @@ class Config(collections.MutableMapping):
         return len(self.__config)
 
 
-    def __load_app(self):
+    def __old_load_app(self):
         self.__config['app'] = ConfigApp()
 
         if 'config_app_file' in self['entry']:
+            self['app'].load_from_file(expand_path(self['entry']['config_app_file']))
+        if 'config_app' in self['entry']:
+            self['app'] = copy.deepcopy(self['entry']['config_app'])
+        if 'app_id' in self['entry']:
+            self['app']['id'] = self['entry']['app_id']
+
+        self['app'].load_app()
+
+    def __load_app(self):
+        self.__config['app'] = ConfigApp()
+
+        if 'app_root' in self['entry']:
             self['app'].load_from_file(expand_path(self['entry']['config_app_file']))
         if 'config_app' in self['entry']:
             self['app'] = copy.deepcopy(self['entry']['config_app'])
