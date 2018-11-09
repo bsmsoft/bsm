@@ -8,8 +8,8 @@ from bsm.util.option import parse_lines
 @click.group(context_settings=dict(help_option_names=['-h', '--help']))
 @click.option('--verbose', '-v', is_flag=True, help='Verbose mode, also print debug information')
 @click.option('--quiet', '-q', is_flag=True, help='Quiet mode, only print error information')
-@click.option('--app', '-a', type=str, help='Application ID')
-@click.option('--config-app', type=str, help='Application configuration file path')
+#@click.option('--app', '-a', type=str, help='Application ID')
+#@click.option('--config-app', type=str, help='Application configuration file path')
 @click.option('--config-user', type=str, help='User configuration file path')
 @click.option('--output-format', type=str, default='plain', help='Output format')
 @click.option('--output-env', is_flag=True, help='Also output environment')
@@ -45,8 +45,9 @@ def home(ctx):
 
 
 @cli.command()
+@click.option('--app-root', '-a', help='Directory with app configuration')
 @click.pass_context
-def init(ctx):
+def init(ctx, app):
     '''Initialize bsm environment'''
     cmd = Cmd('init')
     cmd.execute(ctx.obj)
