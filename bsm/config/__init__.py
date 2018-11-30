@@ -63,14 +63,7 @@ class Config(collections.MutableMapping):
     def __load_app(self):
         self.__config['app'] = ConfigApp()
 
-        if 'app_root' in self['entry']:
-            self['app'].load_from_file(expand_path(self['entry']['config_app_file']))
-        if 'config_app' in self['entry']:
-            self['app'] = copy.deepcopy(self['entry']['config_app'])
-        if 'app_id' in self['entry']:
-            self['app']['id'] = self['entry']['app_id']
-
-        self['app'].load_app()
+        self['app'].load_app(expand_path(self['entry'].get('app_root')))
 
     def __load_user(self):
         self.__config['user'] = ConfigCommon()
