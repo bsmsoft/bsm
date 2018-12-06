@@ -1,3 +1,5 @@
+import re
+
 from bsm.operation.base import Base
 
 from bsm.git import Git
@@ -16,7 +18,14 @@ class LsRemote(Base):
             _logger.error('No release repository found. Please setup "release_repo" first')
             raise
 
-        versions = [tag[1:] for tag in tags if tag.startswith('v')]
-        versions.sort()
+        versions = []
+        version_pattern = re.compile(self._config['app']['version_pattern'])
+        for tag in tags:
+            m = version_pattern.match(tag)
+            if not m:
+                continue
+            groups = m.groups()
+            if len(groups) > 0:
+                versions.append(groups[0])
 
         return versions

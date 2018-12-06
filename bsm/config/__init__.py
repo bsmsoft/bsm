@@ -63,7 +63,7 @@ class Config(collections.MutableMapping):
     def __load_app(self):
         self.__config['app'] = ConfigApp()
 
-        self['app'].load_app(expand_path(self['entry'].get('app_root')))
+        self['app'].load_app(self['entry'].get('app_root', ''))
 
     def __load_user(self):
         self.__config['user'] = ConfigCommon()

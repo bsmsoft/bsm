@@ -1,5 +1,8 @@
 import click
 
+from bsm.cmd.base import Base
+from bsm.cmd import CmdResult
+
 from bsm.use import Use as BsmUse
 from bsm.env import Env
 
@@ -10,32 +13,10 @@ from bsm.config.info import Info
 from bsm.logger import get_logger
 _logger = get_logger()
 
-class Init(object):
-    def execute(self, config_user, shell):
-        shell.clear_script()
+class Init(Base):
+    def execute(self, shell):
+        script = self._bsm.shell_init_script(shell)
 
-        shell.define_command()
-        shell.newline()
+        self._bsm.default_load()
 
-        try:
-            info = Info()
-            default_version = info.default_version
-            if default_version:
-                config_version = ConfigVersion(config_user, default_version)
-                config_release = ConfigRelease(config_version)
-
-                obj = BsmUse(config_user, config_version, config_release)
-                set_env, unset_env = obj.run()
-            else:
-                env = Env()
-                env.clean()
-                set_env, unset_env = env.env_change()
-
-            for e in unset_env:
-                shell.unset_env(e)
-            for k, v in set_env.items():
-                shell.set_env(k, v)
-        except Exception as e:
-            _logger.warn('Cat not load default version: {0}'.format(e))
-
-        click.echo(shell.script, nl=False)
+        return CmdResult(script, script)

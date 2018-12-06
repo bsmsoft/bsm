@@ -103,8 +103,8 @@ class BSM(object):
         return self.__operation.execute('ls_remote')
 
     @__auto_reload
-    def check_compile(self):
-        return self.__operation.execute('check', 'compile')
+    def check_install(self):
+        return self.__operation.execute('check', 'install')
 
     @__auto_reload
     def check_runtime(self):
@@ -139,5 +139,24 @@ class BSM(object):
         # like bsm run pack (only in current version)
         pass
 
-    def default_load(self, shell=None):
-        pass
+    def default_version(self, shell=None):
+        try:
+            info = Info()
+            default_version = info.default_version
+            if default_version:
+                config_version = ConfigVersion(config_user, default_version)
+                config_release = ConfigRelease(config_version)
+
+                obj = BsmUse(config_user, config_version, config_release)
+                set_env, unset_env = obj.run()
+            else:
+                env = Env()
+                env.clean()
+                set_env, unset_env = env.env_change()
+
+            for e in unset_env:
+                shell.unset_env(e)
+            for k, v in set_env.items():
+                shell.set_env(k, v)
+        except Exception as e:
+            _logger.warn('Cat not load default version: {0}'.format(e))

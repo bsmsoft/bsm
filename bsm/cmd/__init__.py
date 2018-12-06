@@ -6,6 +6,7 @@ import click
 from bsm import BSM
 from bsm.loader import load_common
 from bsm.config.release import ConfigReleaseError
+from bsm.shell import Shell
 
 from bsm.cmd.output import Output
 
@@ -18,17 +19,30 @@ class CmdError(Exception):
 
 
 class CmdResult(object):
-    def __init__(self, output='', script_type='unknown'):
+    def __init__(self, output='', script=''):
         self.__output = output
-        self.__script_type = script_type
+        self.__script = script
 
     @property
     def output(self):
         return self.__output
 
     @property
-    def script_type(self):
-        return self.__script_type
+    def script(self):
+        return self.__script
+
+
+def _convert_cmd_result(result):
+    if isinstance(result, CmdResult):
+        return result
+    return CmdResult(result)
+
+
+def _generate_script(bsm, shell_name, output, env, script):
+    script = ''
+    script += bsm
+
+    return shell.script
 
 
 class Cmd(object):
@@ -41,14 +55,9 @@ class Cmd(object):
             raise CmdError('Can not load command "{0}": {1}'.format(cmd_name, e))
 
         try:
-            cmd_result = cmd.execute(*args, **kwargs)
+            cmd_result = _convert_cmd_result(cmd.execute(*args, **kwargs))
 
-            if isinstance(cmd_result, CmdResult):
-                result_output = cmd_result.output
-                if obj['output']['shell']:
-                    result_script_type = cmd_result.script_type
-            else:
-                result_output = cmd_result
+            result_output = cmd_result.output
 
             if obj['output']['env']:
                 result_output = {'value': result_output, 'env': bsm.env().env_all()}
@@ -57,8 +66,7 @@ class Cmd(object):
             final_output = output.dump(result_output)
 
             if obj['output']['shell']:
-                output_shell = Output('json')
-                final_output = output_shell.dump({'output': final_output, 'script_type': result_script_type, 'env': bsm.env().env_change()})
+                final_output = _generate_script(obj['output']['shell'], final_output, bsm.env().env_change(), cmd_result.script)
         except ConfigReleaseError as e:
             _logger.error(str(e))
             _logger.critical('Can not load release version: {0}'.format(cmd_kwargs.get('version_name')))

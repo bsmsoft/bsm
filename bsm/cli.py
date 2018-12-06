@@ -10,22 +10,26 @@ from bsm.util.option import parse_lines
 @click.option('--quiet', '-q', is_flag=True, help='Quiet mode, only print error information')
 #@click.option('--app', '-a', type=str, help='Application ID')
 #@click.option('--config-app', type=str, help='Application configuration file path')
+@click.option('--app-root', type=str, hidden=True, help='Application configuration directory')
+@click.option('--shell', type=str, default='sh', hidden=True, help='Type of shell script')
 @click.option('--config-user', type=str, help='User configuration file path')
 @click.option('--output-format', type=str, default='plain', help='Output format')
 @click.option('--output-env', is_flag=True, help='Also output environment')
 @click.pass_context
-def cli(ctx, verbose, quiet, app, config_app, config_user, output_format, output_env):
-    ctx.obj['config_entry'] = {}
+def cli(ctx, verbose, quiet, app_root, shell, config_user, output_format, output_env):
     ctx.obj['config_entry']['verbose'] = verbose
     ctx.obj['config_entry']['quiet'] = quiet
-    if app is not None:
-        ctx.obj['config_entry']['app_id'] = app
-    if config_app is not None:
-        ctx.obj['config_entry']['config_app_file'] = config_app
     if config_user is not None:
         ctx.obj['config_entry']['config_user_file'] = config_user
     ctx.obj['output']['format'] = output_format
+    ctx.obj['output']['format'] = output_format
     ctx.obj['output']['env'] = output_env
+
+    if 'app_root' not in ctx.obj['config_entry'] or ctx.obj['config_entry']['app_root'] is None:
+        ctx.obj['config_entry']['app_root'] = app_root
+
+    if 'shell' not in ctx.obj['output'] or ctx.obj['output']['shell'] is None:
+        ctx.obj['output']['shell'] = shell
 
 
 @cli.command()
@@ -45,12 +49,11 @@ def home(ctx):
 
 
 @cli.command()
-@click.option('--app-root', '-a', help='Directory with app configuration')
 @click.pass_context
-def init(ctx, app):
+def init(ctx):
     '''Initialize bsm environment'''
-    cmd = Cmd('init')
-    cmd.execute(ctx.obj)
+    cmd = Cmd()
+    cmd.execute('init', ctx.obj, shell=ctx.obj['output']['shell'])
 
 
 @cli.command()
@@ -177,5 +180,5 @@ def clean(ctx):
     cmd.execute(ctx.obj)
 
 
-def main(cmd_name=None, output_for_shell=False):
-    cli(prog_name=cmd_name, obj={'output': {'shell': output_for_shell}})
+def main(cmd_name=None, app_root=None, output_shell=None):
+    cli(prog_name=cmd_name, obj={'config_entry': {'app_root': app_root}, 'output': {'shell': output_shell}})

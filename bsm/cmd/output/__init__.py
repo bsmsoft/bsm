@@ -10,7 +10,7 @@ class Output(object):
         if not fmt:
             fmt = 'direct'
         try:
-            self.__output = load_common(fmt, 'bsm.output')()
+            self.__output = load_common(fmt, 'bsm.cmd.output')()
         except Exception as e:
             raise OutputError('Can not load output "{0}": {1}'.format(fmt, e))
 

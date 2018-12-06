@@ -45,7 +45,7 @@ setup(
     keywords = 'bsm',
     packages = find_packages(exclude=[]),
     install_requires = [
-        'click>=6.0,<7.0',
+        'click>=7.0,<8.0',
         'PyYAML>=3.0,<4.0',
     ],
     include_package_data = True,

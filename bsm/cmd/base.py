@@ -6,4 +6,4 @@ class Base(object):
         self._output_command = output_command
 
     def output_script(self):
-        return self.
+        return self.OUTPUT_SCRIPT
