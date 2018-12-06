@@ -26,7 +26,7 @@ class Shell(object):
         return self.__script
 
 
-def _generate_script(output, shell, command):
+def _generate_script(output, shell, cmd_name):
     try:
         result = json.loads(output)
     except Exception as e:
@@ -47,15 +47,15 @@ def _generate_script(output, shell, command):
     if 'script_type' in result:
         script_type = result['script_type']
         if script_type == 'init':
-            shell.init_script(command)
+            shell.init_script(cmd_name)
         elif script_type == 'exit':
-            shell.exit_script(command)
+            shell.exit_script(cmd_name)
 
-def main(shell_name='sh', command='bsm'):
+def main(shell_name='sh', cmd_name='bsm'):
     output = sys.stdin.read()
 
     shell = Shell(shell_name)
 
-    _generate_script(output, shell, command)
+    _generate_script(output, shell, cmd_name)
 
     sys.stdout.write(shell.script)

@@ -27,9 +27,16 @@ class Sh(Base):
         bsm_func = '''\
 {command}() {{
   _command_result=$('{python_exe}' -c 'from bsm.cli import main;main(cmd_name='{command}',output_for_shell=True)' "$*")
+  if [ $? -eq 0 ]; then
+    echo "$_command_result" | '{python_exe}' -c 'from bsm.shell import main;main(shell_name='sh',command='{command}')'
+    return $?
+  else
+    return 1
+  fi
+
   _{command}_bsm_exit_code=$?
   if [ $_{command}_bsm_exit_code -eq 0 ]; then
-    echo "$_command_result" | 
+    echo "$_command_result" | '{python_exe}' -c 'from bsm.shell import main;main(shell_name='sh',command='{command}')'
   fi
   unset _command_result
 
