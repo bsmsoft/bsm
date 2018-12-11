@@ -74,30 +74,12 @@ def upgrade(ctx):
 
 
 @cli.command()
-@click.option('--example', '-e', is_flag=True, help='Print the configuration example')
+@click.argument('config-type', type=str, required=False)
 @click.pass_context
-def config(ctx, example):
-    '''Display user configuration'''
-    cmd = Cmd('config')
-    cmd.execute(ctx.obj, output_example=example)
-
-
-@cli.command(name='config-version')
-@click.argument('version', type=str, required=False)
-@click.pass_context
-def config_version(ctx, version):
-    '''Display configuration of specified release version'''
-    cmd = Cmd('config_version')
-    cmd.execute(ctx.obj, version_name=version)
-
-
-@cli.command(name='config-release')
-@click.argument('version', type=str)
-@click.pass_context
-def config_release(ctx, version):
-    '''Display release configuration of specified release version'''
-    cmd = Cmd('config_release')
-    cmd.execute(ctx.obj, version_name=version)
+def config(ctx, config_type):
+    '''Display configuration'''
+    cmd = Cmd()
+    cmd.execute('config', ctx.obj, config_type)
 
 
 @cli.command()

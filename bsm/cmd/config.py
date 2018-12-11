@@ -1,16 +1,9 @@
-import os
-import click
+from bsm.cmd import Base
 
-from bsm import BSM_HOME
-from bsm.config import dump_config_str
-
-class Config(object):
-    def execute(self, config_user, output_example):
-        if output_example:
-            click.echo(self.__load_example(), nl=False)
-        else:
-            click.echo(dump_config_str(config_user), nl=False)
-
-    def __load_example(self):
-        with open(os.path.join(BSM_HOME, 'support', 'bsm.conf.example'), 'r') as f:
-            return f.read()
+class Config(Base):
+    def execute(self, config_type=''):
+        if not config_type or config_type == 'all':
+            return self._bsm.config_all()
+        if config_type == 'example':
+            return self._bsm.config_user_example()
+        return self._bsm.config(config_type)

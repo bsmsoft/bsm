@@ -62,7 +62,6 @@ class BSM(object):
         return env_result
 
 
-    @property
     def config_entry(self):
         return self.__config_entry_input
 
@@ -83,7 +82,7 @@ class BSM(object):
 
     @__auto_reload
     def config_all(self):
-        return self.__config
+        return dict(self.__config)
 
     @__auto_reload
     def config(self, config_type):
