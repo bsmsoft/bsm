@@ -94,7 +94,7 @@ class BSM(object):
         try:
             return open(self.__config['app']['example_config_user']).read()
         except Exception as e:
-            _logger.warn('Open example failed: %s' % e)
+            _logger.warn('Open user config example failed: %s' % e)
             return ''
 
 

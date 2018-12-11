@@ -1,4 +1,4 @@
-from bsm.cmd.base import Base
+from bsm.cmd import Base
 
 class Home(Base):
     def execute(self):

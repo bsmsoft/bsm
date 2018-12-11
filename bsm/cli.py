@@ -152,16 +152,6 @@ def ls_package(ctx):
 
 
 @cli.command()
-@click.option('--destination', '-d', type=str, help='Directory for packing output')
-@click.argument('version', type=str)
-@click.pass_context
-def pack(ctx, destination, version):
-    '''Create tar packages for the specified release version'''
-    cmd = Cmd('pack')
-    cmd.execute(ctx.obj, destination=destination, version_name=version)
-
-
-@cli.command()
 @click.option('--software-root', '-r', type=str, help='Local installed software root directory')
 @click.option('--default', '-d', is_flag=True, help='Also set the version as default')
 @click.argument('version', type=str)
@@ -179,6 +169,16 @@ def clean(ctx):
     '''Clean the current release version environment'''
     cmd = Cmd('clean')
     cmd.execute(ctx.obj)
+
+
+@cli.command()
+@click.option('--destination', '-d', type=str, help='Directory for packing output')
+@click.argument('version', type=str)
+@click.pass_context
+def pack(ctx, destination, version):
+    '''Create tar packages for the specified release version'''
+    cmd = Cmd('pack')
+    cmd.execute(ctx.obj, destination=destination, version_name=version)
 
 
 def main(cmd_name=None, app_root=None, output_shell=None, check_cli=False):

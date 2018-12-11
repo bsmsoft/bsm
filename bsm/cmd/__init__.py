@@ -62,6 +62,12 @@ def _generate_script(cmd_name, app_root, shell_name, output, env, script_types):
     return shell.script
 
 
+class Base(object):
+    def __init__(self, bsm, output_format):
+        self._bsm = bsm
+        self._output_format = output_format
+
+
 class Cmd(object):
     def execute(self, cmd_name, obj, *args, **kwargs):
         if 'check_cli' in obj and obj['check_cli']:

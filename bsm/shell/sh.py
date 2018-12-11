@@ -32,27 +32,28 @@ class Sh(Base):
 
         bsm_func = '''\
 {cmd_name}() {{
-  _bsm_check_cli="$('{python_exe}' -c "from bsm.cli import main;main(cmd_name='{cmd_name}',app_root='{app_root}',output_shell='sh',check_cli=True)" $* 2>/dev/null)"
-  if [ "$_bsm_check_cli" != 'BSM:COMMAND_LINE_INTERFACE_OK' ]; then
-    unset _bsm_check_cli
+  _bsm_var_check_cli="$('{python_exe}' -c "from bsm.cli import main;main(cmd_name='{cmd_name}',app_root='{app_root}',output_shell='sh',check_cli=True)" $* 2>/dev/null)"
+  if [ "$_bsm_var_check_cli" != 'BSM:COMMAND_LINE_INTERFACE_OK' ]; then
+    unset _bsm_var_check_cli
     '{python_exe}' -c "from bsm.cli import main;main(cmd_name='{cmd_name}',app_root='{app_root}',output_shell='sh')" $*
     return
   fi
+  unset _bsm_var_check_cli
 
   _cmd_result=$('{python_exe}' -c "from bsm.cli import main;main(cmd_name='{cmd_name}',app_root='{app_root}',output_shell='sh')" $*)
-  _bsm_command_exit_code=$?
-  if [ "$_bsm_command_exit_code" -eq 0 ]; then
+  _bsm_var_command_exit_code=$?
+  if [ "$_bsm_var_command_exit_code" -eq 0 ]; then
     eval "$_cmd_result"
-    _bsm_command_exit_code=$?
+    _bsm_var_command_exit_code=$?
   fi
   unset _cmd_result
-  return $_bsm_command_exit_code
+  return $_bsm_var_command_exit_code
 }}
 '''.format(cmd_name=self._cmd_name, python_exe=python_exe, app_root=self._app_root)
 
         return bsm_func
 
-    def script_exit(self, command):
+    def script_exit(self):
         bsm_exit = '''\
 unset -f {cmd_name}
 '''.format(cmd_name=self._cmd_name)

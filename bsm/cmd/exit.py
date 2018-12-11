@@ -1,4 +1,4 @@
-from bsm.cmd.base import Base
+from bsm.cmd import Base
 from bsm.cmd import CmdResult
 from bsm.shell import Shell
 
