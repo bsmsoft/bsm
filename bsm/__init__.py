@@ -75,11 +75,11 @@ class BSM(object):
     def app(self):
         return self.__config['app']['id']
 
-    def shell_init_script(self, shell):
-        return shell
-
-    def shell_exit_script(self, shell):
-        pass
+#    def shell_init_script(self, shell):
+#        return shell
+#
+#    def shell_exit_script(self, shell):
+#        pass
 
     @__auto_reload
     def config_all(self):

@@ -18,49 +18,42 @@ class Sh(Base):
     def unset_env(self, env_name):
         return 'unset {0}\n'.format(env_name)
 
+    def alias(self, alias_name, alias_value):
+        return 'alias {0}="{1}"\n'.format(alias_name, alias_value)
+
+    def unalias(self, alias_name):
+        return 'unalias {0}\n'.format(alias_name)
+
     def source(self, script_path):
         return '. {0}\n'.format(script_path)
 
-    def init_script(self, command):
+    def script_init(self):
         python_exe = sys.executable or 'python'
 
         bsm_func = '''\
-{command}() {{
-  _command_result=$('{python_exe}' -c 'from bsm.cli import main;main(cmd_name='{command}',output_for_shell=True)' "$*")
-  if [ $? -eq 0 ]; then
-    echo "$_command_result" | '{python_exe}' -c 'from bsm.shell import main;main(shell_name='sh',command='{command}')'
-    return $?
-  else
-    return 1
+{cmd_name}() {{
+  _bsm_check_cli="$('{python_exe}' -c "from bsm.cli import main;main(cmd_name='{cmd_name}',app_root='{app_root}',output_shell='sh',check_cli=True)" $* 2>/dev/null)"
+  if [ "$_bsm_check_cli" != 'BSM:COMMAND_LINE_INTERFACE_OK' ]; then
+    unset _bsm_check_cli
+    '{python_exe}' -c "from bsm.cli import main;main(cmd_name='{cmd_name}',app_root='{app_root}',output_shell='sh')" $*
+    return
   fi
 
-  _{command}_bsm_exit_code=$?
-  if [ $_{command}_bsm_exit_code -eq 0 ]; then
-    echo "$_command_result" | '{python_exe}' -c 'from bsm.shell import main;main(shell_name='sh',command='{command}')'
+  _cmd_result=$('{python_exe}' -c "from bsm.cli import main;main(cmd_name='{cmd_name}',app_root='{app_root}',output_shell='sh')" $*)
+  _bsm_command_exit_code=$?
+  if [ "$_bsm_command_exit_code" -eq 0 ]; then
+    eval "$_cmd_result"
+    _bsm_command_exit_code=$?
   fi
-  unset _command_result
-
-  return "$_{command}_bsm_exit_code"
+  unset _cmd_result
+  return $_bsm_command_exit_code
 }}
-
-bsm_script() {{
-  local _check_shell="$('{python_exe}' -c 'from bsm import main;main(check_shell=True)' "$*" 2>/dev/null)"
-
-  if [ "$_check_shell" = 'BSM:OUTPUT_IS_SHELL' ]; then
-    '{python_exe}' -c 'from bsm import main;main()' --shell sh "$*"
-  else
-    >&2 echo 'This command does not output shell script'
-    return 2
-  fi
-}}
-'''.format(command=command, python_exe=python_exe)
+'''.format(cmd_name=self._cmd_name, python_exe=python_exe, app_root=self._app_root)
 
         return bsm_func
 
-    def exit_script(self, command):
+    def script_exit(self, command):
         bsm_exit = '''\
-#unset _{command}_bsm_exit_code
-unset -f {command}_script
-unset -f {command}
-'''.format(command=command)
+unset -f {cmd_name}
+'''.format(cmd_name=self._cmd_name)
         return bsm_exit

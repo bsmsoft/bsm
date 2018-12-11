@@ -1,4 +1,8 @@
 class Base(object):
+    def __init__(self, cmd_name, app_root):
+        self._cmd_name = cmd_name
+        self._app_root = app_root
+
     def comment(self, content):
         lines = content.rstrip().split('\n')
         newlines = map(lambda x:'# '+x, lines)

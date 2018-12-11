@@ -1,22 +1,15 @@
-import click
-
 from bsm.cmd.base import Base
 from bsm.cmd import CmdResult
-
-from bsm.use import Use as BsmUse
-from bsm.env import Env
-
-from bsm.config.config_version import ConfigVersion
-from bsm.config.config_release import ConfigRelease
-from bsm.config.info import Info
-
-from bsm.logger import get_logger
-_logger = get_logger()
+from bsm.shell import Shell
 
 class Init(Base):
     def execute(self, shell):
-        script = self._bsm.shell_init_script(shell)
+        cmd_name = self._bsm.config('app')['cmd_name']
+        app_root = self._bsm.config('app').get('app_root', '')
 
-        self._bsm.default_load()
+        shell = Shell(shell, cmd_name, app_root)
+        shell.add_script('init')
 
-        return CmdResult(script, script)
+#        self._bsm.default_load()
+
+        return CmdResult(shell.script, 'init')

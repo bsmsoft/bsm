@@ -1,20 +1,18 @@
-import click
+from bsm.cmd.base import Base
+from bsm.cmd import CmdResult
+from bsm.shell import Shell
 
-from bsm.env import Env
-
-class Exit(object):
+class Exit(Base):
     def execute(self, shell):
-        shell.clear_script()
+        if not shell:
+            return ''
 
-        env = Env()
-        env.clean()
-        set_env, unset = env.env_change()
+        cmd_name = self._bsm.config('app')['cmd_name']
+        app_root = self._bsm.config('app').get('app_root', '')
 
-        for e in unset:
-            shell.unset_env(e)
-        for k, v in set_env.items():
-            shell.set_env(k, v)
+        shell = Shell(shell, cmd_name, app_root)
+        shell.add_script('exit')
 
-        shell.undefine_command()
+#        self._bsm.clean()
 
-        click.echo(shell.script, nl=False)
+        return CmdResult(shell.script, 'exit')

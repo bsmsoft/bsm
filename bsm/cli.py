@@ -11,7 +11,7 @@ from bsm.util.option import parse_lines
 #@click.option('--app', '-a', type=str, help='Application ID')
 #@click.option('--config-app', type=str, help='Application configuration file path')
 @click.option('--app-root', type=str, hidden=True, help='Application configuration directory')
-@click.option('--shell', type=str, default='sh', hidden=True, help='Type of shell script')
+@click.option('--shell', type=str, hidden=True, help='Type of shell script')
 @click.option('--config-user', type=str, help='User configuration file path')
 @click.option('--output-format', type=str, default='plain', help='Output format')
 @click.option('--output-env', is_flag=True, help='Also output environment')
@@ -49,19 +49,20 @@ def home(ctx):
 
 
 @cli.command()
+@click.option('--shell', type=str, default='sh', help='Type of shell script')
 @click.pass_context
-def init(ctx):
+def init(ctx, shell):
     '''Initialize bsm environment'''
     cmd = Cmd()
-    cmd.execute('init', ctx.obj, shell=ctx.obj['output']['shell'])
+    cmd.execute('init', ctx.obj, shell=shell)
 
 
 @cli.command()
 @click.pass_context
 def exit(ctx):
     '''Exit bsm environment completely'''
-    cmd = Cmd('exit')
-    cmd.execute(ctx.obj)
+    cmd = Cmd()
+    cmd.execute('exit', ctx.obj, shell=ctx.obj['output']['shell'])
 
 
 @cli.command()
@@ -127,9 +128,9 @@ def install(ctx, software_root, release_repo, release_source, option, reinstall,
 @click.pass_context
 def ls(ctx, software_root):
     '''List installed release versions'''
-    cmd = Cmd('ls')
+    cmd = Cmd()
     ctx.obj['software_root'] = software_root
-    cmd.execute(ctx.obj)
+    cmd.execute('ls', ctx.obj)
 
 
 @cli.command(name='ls-remote')
@@ -180,5 +181,5 @@ def clean(ctx):
     cmd.execute(ctx.obj)
 
 
-def main(cmd_name=None, app_root=None, output_shell=None):
-    cli(prog_name=cmd_name, obj={'config_entry': {'app_root': app_root}, 'output': {'shell': output_shell}})
+def main(cmd_name=None, app_root=None, output_shell=None, check_cli=False):
+    cli(prog_name=cmd_name, obj={'config_entry': {'app_root': app_root}, 'output': {'shell': output_shell}, 'check_cli': check_cli})

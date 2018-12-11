@@ -1,9 +1,4 @@
 class Base(object):
-    OUTPUT_SCRIPT = True
-
-    def __init__(self, bsm, output_command):
+    def __init__(self, bsm, output_format):
         self._bsm = bsm
-        self._output_command = output_command
-
-    def output_script(self):
-        return self.OUTPUT_SCRIPT
+        self._output_format = output_format
