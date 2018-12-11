@@ -54,7 +54,8 @@ def _generate_script(cmd_name, app_root, shell_name, output, env, script_types):
 
     shell.newline()
     shell.comment('Final output')
-    shell.echo(output)
+    if output:
+        shell.echo(output)
 
     shell.newline()
     shell.comment('Shell script finished')
