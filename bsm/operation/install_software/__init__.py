@@ -15,7 +15,7 @@ from bsm.package_manager import PackageManager
 
 from bsm.util import ensure_list
 
-from bsm.operation.base import Base
+from bsm.operation import Base
 
 from bsm.logger import get_logger
 _logger = get_logger()

@@ -2,6 +2,7 @@ import os
 import subprocess
 
 from bsm.util import safe_rmdir
+from bsm.util import expand_path
 
 from bsm.logger import get_logger
 _logger = get_logger()
@@ -21,22 +22,12 @@ class GitEmptyUrlError(GitError):
 
 
 COMMAND_MAP = {
-    'git': {
-        'clone': [None, 'clone', '{url}', '{path}'],
-        'checkout': ['{path}', 'checkout', '{branch}'],
-        'ls-remote-branches': [None, 'ls-remote', '--refs', '--heads', '{url}'],
-        'ls-remote-tags': [None, 'ls-remote', '--refs', '--tags', '{url}'],
-        'ls-branches': ['{path}', 'for-each-ref', '--format=%(refname:short)', 'refs/heads'],
-        'ls-tags': ['{path}', 'for-each-ref', '--format=%(refname:short)', 'refs/tags'],
-    },
-    'gittemp': {
-        'clone': [None, 'clone', '{url}', '{path}'],
-        'checkout': [None, 'checkout', '{path}', '{branch}'],
-        'ls-remote-branches': [None, 'ls-remote', 'branches', '{url}'],
-        'ls-remote-tags': [None, 'ls-remote', 'tags', '{url}'],
-        'ls-branches': [None, 'ls', 'branches', '{path}'],
-        'ls-tags': [None, 'ls', 'tags', '{path}'],
-    },
+    'clone': [None, 'clone', '{url}', '{path}'],
+    'checkout': ['{path}', 'checkout', '{branch}'],
+    'ls-remote-branches': [None, 'ls-remote', '--refs', '--heads', '{url}'],
+    'ls-remote-tags': [None, 'ls-remote', '--refs', '--tags', '{url}'],
+    'ls-branches': ['{path}', 'for-each-ref', '--format=%(refname:short)', 'refs/heads'],
+    'ls-tags': ['{path}', 'for-each-ref', '--format=%(refname:short)', 'refs/tags'],
 }
 
 
@@ -54,20 +45,19 @@ def _git_cmd(cwd, exe, *args):
 
     return out.decode()
 
-def _find_git():
+def _find_git(git_temp=None):
     try:
         _git_cmd(None, 'git', 'version')
         _logger.debug('Use system git')
-        return 'git', 'git'
+        return 'git'
     except Exception as e:
         pass
 
-    if '_BSM_GITTEMP' in os.environ:
-        gittemp_exec = os.environ['_BSM_GITTEMP']
+    if git_temp is not None:
         try:
-            _git_cmd(None, gittemp_exec, 'version')
-            _logger.debug('Use temporary git from {0}'.format(gittemp_exec))
-            return 'gittemp', gittemp_exec
+            _git_cmd(None, git_temp, 'version')
+            _logger.debug('Use temporary git from {0}'.format(git_temp))
+            return git_temp
         except Exception as e:
             pass
 
@@ -76,12 +66,12 @@ def _find_git():
 
 
 class Git(object):
-    def __init__(self, path=None):
+    def __init__(self, path=None, git_temp=None):
         self.__path = path
-        self.__git_type, self.__git_exec = _find_git()
+        self.__git_exec = _find_git(expand_path(git_temp))
 
     def __run_cmd(self, command, **kwargs):
-        if command not in COMMAND_MAP[self.__git_type]:
+        if command not in COMMAND_MAP:
             _logger.error('Do not known how to run: {0}'.format(command))
             raise GitUnknownCommandError('Do not known how to run: {0}'.format(command))
 
@@ -89,10 +79,10 @@ class Git(object):
         if self.__path is not None:
             params['path'] = self.__path
 
-        cwd = COMMAND_MAP[self.__git_type][command][0]
+        cwd = COMMAND_MAP[command][0]
         if cwd is not None:
             cwd = cwd.format(**params)
-        git_args = [v.format(**params) for v in COMMAND_MAP[self.__git_type][command][1:]]
+        git_args = [v.format(**params) for v in COMMAND_MAP[command][1:]]
         return _git_cmd(cwd, self.__git_exec, *git_args)
 
     def clone(self, url):

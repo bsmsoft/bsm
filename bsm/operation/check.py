@@ -1,4 +1,4 @@
-from bsm.operation.base import Base
+from bsm.operation import Base
 
 class Check(Base):
     def execute(self, check_type):

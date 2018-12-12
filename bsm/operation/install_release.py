@@ -5,7 +5,7 @@ from bsm.git import Git
 from bsm.util import safe_cpdir
 from bsm.util import safe_rmdir
 
-from bsm.operation.base import Base
+from bsm.operation import Base
 
 
 class ReleaseVersionNotExistError(Exception):
