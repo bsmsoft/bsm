@@ -1,14 +1,6 @@
 import click
 
-try:
-    input = raw_input
-except NameError:
-    pass
-
-from bsm.config.config_release import ConfigRelease
-from bsm.config.config_release import ConfigReleaseError
-from bsm.install import Install as BsmInstall
-from bsm.install.version import install_version
+from bsm.cmd import Base
 
 from bsm.logger import get_logger
 _logger = get_logger()
@@ -45,8 +37,8 @@ def _get_config_release(config_user, config_version, option, update):
     return config_release
 
 
-class Install(object):
-    def execute(self, scenario, reinstall, update, force, yes):
+class Install(Base):
+    def execute(self, reinstall, update, force, yes):
         config_release = _get_config_release(scenario, update)
 
         install = BsmInstall(config_user, config_version, config_release)

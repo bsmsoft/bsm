@@ -1,15 +1,13 @@
-import os
-import click
-
-from bsm.use import Use as BsmUse
-
-from bsm.config.info import Info
+from bsm.cmd import Base
 
 from bsm.logger import get_logger
 _logger = get_logger()
 
-class Use(object):
-    def execute(self, config_user, config_version, config_release, shell, default=False):
+class Use(Base):
+    def execute(self, default=False):
+        return self._bsm.use()
+
+
         obj = BsmUse(config_user, config_version, config_release)
 
         missing_pkg, install_cmd, pkg_install_name = obj.check()

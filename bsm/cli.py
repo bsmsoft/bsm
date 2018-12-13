@@ -49,20 +49,21 @@ def home(ctx):
 
 
 @cli.command()
-#@click.option('--shell', type=str, default='sh', help='Type of shell script')
+@click.option('--show-script', is_flag=True, help='Display the shell script')
 @click.pass_context
-def init(ctx):
+def init(ctx, show_script):
     '''Initialize bsm environment'''
     cmd = Cmd()
-    cmd.execute('init', ctx.obj, shell=ctx.obj['output']['shell'])
+    cmd.execute('init', ctx.obj, show_script=show_script, shell=ctx.obj['output']['shell'])
 
 
 @cli.command()
+@click.option('--show-script', is_flag=True, help='Display the shell script')
 @click.pass_context
-def exit(ctx):
+def exit(ctx, show_script):
     '''Exit bsm environment completely'''
     cmd = Cmd()
-    cmd.execute('exit', ctx.obj, shell=ctx.obj['output']['shell'])
+    cmd.execute('exit', ctx.obj, show_script=show_script, shell=ctx.obj['output']['shell'])
 
 
 @cli.command()
@@ -73,6 +74,26 @@ def upgrade(ctx):
     cmd.execute(ctx.obj)
 
 
+@cli.command(name='ls-remote')
+@click.option('--release-repo', '-t', type=str, help='Repository with release information')
+@click.pass_context
+def ls_remote(ctx, release_repo):
+    '''List all available release versions'''
+    cmd = Cmd()
+    ctx.obj['release_repo'] = release_repo
+    cmd.execute('ls-remote', ctx.obj)
+
+
+@cli.command()
+@click.option('--software-root', '-r', type=str, help='Local installed software root directory')
+@click.pass_context
+def ls(ctx, software_root):
+    '''List installed release versions'''
+    cmd = Cmd()
+    ctx.obj['software_root'] = software_root
+    cmd.execute('ls', ctx.obj)
+
+
 @cli.command()
 @click.argument('config-type', type=str, required=False)
 @click.pass_context
@@ -80,6 +101,14 @@ def config(ctx, config_type):
     '''Display configuration'''
     cmd = Cmd()
     cmd.execute('config', ctx.obj, config_type)
+
+
+@cli.command(name='ls-package')
+@click.pass_context
+def ls_package(ctx):
+    '''List all packages of the current release versions'''
+    cmd = Cmd('ls_package')
+    cmd.execute(ctx.obj)
 
 
 @cli.command()
@@ -96,53 +125,30 @@ def config(ctx, config_type):
 @click.pass_context
 def install(ctx, software_root, release_repo, release_source, option, reinstall, update, force, yes, version):
     '''Install specified release version'''
-    cmd = Cmd('install')
+    cmd = Cmd()
     ctx.obj['config_entry']['software_root'] = software_root
     ctx.obj['config_entry']['release_repo'] = release_repo
     ctx.obj['config_entry']['release_source'] = release_source
     ctx.obj['config_entry']['option'] = parse_lines(option)
+    ctx.obj['config_entry']['scenario'] = version
+    # ???
     # scenario is not put in config_entry because it need to be installed
-    cmd.execute(ctx.obj, scenario=version, reinstall=reinstall, update=update, force=force, yes=yes)
-
-
-@cli.command()
-@click.option('--software-root', '-r', type=str, help='Local installed software root directory')
-@click.pass_context
-def ls(ctx, software_root):
-    '''List installed release versions'''
-    cmd = Cmd()
-    ctx.obj['software_root'] = software_root
-    cmd.execute('ls', ctx.obj)
-
-
-@cli.command(name='ls-remote')
-@click.option('--release-repo', '-t', type=str, help='Repository with release information')
-@click.pass_context
-def ls_remote(ctx, release_repo):
-    '''List all available release versions'''
-    cmd = Cmd()
-    ctx.obj['release_repo'] = release_repo
-    cmd.execute('ls-remote', ctx.obj)
-
-
-@cli.command(name='ls-package')
-@click.pass_context
-def ls_package(ctx):
-    '''List all packages of the current release versions'''
-    cmd = Cmd('ls_package')
-    cmd.execute(ctx.obj)
+    cmd.execute('install', ctx.obj, reinstall=reinstall, update=update, force=force, yes=yes)
 
 
 @cli.command()
 @click.option('--software-root', '-r', type=str, help='Local installed software root directory')
 @click.option('--default', '-d', is_flag=True, help='Also set the version as default')
+@click.option('--option', '-o', type=str, multiple=True, help='Options for installation')
 @click.argument('version', type=str)
 @click.pass_context
-def use(ctx, software_root, default, version):
+def use(ctx, software_root, default, option, version):
     '''Switch environment to given release version'''
-    cmd = Cmd('use')
+    cmd = Cmd()
     ctx.obj['software_root'] = software_root
-    cmd.execute(ctx.obj, default=default, version_name=version)
+    ctx.obj['config_entry']['option'] = parse_lines(option)
+    ctx.obj['config_entry']['scenario'] = version
+    cmd.execute('use', ctx.obj, default=default)
 
 
 @cli.command()

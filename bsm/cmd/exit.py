@@ -3,9 +3,9 @@ from bsm.cmd import CmdResult
 from bsm.shell import Shell
 
 class Exit(Base):
-    def execute(self, shell):
+    def execute(self, show_script, shell):
         output = ''
-        if shell and self._output_format != 'plain':
+        if show_script and shell:
             cmd_name = self._bsm.config('app')['cmd_name']
             app_root = self._bsm.config('app').get('app_root', '')
 

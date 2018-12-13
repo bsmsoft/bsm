@@ -167,12 +167,12 @@ class Env(object):
                 self.__path[path_name].insert(0, v.format(**pkg_dir))
 
     def __set_package_env(self, path_def, pkg_name, pkg_config, pkg_dir):
-        all_path = pkg_config.get('path', {})
-        for k, v in all_path.items():
-            solo_env_path_name = path_def.get('solo_env', {})
-            if k in solo_env_path_name:
-                env_name = solo_env_path_name[k].format(package=pkg_name)
-                self.__solo[env_name] = v.format(**pkg_dir)
+#        all_path = pkg_config.get('path', {})
+#        for k, v in all_path.items():
+#            solo_env_path_name = path_def.get('solo_env', {})
+#            if k in solo_env_path_name:
+#                env_name = solo_env_path_name[k].format(package=pkg_name)
+#                self.__solo[env_name] = v.format(**pkg_dir)
 
         all_solo = pkg_config.get('env', {})
         for k, v in all_solo.items():
