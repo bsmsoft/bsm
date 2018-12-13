@@ -106,4 +106,6 @@ class Cmd(object):
                 _logger.critical('\n{0}'.format(traceback.format_exc()))
             sys.exit(1)
 
-        click.echo(final_output)
+        if final_output:
+            nl = not final_output.endswith('\n')
+            click.echo(final_output, nl=nl)

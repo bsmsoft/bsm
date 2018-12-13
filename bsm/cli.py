@@ -49,12 +49,12 @@ def home(ctx):
 
 
 @cli.command()
-@click.option('--shell', type=str, default='sh', help='Type of shell script')
+#@click.option('--shell', type=str, default='sh', help='Type of shell script')
 @click.pass_context
-def init(ctx, shell):
+def init(ctx):
     '''Initialize bsm environment'''
     cmd = Cmd()
-    cmd.execute('init', ctx.obj, shell=shell)
+    cmd.execute('init', ctx.obj, shell=ctx.obj['output']['shell'])
 
 
 @cli.command()

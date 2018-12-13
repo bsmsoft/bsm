@@ -255,7 +255,6 @@ class Env(object):
         env_all.update(self.__env_solo())
         return env_all
 
-
     def env_final(self):
         env_to_update = self.env_all()
 

@@ -1,16 +1,13 @@
-import os
-import click
-
-from bsm.env import Env
-
-from bsm.config.info import Info
-from bsm.config.config_version import ConfigVersion
+from bsm.cmd import Base
 
 from bsm.logger import get_logger
 _logger = get_logger()
 
-class Ls(object):
-    def execute(self, config_user, config_version):
+class Ls(Base):
+    def execute(self):
+        return self._bsm.ls()
+
+
         local_versions = []
 
         try:
