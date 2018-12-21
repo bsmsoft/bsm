@@ -88,7 +88,7 @@ class Cmd(object):
             result_output = cmd_result.output
 
             if obj['output']['env']:
-                result_output = {'value': result_output, 'env': bsm.env().env_all()}
+                result_output = {'output': result_output, 'env': bsm.env().env_bsm()}
 
             output = Output(obj['output']['format'])
             final_output = output.dump(result_output)

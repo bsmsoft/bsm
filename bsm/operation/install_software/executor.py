@@ -85,6 +85,7 @@ class Executor(object):
             result['success'] = True
         if isinstance(result_action, dict) and 'success' in result_action and result_action['success']:
             result['success'] = True
+
         if not result['success']:
             if isinstance(result_action, dict) and 'message' in result_action:
                 _logger.error('"{0}" execution error: {1}'.format(action_full_name, result_action['message']))

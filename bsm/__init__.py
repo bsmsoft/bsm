@@ -56,7 +56,7 @@ class BSM(object):
 
     def __env_result(self):
         env_result = {}
-        env_result['bsm'] = self.__env.env_all()
+        env_result['bsm'] = self.__env.env_bsm()
         env_result['final'] = self.__env.env_final()
         env_result['change'] = self.__env.env_change()
         return env_result
