@@ -248,12 +248,12 @@ class Env(object):
         return env
 
     def env_bsm(self):
-        env_all = {}
-        env_all.update(self.__env_release())
-        env_all.update(self.__env_package_info())
-        env_all.update(self.__env_path())
-        env_all.update(self.__env_solo())
-        return env_all
+        env_bsm = {}
+        env_bsm.update(self.__env_release())
+        env_bsm.update(self.__env_package_info())
+        env_bsm.update(self.__env_path())
+        env_bsm.update(self.__env_solo())
+        return env_bsm
 
     def env_final(self):
         env_to_update = self.env_bsm()

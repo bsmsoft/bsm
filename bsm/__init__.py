@@ -21,7 +21,7 @@ from bsm.logger import get_logger
 _logger = get_logger()
 
 
-class BSM(object):
+class Bsm(object):
     def __init__(self, config_entry={}):
         self.__config_entry_input = config_entry
         self.__config_entry = copy.deepcopy(self.__config_entry_input)

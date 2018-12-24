@@ -3,7 +3,7 @@ import traceback
 
 import click
 
-from bsm import BSM
+from bsm import Bsm
 from bsm.loader import load_common
 from bsm.config.release import ConfigReleaseError
 from bsm.shell import Shell
@@ -75,7 +75,7 @@ class Cmd(object):
             click.echo('BSM:COMMAND_LINE_INTERFACE_OK')
             return
 
-        bsm = BSM(obj['config_entry'])
+        bsm = Bsm(obj['config_entry'])
 
         try:
             cmd = load_common(cmd_name, 'bsm.cmd')(bsm, obj['output']['format'])
