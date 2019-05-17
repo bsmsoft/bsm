@@ -3,6 +3,8 @@ import sys
 import re
 import shutil
 import subprocess
+import datetime
+import pprint
 
 
 def camel_to_snake(name, delim='_'):
@@ -74,6 +76,26 @@ def call(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=None, env=N
     out, err = p.communicate(input=input)
     ret = p.returncode
     return (ret, out, err)
+
+def call_and_log(cmd, log, cwd=None, env=None, input=None):
+    log.write('='*80 + '\n')
+    log.write(' - Start time: {0}\n'.format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+    log.write(' - Command: {0}\n'.format(cmd))
+    log.write(' - Cwd: {0}\n'.format(cwd))
+    log.write(' - Env:\n{0}\n'.format(pprint.pformat(env)))
+    log.write('-'*80 + '\n')
+    log.flush()
+
+    try:
+        ret, out, err = call(cmd, stdout=log, cwd=cwd, env=env, input=input)
+    except OSError as e:
+        log.write('OSError: {0}\n'.format(e))
+        log.write('Command not found: {0}\n'.format(cmd[0]))
+        ret = 127
+
+    log.flush()
+
+    return ret
 
 
 def which(program):

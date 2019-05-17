@@ -8,6 +8,9 @@ here = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(here, 'bsm', 'VERSION')) as version_file:
     version = version_file.read().strip()
 
+with open(os.path.join(here, 'bsm', 'BSMCLI_CMD')) as bsmcli_cmd_file:
+    bsmcli_cmd = bsmcli_cmd_file.read().strip()
+
 with open(os.path.join(here, 'README.rst')) as f:
     long_description = f.read()
 
@@ -45,8 +48,8 @@ setup(
     keywords = 'bsm',
     packages = find_packages(exclude=[]),
     install_requires = [
-        'click>=7.0,<8.0',
-        'PyYAML>=3.0,<4.0',
+        'click',
+        'PyYAML',
     ],
     include_package_data = True,
     tests_require = [
@@ -54,7 +57,7 @@ setup(
     ],
     entry_points = {
         'console_scripts': [
-            'bsmcli = bsm.cli:main',
+            bsmcli_cmd+' = bsm.cli:main',
         ],
     },
 )

@@ -14,16 +14,14 @@ from bsm.util.option import parse_lines
 @click.option('--shell', type=str, hidden=True, help='Type of shell script')
 @click.option('--config-user', type=str, help='User configuration file path')
 @click.option('--output-format', type=str, default='plain', help='Output format')
-@click.option('--output-env', is_flag=True, help='Also output environment')
 @click.pass_context
-def cli(ctx, verbose, quiet, app_root, shell, config_user, output_format, output_env):
+def cli(ctx, verbose, quiet, app_root, shell, config_user, output_format):
     ctx.obj['config_entry']['verbose'] = verbose
     ctx.obj['config_entry']['quiet'] = quiet
     if config_user is not None:
         ctx.obj['config_entry']['config_user_file'] = config_user
     ctx.obj['output']['format'] = output_format
     ctx.obj['output']['format'] = output_format
-    ctx.obj['output']['env'] = output_env
 
     if 'app_root' not in ctx.obj['config_entry'] or ctx.obj['config_entry']['app_root'] is None:
         ctx.obj['config_entry']['app_root'] = app_root
@@ -96,11 +94,21 @@ def ls(ctx, software_root):
 
 @cli.command()
 @click.argument('config-type', type=str, required=False)
+@click.argument('item-name', type=str, required=False)
 @click.pass_context
-def config(ctx, config_type):
+def config(ctx, config_type, item_name):
     '''Display configuration'''
     cmd = Cmd()
-    cmd.execute('config', ctx.obj, config_type)
+    cmd.execute('config', ctx.obj, config_type, item_name)
+
+
+@cli.command(name='config-example')
+@click.option('--save', is_flag=True, help='Save example user configuration to file')
+@click.pass_context
+def config_example(ctx, save):
+    '''Display configuration example'''
+    cmd = Cmd()
+    cmd.execute('config-example', ctx.obj, save)
 
 
 @cli.command(name='ls-package')
@@ -170,4 +178,5 @@ def pack(ctx, destination, version):
 
 
 def main(cmd_name=None, app_root=None, output_shell=None, check_cli=False):
+    '''The app_root and output_shell here take precedence over cli arguments'''
     cli(prog_name=cmd_name, obj={'config_entry': {'app_root': app_root}, 'output': {'shell': output_shell}, 'check_cli': check_cli})

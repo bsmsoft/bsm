@@ -6,10 +6,8 @@ import traceback
 from bsm.env import Env
 from bsm.package_manager import PackageManager
 
-from bsm.loader import load_func
+from bsm.loader import run_handler
 from bsm.util import safe_mkdir
-
-from bsm import HANDLER_MODULE_NAME
 
 from bsm.logger import get_logger
 _logger = get_logger()
@@ -42,7 +40,7 @@ class Executor(object):
         par['sub_action'] = sub_action
 
         step = self.__step_info.package_step(pkg, action, sub_action)
-        par['action_handler'] = step.get('handler')
+        par['action_name'] = step.get('action')
         par['action_param'] = step.get('param')
 
         par['log_file'] = os.path.join(self.__pkg_mgr.package_info(pkg)['dir']['log'], '{0}_{1}_{2}.log'.format(pkg, action, sub_action))
@@ -73,7 +71,7 @@ class Executor(object):
         safe_mkdir(param['pkg_info']['dir']['log'])
 
         try:
-            result_action = run_handler('install.'+param['action_handler'], param)
+            result_action = run_handler('', 'install', param['action_name'], param)
         except Exception as e:
             _logger.critical('"{0}" install handler error: {1}'.format(action_full_name, e))
             if param['config_user']['verbose']:

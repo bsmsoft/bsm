@@ -8,7 +8,7 @@ from bsm.config.common import Common
 from bsm.util import expand_path
 from bsm.util import ensure_list
 
-from bsm import HANDLER_MODULE_NAME
+from bsm.const import HANDLER_MODULE_NAME
 
 
 _SCENARIO_GLOBAL_ITEMS = ('software_root', 'release_repo')

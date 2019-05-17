@@ -1,7 +1,6 @@
 import sys
 import inspect
 
-from bsm import HANDLER_MODULE_NAME
 
 from bsm.util import snake_to_camel
 
@@ -94,20 +93,40 @@ def load_relative(module_name, attr_name):
     return c
 
 
-def run_handler(handler_name, param, handler_dir=''):
-    if handler_dir:
-        sys.path.insert(0, handler_dir)
-
-    module_name = HANDLER_MODULE_NAME + '.' + handler_name
+def handler_func(module_name, handler_name, func_name):
     try:
-        f = load_func(module_name, 'run')
-        return f(param)
+        f = load_func(module_name, func_name)
+        return f
     except LoadError as e:
         _logger.debug('Load handler "{0}" error: {1}'.format(handler_name, e))
         raise
     except Exception as e:
         _logger.debug('Handler "{0}" run error: {1}'.format(handler_name, e))
         raise
-    finally:
-        if handler_dir:
-            sys.path.remove(handler_dir)
+
+def run_handler(extra_python_dir, handler_name, *args, **kwargs):
+    module_list = [HANDLER_MODULE_NAME, 'bsm.handler']
+
+    if extra_python_dir:
+        sys.path.insert(0, extra_python_dir)
+
+    final_module = ''
+    for m in module_list:
+        try:
+            f = load_func(m+'.'+handler_name, 'avail')
+            if f(*args, **kwargs):
+                final_module = m
+                break
+        except Exception as e:
+            continue
+
+    if not final_module:
+        raise FunctionNotFoundError('Could not find handler for "{0}"'.format(handler_name))
+
+    f = load_func(final_module+'.'+handler_name, 'run')
+    result = f(*args, **kwargs)
+
+    if extra_python_dir:
+        sys.path.remove(extra_python_dir)
+
+    return result

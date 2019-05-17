@@ -1,6 +1,6 @@
 #verbose: false
 
-#release_repo: https://github.com/bsmhep/bsmdemo
+#release_repo: https://github.com/bsmsoft/bsmdemo
 
 #software_root: ~/bsmsoft
 
@@ -16,7 +16,7 @@
 # "version", "software_root", "release_repo", "option", etc.
 #scenario:
 #  '1.2.3':
-#    release_repo: https://github.com/bsmhep/newdemo
+#    release_repo: https://github.com/bsmsoft/newdemo
 #    option:
 #      work_root: ~/mywork123
 #      arch: x86

@@ -33,6 +33,8 @@ COMMAND_MAP = {
 
 def _git_cmd(cwd, exe, *args):
     full_cmd = [exe] + list(args)
+    _logger.debug('Run git command: {0}'.format(full_cmd))
+
     try:
         p = subprocess.Popen(full_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd)
         out, err = p.communicate()
@@ -55,7 +57,7 @@ def _find_git(git_temp=None):
 
     if git_temp is not None:
         try:
-            _git_cmd(None, git_temp, 'version')
+            _git_cmd(None, expand_path(git_temp), 'version')
             _logger.debug('Use temporary git from {0}'.format(git_temp))
             return git_temp
         except Exception as e:
@@ -68,7 +70,7 @@ def _find_git(git_temp=None):
 class Git(object):
     def __init__(self, path=None, git_temp=None):
         self.__path = path
-        self.__git_exec = _find_git(expand_path(git_temp))
+        self.__git_exec = _find_git(git_temp)
 
     def __run_cmd(self, command, **kwargs):
         if command not in COMMAND_MAP:

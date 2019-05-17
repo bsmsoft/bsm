@@ -27,7 +27,7 @@ class App(Common):
         app_id = self['id']
 
         self.setdefault('description', 'Application of BSM')
-        self.setdefault('site', 'https://bsmhep.github.io/')
+        self.setdefault('site', 'https://bsmsoft.github.io/')
 
         self.setdefault('cmd_name', app_id)
         self.setdefault('version_pattern', 'v(.*)')
@@ -36,15 +36,11 @@ class App(Common):
         self.setdefault('config_info_file', '~/.'+app_id+'.info')
         self.setdefault('release_dir_name', '.bsm')
         self.setdefault('package_work_dir_name', '.bsm')
-        self.setdefault('set_env', {})
-        self.setdefault('prepend_path', {})
-        self.setdefault('append_path', {})
-        self.setdefault('unset_env', [])
-        self.setdefault('alias', {})
-        self.setdefault('unalias', [])
+        self.setdefault('package_config_name', '.'+app_id+'.yml')
+        self.setdefault('env', {})
 
-        self.setdefault('release_repo', 'https://github.com/bsmhep/bsmdemo')
-        self.setdefault('software_root', os.getcwd())
+        self.setdefault('release_repo', 'https://github.com/bsmsoft/bsmdemo')
+        self.setdefault('software_root', '~/bsmdemo')
 
 #        self.setdefault('git_temp', '')
 

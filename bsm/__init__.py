@@ -1,16 +1,7 @@
 import os
 import copy
 
-
-BSM_HOME = os.path.dirname(os.path.realpath(__file__))
-
-# This name is very long in order to avoid conflicts with other modules
-HANDLER_MODULE_NAME = '_bsm_handler_run_avoid_conflict'
-
-
-with open(os.path.join(BSM_HOME, 'VERSION'), 'r') as f:
-    BSM_VERSION = f.read().strip()
-
+from bsm.const import BSM_HOME, BSM_VERSION
 
 from bsm.config import Config
 from bsm.env import Env
@@ -54,31 +45,18 @@ class Bsm(object):
         self.__config = Config(self.__config_entry)
         self.__operation = Operation(self.__config, self.__env)
 
-    def __env_result(self):
-        env_result = {}
-        env_result['bsm'] = self.__env.env_bsm()
-        env_result['final'] = self.__env.env_final()
-        env_result['change'] = self.__env.env_change()
-        return env_result
-
 
     def config_entry(self):
         return self.__config_entry_input
 
 
-    def select(self, scenario):
+    def switch(self, scenario):
         self.__config_entry_input['scenario'] = scenario
 
 
     @__auto_reload
     def app(self):
         return self.__config['app']['id']
-
-#    def shell_init_script(self, shell):
-#        return shell
-#
-#    def shell_exit_script(self, shell):
-#        pass
 
     @__auto_reload
     def config_all(self):
@@ -124,7 +102,10 @@ class Bsm(object):
     @__auto_reload
     def use(self):
         self.__operation.execute('use')
-        return self.__env_result()
+        return self.__env.env()
+
+    def apply_env_changes(self):
+        return self.__env.apply_changes()
 
     def env(self):
         return self.__env
