@@ -60,11 +60,11 @@ class Bsm(object):
 
     @__auto_reload
     def config_all(self):
-        return dict(self.__config)
+        return self.__config.data
 
     @__auto_reload
     def config(self, config_type):
-        return dict(self.__config[config_type])
+        return self.__config[config_type].data
 
     @__auto_reload
     def config_user_example(self):

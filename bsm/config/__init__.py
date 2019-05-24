@@ -128,9 +128,5 @@ class Config(collections.MutableMapping):
 
 
     @property
-    def config(self):
-        return dict(self.__config)
-
-    @property
-    def config_copy(self):
-        return copy.deepcopy(dict(self.__config))
+    def data(self):
+        return {k:dict(v) for k, v in self.__config.items()}
