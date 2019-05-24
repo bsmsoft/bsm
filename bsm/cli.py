@@ -72,6 +72,17 @@ def upgrade(ctx):
     cmd.execute(ctx.obj)
 
 
+@cli.command()
+@click.argument('version', type=str, required=False)
+@click.pass_context
+def option(ctx, version):
+    '''Get the available options'''
+    cmd = Cmd()
+    if not version:
+        ctx.obj['config_entry']['scenario'] = version
+    cmd.execute('option', ctx.obj)
+
+
 @cli.command(name='ls-remote')
 @click.option('--release-repo', '-t', type=str, help='Repository with release information')
 @click.pass_context

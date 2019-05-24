@@ -1,11 +1,7 @@
 import sys
 import inspect
 
-
 from bsm.util import snake_to_camel
-
-from bsm.logger import get_logger
-_logger = get_logger()
 
 
 class LoadError(Exception):
@@ -92,17 +88,6 @@ def load_relative(module_name, attr_name):
 
     return c
 
-
-def handler_func(module_name, handler_name, func_name):
-    try:
-        f = load_func(module_name, func_name)
-        return f
-    except LoadError as e:
-        _logger.debug('Load handler "{0}" error: {1}'.format(handler_name, e))
-        raise
-    except Exception as e:
-        _logger.debug('Handler "{0}" run error: {1}'.format(handler_name, e))
-        raise
 
 def run_handler(extra_python_dir, handler_name, *args, **kwargs):
     module_list = [HANDLER_MODULE_NAME, 'bsm.handler']
