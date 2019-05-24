@@ -87,12 +87,18 @@ class Cmd(object):
 
             result_output = cmd_result.output
 
+            env_final = bsm.env_final()
+            env_changes = bsm.apply_env_changes()
+
+            if obj['output']['env']:
+                result_output = {'output': result_output, 'env_final': env_final, 'env_changes': env_changes}
+
             output = Output(obj['output']['format'])
             final_output = output.dump(result_output)
 
             if obj['output']['shell']:
                 final_output = _generate_script(bsm.config('app')['cmd_name'], bsm.config('app').get('app_root', ''),
-                        obj['output']['shell'], final_output, bsm.apply_env_changes(), cmd_result.script_types)
+                        obj['output']['shell'], final_output, env_changes, cmd_result.script_types)
         except ConfigReleaseError as e:
             _logger.error(str(e))
             _logger.critical('Can not load release version: {0}'.format(cmd_kwargs.get('version_name')))

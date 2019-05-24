@@ -111,8 +111,8 @@ class Bsm(object):
     def apply_env_changes(self):
         return self.__env.apply_changes()
 
-    def env(self):
-        return self.__env
+    def env_final(self):
+        return self.__env.env_final()
 
     @__auto_reload
     def ls_package(self):

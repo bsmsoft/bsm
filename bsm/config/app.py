@@ -42,8 +42,6 @@ class App(Common):
         self.setdefault('release_repo', 'https://github.com/bsmsoft/bsmdemo')
         self.setdefault('software_root', '~/bsmdemo')
 
-#        self.setdefault('git_temp', '')
-
         if 'example_config_user' in self and 'app_root' in self:
             self['example_config_user'] = os.path.join(self['app_root'], self['example_config_user'])
         else:

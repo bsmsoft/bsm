@@ -5,10 +5,6 @@ import json
 from bsm.const import BSMCLI_CMD
 
 
-def merge_env(env1, env2):
-    return {}
-
-
 def _parse_path(path_str):
     return path_str.split(os.pathsep)
 
@@ -66,7 +62,7 @@ class Env(object):
         else:
             final_path_list = path_list + original_path_list
 
-        self.env[env_name] = _emit_path(final_path_list)
+        self.__env[env_name] = _emit_path(final_path_list)
 
     def __remove_path(self, env_name, path_list):
         if env_name not in self.__env:
@@ -77,52 +73,52 @@ class Env(object):
         final_path_list = [x for x in original_path_list if x not in [path_list]]
 
         if not final_path_list:
-            del self.env[env_name]
+            del self.__env[env_name]
         else:
-            self.env[env_name] = _emit_path(final_path_list)
+            self.__env[env_name] = _emit_path(final_path_list)
 
-    def __load_env(self, env):
+    def __load_env(self, config_env):
         env_info = {}
         env_info['set_env'] = []
         env_info['path'] = {}
         env_info['alias'] = []
 
-        if 'unset_env' in env:
-            unset_env = ensure_list(env['unset_env'])
+        if 'unset_env' in config_env:
+            unset_env = ensure_list(config_env['unset_env'])
             for e in unset_env:
                 if e in self.__env:
                     del self.__env[e]
 
-        if 'set_env' in env:
-            for e, v in env['set_env'].items():
+        if 'set_env' in config_env:
+            for e, v in config_env['set_env'].items():
                 self.__env[e] = v
                 env_info['set_env'].append(e)
 
-        if 'prepend_path' in env:
-            for e, v in env['prepend_path'].items():
+        if 'prepend_path' in config_env:
+            for e, v in config_env['prepend_path'].items():
                 path_list = ensure_list(v)
                 self.__merge_path(e, path_list)
                 env_info['path'].setdefault(e, [])
                 env_info['path'][e] += path_list
 
-        if 'append_path' in env:
-            for e, v in env['append_path'].items():
+        if 'append_path' in config_env:
+            for e, v in config_env['append_path'].items():
                 path_list = ensure_list(v)
                 self.__merge_path(e, path_list, True)
                 env_info['path'].setdefault(e, [])
                 env_info['path'][e] += path_list
 
-        if 'unalias' in env:
-            unalias_list = ensure_list(env['unalias'])
+        if 'unalias' in config_env:
+            unalias_list = ensure_list(config_env['unalias'])
             for e in unalias_list:
                 if e in self.__alias:
                     del self.__alias[e]
                 else:
                     self.__unalias.append(e)
 
-        if 'alias' in env:
-            self.__alias.update(env['alias'])
-            env_info['alias'] += list(env['alias'].keys())
+        if 'alias' in config_env:
+            self.__alias.update(config_env['alias'])
+            env_info['alias'] += list(config_env['alias'].keys())
 
         return env_info
 
@@ -160,7 +156,7 @@ class Env(object):
             self.__unload_env(app_info.get('env', {}))
             del self.__env[self.__env_name['app_info']]
 
-    def env(self):
+    def env_final(self):
         return self.__env.copy()
 
     def apply_changes(self):

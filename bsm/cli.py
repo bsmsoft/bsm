@@ -14,18 +14,19 @@ from bsm.util.option import parse_lines
 @click.option('--shell', type=str, hidden=True, help='Type of shell script')
 @click.option('--config-user', type=str, help='User configuration file path')
 @click.option('--output-format', type=str, default='plain', help='Output format')
+@click.option('--output-env', is_flag=True, help='Also output environment')
 @click.pass_context
-def cli(ctx, verbose, quiet, app_root, shell, config_user, output_format):
+def cli(ctx, verbose, quiet, app_root, shell, config_user, output_format, output_env):
     ctx.obj['config_entry']['verbose'] = verbose
     ctx.obj['config_entry']['quiet'] = quiet
     if config_user is not None:
         ctx.obj['config_entry']['config_user_file'] = config_user
     ctx.obj['output']['format'] = output_format
-    ctx.obj['output']['format'] = output_format
+    ctx.obj['output']['env'] = output_env
 
+    # app_root and shell could not be changed by arguments under shell command
     if 'app_root' not in ctx.obj['config_entry'] or ctx.obj['config_entry']['app_root'] is None:
         ctx.obj['config_entry']['app_root'] = app_root
-
     if 'shell' not in ctx.obj['output'] or ctx.obj['output']['shell'] is None:
         ctx.obj['output']['shell'] = shell
 
