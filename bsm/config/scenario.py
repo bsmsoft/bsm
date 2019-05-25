@@ -51,7 +51,7 @@ class Scenario(Common):
 
         self.__version_path = {}
 
-    def load_scenario(self, config_entry, config_user, config_app):
+    def load_scenario(self, config_entry, config_env, config_user, config_app):
         self['option'] = {}
 
         self.update(_filter_scenario_config(config_app, _SCENARIO_GLOBAL_ITEMS))
@@ -74,7 +74,7 @@ class Scenario(Common):
         self.__update_option(config_entry)
 
         if 'version' not in self:
-            self['version'] = _temp_version()
+            raise ConfigScenarioError('Version is not found')
 
         self.__expand_path()
         self.__load_version_path(config_app)

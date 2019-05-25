@@ -13,13 +13,17 @@ class ConfigNoDirectModError(Exception):
 
 from bsm.config.common import Common as ConfigCommon
 from bsm.config.app import App as ConfigApp
+from bsm.config.env import Env as ConfigEnv
 from bsm.config.scenario import Scenario as ConfigScenario
 from bsm.config.release import Release as ConfigRelease
 from bsm.config.packages import Packages as ConfigPackages
 
 
 class Config(collections.MutableMapping):
-    def __init__(self, config_entry={}):
+    def __init__(self, config_entry={}, initial_env=None):
+        if initial_env is None:
+            initial_env = os.environ
+
         self.__config = {}
         self.__config['entry'] = ConfigCommon(config_entry)
 
@@ -48,22 +52,13 @@ class Config(collections.MutableMapping):
         return len(self.__config)
 
 
-    def __old_load_app(self):
-        self.__config['app'] = ConfigApp()
-
-        if 'config_app_file' in self['entry']:
-            self['app'].load_from_file(expand_path(self['entry']['config_app_file']))
-        if 'config_app' in self['entry']:
-            self['app'] = copy.deepcopy(self['entry']['config_app'])
-        if 'app_id' in self['entry']:
-            self['app']['id'] = self['entry']['app_id']
-
-        self['app'].load_app()
-
     def __load_app(self):
         self.__config['app'] = ConfigApp()
-
         self['app'].load_app(self['entry'].get('app_root', ''))
+
+    def __load_env(self):
+        self.__config['env'] = ConfigEnv()
+        self['env'].load_env(initial_env, self['app']['env_prefix'])
 
     def __load_user(self):
         self.__config['user'] = ConfigCommon()
@@ -99,11 +94,15 @@ class Config(collections.MutableMapping):
 
     def __load_scenario(self):
         self.__config['scenario'] = ConfigScenario()
-        self['scenario'].load_scenario(self['entry'], self['user'], self['app'])
+        self['scenario'].load_scenario(self['entry'], self['env'], self['user'], self['app'])
 
     def __load_release(self):
         self.__config['release'] = ConfigRelease()
         self['release'].load_release(self['scenario'], self['app'])
+
+    def __load_property(self):
+        self.__config['property'] = ConfigProperty()
+        self['property'].load_property(self['scenario'])
 
     def __load_category(self):
         self.__config['category'] = ConfigCommon()
@@ -124,9 +123,9 @@ class Config(collections.MutableMapping):
 
     def __load_packages(self):
         self.__config['packages'] = ConfigPackages()
-        self['packages'].load_packages(self['app'], self['release'], self['category'])
+        self['packages'].load_packages(self['app'], self['release'], self['category'], self['env'])
 
 
     @property
     def data(self):
-        return {k:dict(v) for k, v in self.__config.items()}
+        return {k:v.data for k, v in self.items()}

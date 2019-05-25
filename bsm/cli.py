@@ -77,7 +77,7 @@ def upgrade(ctx):
 @click.argument('version', type=str, required=False)
 @click.pass_context
 def option(ctx, version):
-    '''Get the available options'''
+    '''Display the available options'''
     cmd = Cmd()
     if not version:
         ctx.obj['config_entry']['scenario'] = version
@@ -109,7 +109,7 @@ def ls(ctx, software_root):
 @click.argument('item-name', type=str, required=False)
 @click.pass_context
 def config(ctx, config_type, item_name):
-    '''Display configuration'''
+    '''Display configuration, mostly for debug purpose'''
     cmd = Cmd()
     cmd.execute('config', ctx.obj, config_type, item_name)
 
@@ -125,9 +125,9 @@ def config_example(ctx, save):
 
 @cli.command(name='ls-package')
 @click.pass_context
-def ls_package(ctx):
+def ls_pkg(ctx):
     '''List all packages of the current release versions'''
-    cmd = Cmd('ls_package')
+    cmd = Cmd('ls_pkg')
     cmd.execute(ctx.obj)
 
 

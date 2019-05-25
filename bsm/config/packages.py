@@ -45,5 +45,9 @@ class Packages(Common):
 
 
     @property
+    def data(self):
+        return {k:v.data for k, v in self.items()}
+
+    @property
     def dir_list(self):
         return self.__dir_list

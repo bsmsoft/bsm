@@ -2,7 +2,7 @@ import click
 
 from bsm.env import Env
 
-class LsPackage(object):
+class LsPkg(object):
     def execute(self, config, config_version):
         env = Env()
 
