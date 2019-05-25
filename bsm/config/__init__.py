@@ -16,13 +16,13 @@ from bsm.config.app import App as ConfigApp
 from bsm.config.env import Env as ConfigEnv
 from bsm.config.scenario import Scenario as ConfigScenario
 from bsm.config.release import Release as ConfigRelease
+from bsm.config.attribute import Attribute as ConfigAttribute
 from bsm.config.packages import Packages as ConfigPackages
 
 
 class Config(collections.MutableMapping):
     def __init__(self, config_entry={}, initial_env=None):
-        if initial_env is None:
-            initial_env = os.environ
+        self.__initial_env = initial_env
 
         self.__config = {}
         self.__config['entry'] = ConfigCommon(config_entry)
@@ -58,7 +58,7 @@ class Config(collections.MutableMapping):
 
     def __load_env(self):
         self.__config['env'] = ConfigEnv()
-        self['env'].load_env(initial_env, self['app']['env_prefix'])
+        self['env'].load_env(self.__initial_env, self['app']['env_prefix'])
 
     def __load_user(self):
         self.__config['user'] = ConfigCommon()
@@ -100,9 +100,9 @@ class Config(collections.MutableMapping):
         self.__config['release'] = ConfigRelease()
         self['release'].load_release(self['scenario'], self['app'])
 
-    def __load_property(self):
-        self.__config['property'] = ConfigProperty()
-        self['property'].load_property(self['scenario'])
+    def __load_attribute(self):
+        self.__config['attribute'] = ConfigAttribute()
+        self['attribute'].load_attribute(self['scenario'])
 
     def __load_category(self):
         self.__config['category'] = ConfigCommon()

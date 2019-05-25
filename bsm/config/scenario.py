@@ -73,11 +73,10 @@ class Scenario(Common):
         self.update(_filter_scenario_config(config_entry, _SCENARIO_ENTRY_ITEMS))
         self.__update_option(config_entry)
 
-        if 'version' not in self:
-            raise ConfigScenarioError('Version is not found')
-
         self.__expand_path()
-        self.__load_version_path(config_app)
+
+        if 'version' in self:
+            self.__load_version_path(config_app)
 
 
     def __update_option(self, config_container):

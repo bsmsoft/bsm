@@ -41,6 +41,9 @@ def _compare_version(ver1, ver2):
 
 class Release(Common):
     def load_release(self, config_scenario, config_app):
+        if 'version' not in config_scenario:
+            return
+
         self.__load_config(config_scenario)
 
         self.__transform(config_scenario, config_app)
