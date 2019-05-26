@@ -16,7 +16,6 @@ from bsm.config.app import App as ConfigApp
 from bsm.config.env import Env as ConfigEnv
 from bsm.config.scenario import Scenario as ConfigScenario
 from bsm.config.release import Release as ConfigRelease
-from bsm.config.attribute import Attribute as ConfigAttribute
 from bsm.config.packages import Packages as ConfigPackages
 
 
@@ -28,6 +27,8 @@ class Config(collections.MutableMapping):
         self.__config['entry'] = ConfigCommon(config_entry)
 
 
+    # This method implements the lazy load of configs
+    # Configs are only loaded when accessed
     def __getitem__(self, key):
         def method_not_found():
             raise ConfigNotValidError('No such config: {0}'.format(key))
@@ -54,11 +55,11 @@ class Config(collections.MutableMapping):
 
     def __load_app(self):
         self.__config['app'] = ConfigApp()
-        self['app'].load_app(self['entry'].get('app_root', ''))
+        self['app'].load(self['entry'].get('app_root', ''))
 
     def __load_env(self):
         self.__config['env'] = ConfigEnv()
-        self['env'].load_env(self.__initial_env, self['app']['env_prefix'])
+        self['env'].load(self.__initial_env, self['app']['env_prefix'])
 
     def __load_user(self):
         self.__config['user'] = ConfigCommon()
@@ -94,15 +95,18 @@ class Config(collections.MutableMapping):
 
     def __load_scenario(self):
         self.__config['scenario'] = ConfigScenario()
-        self['scenario'].load_scenario(self['entry'], self['env'], self['user'], self['app'])
+        self['scenario'].load(self['entry'], self['env'], self['user'], self['app'])
+
+    def __load_attribute(self):
+        self.__config['attribute'] = ConfigCommon()
+        try:
+            self['attribute'].update(run_handler(self.['scenario'].version_path['handler_python_dir'], 'attribute'))
+        except Exception as e:
+            pass
 
     def __load_release(self):
         self.__config['release'] = ConfigRelease()
-        self['release'].load_release(self['scenario'], self['app'])
-
-    def __load_attribute(self):
-        self.__config['attribute'] = ConfigAttribute()
-        self['attribute'].load_attribute(self['scenario'])
+        self['release'].load(self['app'], self['scenario'], self['attribute'])
 
     def __load_category(self):
         self.__config['category'] = ConfigCommon()
@@ -113,17 +117,23 @@ class Config(collections.MutableMapping):
             self['category'][ctg]['pre_check'] = cfg.get('pre_check', False)
             self['category'][ctg]['install'] = cfg.get('install', False)
             self['category'][ctg]['auto_env'] = cfg.get('auto_env', False)
-            self['category'][ctg]['auto_package'] = cfg.get('auto_package', False)
+            self['category'][ctg]['version_dir'] = cfg.get('version_dir', False)
+            self['category'][ctg]['share_env'] = cfg.get('share_env', False)
 
             if 'root' in cfg:
                 self['category'][ctg]['root'] = cfg['root'].format(**self['scenario'])
             else:
                 self['category'][ctg]['install'] = False
-                self['category'][ctg]['auto_package'] = False
+                self['category'][ctg]['auto_env'] = False
+                self['category'][ctg]['share_env'] = False
+
+    def __load_install(self):
+        self.__config['install'] = ConfigInstall()
+        self['install'].load(self['release'])
 
     def __load_packages(self):
         self.__config['packages'] = ConfigPackages()
-        self['packages'].load_packages(self['app'], self['release'], self['category'], self['env'])
+        self['packages'].load(self['app'], self['release'], self['category'], self['env'])
 
 
     @property

@@ -87,31 +87,3 @@ def load_relative(module_name, attr_name):
         raise AttributeNotFoundError('Attribute "{0}" not found in module "{1}": {2}'.format(attr_name, module_name, e))
 
     return c
-
-
-def run_handler(extra_python_dir, handler_name, *args, **kwargs):
-    module_list = [HANDLER_MODULE_NAME, 'bsm.handler']
-
-    if extra_python_dir:
-        sys.path.insert(0, extra_python_dir)
-
-    final_module = ''
-    for m in module_list:
-        try:
-            f = load_func(m+'.'+handler_name, 'avail')
-            if f(*args, **kwargs):
-                final_module = m
-                break
-        except Exception as e:
-            continue
-
-    if not final_module:
-        raise FunctionNotFoundError('Could not find handler for "{0}"'.format(handler_name))
-
-    f = load_func(final_module+'.'+handler_name, 'run')
-    result = f(*args, **kwargs)
-
-    if extra_python_dir:
-        sys.path.remove(extra_python_dir)
-
-    return result

@@ -17,7 +17,7 @@ class ConfigPackagesError(Exception):
 
 
 class Packages(Common):
-    def load_packages(self, config_app, config_release, config_category):
+    def load(self, config_app, config_release, config_category):
         self.__load_packages(config_release, config_category, config_app['package_work_dir_name'])
         self.__load_dir_list(config_release)
 

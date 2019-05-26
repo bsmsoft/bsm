@@ -5,7 +5,7 @@ from bsm.config.common import Common
 from bsm.util import expand_path
 
 class App(Common):
-    def load_app(self, app_root):
+    def load(self, app_root):
         if app_root:
             self.__load_app_root(expand_path(app_root))
         self.__load_bsm_default()
@@ -34,8 +34,8 @@ class App(Common):
         self.setdefault('env_prefix', app_id.upper())
         self.setdefault('config_user_file', '~/.'+app_id+'.conf')
         self.setdefault('config_info_file', '~/.'+app_id+'.info')
-        self.setdefault('release_dir_name', '.bsm')
-        self.setdefault('package_work_dir_name', '.bsm')
+        self.setdefault('release_work_dir', '.bsm')
+        self.setdefault('category_work_dir', '.bsm')
         self.setdefault('package_config_name', '.'+app_id+'.yml')
         self.setdefault('env', {})
 

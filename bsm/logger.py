@@ -36,7 +36,7 @@ class JsubFormatter(logging.Formatter):
         return s
 
 
-_FORMATTER = JsubFormatter('[%(asctime)s][%(name)s|%(levelname)-8s] %(message)s')
+_FORMATTER = JsubFormatter('[%(asctime)s][%(name)s|%(levelname)-5.5s] %(message)s')
 #_FORMATTER = logging.Formatter('[%(asctime)s](%(name)s:%(levelname)s) %(message)s', '%Y-%m-%d %H:%M:%S')
 
 _FORMATTER_SIMPLE = logging.Formatter('[%(levelname)s] %(message)s')

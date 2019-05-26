@@ -40,13 +40,13 @@ def _compare_version(ver1, ver2):
 
 
 class Release(Common):
-    def load_release(self, config_scenario, config_app):
+    def load(self, config_app, config_scenario, config_attribute):
         if 'version' not in config_scenario:
             return
 
         self.__load_config(config_scenario)
 
-        self.__transform(config_scenario, config_app)
+        self.__transform(config_scenario, config_app, config_attribute)
 
         self.__check_bsm_version()
 
@@ -77,14 +77,15 @@ class Release(Common):
                 full_path = os.path.join(root, f)
                 self['package'][pkg_name] = load_config(full_path)
 
-    def __transform(self, config_scenario, config_app):
+    def __transform(self, config_scenario, config_app, config_attribute):
         param = {}
         param['config_scenario'] = config_scenario.data_copy
         param['config_app'] = config_app.data_copy
+        param['config_attribute'] = config_attribute.data_copy
         param['config_release'] = self.data_copy
 
         try:
-            result = run_handler('transformer', param, config_scenario.version_path['handler_python_dir'])
+            result = run_handler(config_scenario.version_path['handler_python_dir'], 'transform_release', param)
             if isinstance(result, dict):
                 self.clear()
                 self.update(result)

@@ -51,7 +51,7 @@ class Scenario(Common):
 
         self.__version_path = {}
 
-    def load_scenario(self, config_entry, config_env, config_user, config_app):
+    def load(self, config_entry, config_env, config_user, config_app):
         self['option'] = {}
 
         self.update(_filter_scenario_config(config_app, _SCENARIO_GLOBAL_ITEMS))
@@ -98,7 +98,7 @@ class Scenario(Common):
         if 'software_root' not in self:
             raise ConfigScenarioError('"software_root" not specified in configuration')
 
-        self.__version_path['release_dir'] = os.path.join(self['software_root'], config_app['release_dir_name'])
+        self.__version_path['release_dir'] = os.path.join(self['software_root'], config_app['release_work_dir'])
         self.__version_path['main_dir'] = os.path.join(self.__version_path['release_dir'], self['version'])
         self.__version_path['def_dir'] = os.path.join(self.__version_path['main_dir'], 'def')
         self.__version_path['config_dir'] = os.path.join(self.__version_path['def_dir'], 'config')
