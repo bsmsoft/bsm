@@ -100,7 +100,7 @@ class Config(collections.MutableMapping):
     def __load_attribute(self):
         self.__config['attribute'] = ConfigCommon()
         try:
-            self['attribute'].update(run_handler(self.['scenario'].version_path['handler_python_dir'], 'attribute'))
+            self['attribute'].update(run_handler(self['scenario'].version_path['handler_python_dir'], 'attribute'))
         except Exception as e:
             pass
 

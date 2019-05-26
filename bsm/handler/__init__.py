@@ -1,3 +1,5 @@
+import sys
+
 from bsm.const import HANDLER_MODULE_NAME
 
 from bsm.logger import get_logger
@@ -14,21 +16,22 @@ class HandlerNotAvailableError(Exception):
 class Handler(object):
     def __init__(self, extra_python_path=None):
         self.__extra_python_path = extra_python_path
-        if extra_python_dir is not None:
-            sys.path.insert(0, extra_python_dir)
+        if extra_python_path is not None:
+            sys.path.insert(0, extra_python_path)
 
         self.__module_list = [HANDLER_MODULE_NAME, 'bsm.handler']
 
-    def __del__(self):
-        self.clear_python_path()
+    def __enter__(self):
+        return self
 
-    def clear_python_path(self):
+    def __exit__(self, type, value, traceback):
         if not self.__extra_python_path:
             return
+        _logger.debug('Clear python path: {0}'.format(self.__extra_python_path))
         sys.path.remove(self.__extra_python_dir)
         self.__extra_python_dir = None
 
-    def run(handler_name, *args, **kwargs):
+    def run(self, handler_name, *args, **kwargs):
         for m in self.__module_list:
             try:
                 f = load_func(m+'.'+handler_name, 'run')
@@ -43,7 +46,5 @@ class Handler(object):
             except HandlerNotAvailableError as e:
                 _logger.debug('Handler not available for {0} / {1}'.format(m, handler_name))
                 continue
-            except Exception as e:
-                raise
 
         raise HandlerNotFoundError('Could not find handler for "{0}"'.format(handler_name))

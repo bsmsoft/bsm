@@ -75,7 +75,7 @@ class Scenario(Common):
 
         self.__expand_path()
 
-        if 'version' in self:
+        if 'version' in self and self['version']:
             self.__load_version_path(config_app)
 
 

@@ -3,8 +3,8 @@ import re
 
 from bsm.config.common import Common
 
-from bsm.loader import run_handler
-from bsm.loader import LoadError
+from bsm.handler import Handler
+from bsm.handler import HandlerNotFoundError
 
 from bsm.util.config import load_config
 from bsm.util.config import ConfigError
@@ -85,12 +85,13 @@ class Release(Common):
         param['config_release'] = self.data_copy
 
         try:
-            result = run_handler(config_scenario.version_path['handler_python_dir'], 'transform_release', param)
-            if isinstance(result, dict):
-                self.clear()
-                self.update(result)
-        except LoadError as e:
-            _logger.debug('Transformer load failed: {0}'.format(e))
+            with Handler(config_scenario.version_path['handler_python_dir']) as h:
+                h.run('transform_release', param)
+                if isinstance(result, dict):
+                    self.clear()
+                    self.update(result)
+        except HandlerNotFoundError as e:
+            _logger.debug('Transformer not found: {0}'.format(e))
         except Exception as e:
             _logger.error('Transformer run error: {0}'.format(e))
             raise
