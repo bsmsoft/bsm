@@ -30,7 +30,8 @@ class App(Common):
         self.setdefault('site', 'https://bsmsoft.github.io/')
 
         self.setdefault('cmd_name', app_id)
-        self.setdefault('version_pattern', 'v(.*)')
+        self.setdefault('version_pattern', '^v(.*)$')
+        self.setdefault('version_stable_pattern', '^v(\d+\.\d+\.\d+)$')
         self.setdefault('env_prefix', app_id.upper())
         self.setdefault('config_user_file', '~/.'+app_id+'.conf')
         self.setdefault('config_info_file', '~/.'+app_id+'.info')

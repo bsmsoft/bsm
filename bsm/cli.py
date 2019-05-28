@@ -86,12 +86,14 @@ def option(ctx, version):
 
 @cli.command(name='ls-remote')
 @click.option('--release-repo', '-t', type=str, help='Repository with release information')
+@click.option('--all', '-a', 'list_all', is_flag=True, help='List all versions')
+@click.option('--tag', '-g', is_flag=True, help='List tags')
 @click.pass_context
-def ls_remote(ctx, release_repo):
+def ls_remote(ctx, release_repo, list_all, tag):
     '''List all available release versions'''
     cmd = Cmd()
     ctx.obj['release_repo'] = release_repo
-    cmd.execute('ls-remote', ctx.obj)
+    cmd.execute('ls-remote', ctx.obj, list_all, tag)
 
 
 @cli.command()

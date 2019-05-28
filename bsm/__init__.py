@@ -83,8 +83,8 @@ class Bsm(object):
         return self.__operation.execute('option')
 
     @__auto_reload
-    def ls_remote(self):
-        return self.__operation.execute('ls_remote')
+    def ls_remote(self, list_all=False):
+        return self.__operation.execute('ls_remote', list_all)
 
     @__auto_reload
     def check_build(self):
