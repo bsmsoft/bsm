@@ -16,6 +16,7 @@ from bsm.config.app import App as ConfigApp
 from bsm.config.env import Env as ConfigEnv
 from bsm.config.scenario import Scenario as ConfigScenario
 from bsm.config.release import Release as ConfigRelease
+from bsm.config.category import Category as ConfigCategory
 from bsm.config.packages import Packages as ConfigPackages
 
 
@@ -95,7 +96,7 @@ class Config(collections.MutableMapping):
 
     def __load_scenario(self):
         self.__config['scenario'] = ConfigScenario()
-        self['scenario'].load(self['entry'], self['env'], self['user'], self['app'])
+        self['scenario'].load(self['entry'], self['app'], self['env'], self['user'])
 
     def __load_attribute(self):
         self.__config['attribute'] = ConfigCommon()
@@ -109,23 +110,8 @@ class Config(collections.MutableMapping):
         self['release'].load(self['app'], self['scenario'], self['attribute'])
 
     def __load_category(self):
-        self.__config['category'] = ConfigCommon()
-
-        for ctg, cfg in self['release'].get('setting', {}).get('category', {}).get('categories', {}).items():
-            self['category'][ctg] = {}
-            self['category'][ctg]['name'] = ctg
-            self['category'][ctg]['pre_check'] = cfg.get('pre_check', False)
-            self['category'][ctg]['install'] = cfg.get('install', False)
-            self['category'][ctg]['auto_env'] = cfg.get('auto_env', False)
-            self['category'][ctg]['version_dir'] = cfg.get('version_dir', False)
-            self['category'][ctg]['share_env'] = cfg.get('share_env', False)
-
-            if 'root' in cfg:
-                self['category'][ctg]['root'] = cfg['root'].format(**self['scenario'])
-            else:
-                self['category'][ctg]['install'] = False
-                self['category'][ctg]['auto_env'] = False
-                self['category'][ctg]['share_env'] = False
+        self.__config['category'] = ConfigCategory()
+        self['category'].load(self['app'], self['scenario'], self['release'])
 
     def __load_install(self):
         self.__config['install'] = ConfigInstall()
@@ -133,7 +119,7 @@ class Config(collections.MutableMapping):
 
     def __load_packages(self):
         self.__config['packages'] = ConfigPackages()
-        self['packages'].load(self['app'], self['release'], self['category'], self['env'])
+        self['packages'].load(self['app'], self['env'], self['release'], self['category'])
 
 
     @property

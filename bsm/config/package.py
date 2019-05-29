@@ -14,7 +14,7 @@ class ConfigPackageError(Exception):
     pass
 
 class Package(Common):
-    def load_package(self, pkg, pkg_config, pkg_category, pkg_work_dir):
+    def load(self, pkg, pkg_config, pkg_category, pkg_work_dir):
         self.__pkg_work_dir = pkg_work_dir
 
         self['name'] = pkg

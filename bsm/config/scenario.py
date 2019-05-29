@@ -51,7 +51,7 @@ class Scenario(Common):
 
         self.__version_path = {}
 
-    def load(self, config_entry, config_env, config_user, config_app):
+    def load(self, config_entry, config_app, config_env, config_user):
         self['option'] = {}
 
         self.update(_filter_scenario_config(config_app, _SCENARIO_GLOBAL_ITEMS))

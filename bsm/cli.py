@@ -107,12 +107,14 @@ def ls(ctx, software_root):
 
 
 @cli.command()
+@click.option('--version', type=str, help='Release version')
 @click.argument('config-type', type=str, required=False)
 @click.argument('item-name', type=str, required=False)
 @click.pass_context
-def config(ctx, config_type, item_name):
+def config(ctx, version, config_type, item_name):
     '''Display configuration, mostly for debug purpose'''
     cmd = Cmd()
+    ctx.obj['config_entry']['scenario'] = version
     cmd.execute('config', ctx.obj, config_type, item_name)
 
 
