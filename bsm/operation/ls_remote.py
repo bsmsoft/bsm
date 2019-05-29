@@ -40,7 +40,7 @@ class LsRemote(Base):
                 continue
             version = groups[0]
             if version in versions:
-                _logger.warn('Duplicated version "{0}" found, please check the version pattern "{1}"'.format(version, version_pattern_string))
+                _logger.warn('Duplicated version "{0}" found for tag "{1}", please check the version pattern "{2}"'.format(version, tag, version_pattern_string))
                 continue
 
             versions[version] = tag
