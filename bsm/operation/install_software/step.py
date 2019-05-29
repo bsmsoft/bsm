@@ -43,8 +43,10 @@ class Step(object):
         self.__atomic_end = setting_install.get('atomic_end')
         self.__no_skip = ensure_list(setting_install.get('no_skip', []))
 
-        if (self.__atomic_start and self.__atomic_start not in self.__all_steps) or \
-                (self.__atomic_end and self.__atomic_end not in self.__all_steps):
+        if len(self.__all_steps) != len(set(self.__all_steps)):
+            raise InstallStepError('Duplicated steps found: {0}'.format(self.__all_steps))
+
+        if self.__atomic_start not in self.__all_steps or self.__atomic_end not in self.__all_steps:
             raise InstallStepError('Can not find atomic start/end: {0}/{1}'.format(self.__atomic_start, self.__atomic_end))
 
         if self.__all_steps.index(self.__atomic_start) > self.__all_steps.index(self.__atomic_end):

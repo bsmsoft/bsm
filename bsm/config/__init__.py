@@ -15,6 +15,7 @@ from bsm.config.common import Common as ConfigCommon
 from bsm.config.app import App as ConfigApp
 from bsm.config.env import Env as ConfigEnv
 from bsm.config.scenario import Scenario as ConfigScenario
+from bsm.config.release_path import ReleasePath as ConfigReleasePath
 from bsm.config.release import Release as ConfigRelease
 from bsm.config.category import Category as ConfigCategory
 from bsm.config.packages import Packages as ConfigPackages
@@ -99,6 +100,10 @@ class Config(collections.MutableMapping):
     def __load_scenario(self):
         self.__config['scenario'] = ConfigScenario()
         self['scenario'].load(self['entry'], self['app'], self['env'], self['user'])
+
+    def __load_release_path(self):
+        self.__config['release_path'] = ConfigReleasePath()
+        self['release_path'].load(self['scenario'], self['app'])
 
     def __load_attribute(self):
         self.__config['attribute'] = ConfigCommon()

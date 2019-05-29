@@ -84,7 +84,7 @@ def option(ctx, version):
     cmd.execute('option', ctx.obj)
 
 
-@cli.command(name='ls-remote')
+@cli.command()
 @click.option('--release-repo', '-t', type=str, help='Repository with release information')
 @click.option('--all', '-a', 'list_all', is_flag=True, help='List all versions')
 @click.option('--tag', '-g', is_flag=True, help='List tags')
@@ -118,7 +118,7 @@ def config(ctx, version, config_type, item_name):
     cmd.execute('config', ctx.obj, config_type, item_name)
 
 
-@cli.command(name='config-example')
+@cli.command()
 @click.option('--save', is_flag=True, help='Save example user configuration to file')
 @click.pass_context
 def config_example(ctx, save):
@@ -127,11 +127,23 @@ def config_example(ctx, save):
     cmd.execute('config-example', ctx.obj, save)
 
 
-@cli.command(name='ls-package')
+@cli.command()
+@click.option('--category', type=str, help='Category to be installed')
+@click.option('--subdir', type=str, help='Sub directory for package')
+@click.option('--version', type=str, help='Package version')
+@click.argument('package', type=str)
+@click.pass_context
+def pkg_install(ctx, package):
+    '''Install specified package'''
+    cmd = Cmd()
+    cmd.execute('pkg-install', ctx.obj)
+
+
+@cli.command()
 @click.pass_context
 def ls_pkg(ctx):
     '''List all packages of the current release versions'''
-    cmd = Cmd('ls_pkg')
+    cmd = Cmd('ls-pkg')
     cmd.execute(ctx.obj)
 
 
@@ -155,8 +167,6 @@ def install(ctx, software_root, release_repo, release_source, option, reinstall,
     ctx.obj['config_entry']['release_source'] = release_source
     ctx.obj['config_entry']['option'] = parse_lines(option)
     ctx.obj['config_entry']['scenario'] = version
-    # ???
-    # scenario is not put in config_entry because it need to be installed
     cmd.execute('install', ctx.obj, reinstall=reinstall, update=update, force=force, yes=yes)
 
 

@@ -8,21 +8,11 @@ from bsm.config.common import Common
 from bsm.util import expand_path
 from bsm.util import ensure_list
 
-from bsm.const import HANDLER_MODULE_NAME
-
 
 _SCENARIO_GLOBAL_ITEMS = ('software_root', 'release_repo')
 _SCENARIO_ENTRY_ITEMS = ('software_root', 'release_repo', 'release_source')
 _SCENARIO_PATH_ITEMS = ('software_root', 'release_source')
 
-
-__TEMP_VERSION_PREFIX = ''
-__TEMP_VERSION_LENGTH = 6
-
-def _temp_version():
-    return __TEMP_VERSION_PREFIX \
-            + datetime.datetime.utcnow().strftime('%Y%m%d_%H%M%S_%f') + '_' \
-            + ''.join(random.SystemRandom().choice(string.ascii_lowercase + string.digits) for _ in range(__TEMP_VERSION_LENGTH))
 
 def _filter_scenario_config(config, items, veto=False):
     ''' If veto is False, config only in items will be included
@@ -46,11 +36,6 @@ class ConfigScenarioError(Exception):
 
 
 class Scenario(Common):
-    def __init__(self):
-        super(Scenario, self).__init__()
-
-        self.__version_path = {}
-
     def load(self, config_entry, config_app, config_env, config_user):
         self['option'] = {}
 
@@ -75,9 +60,6 @@ class Scenario(Common):
 
         self.__expand_path()
 
-        if 'version' in self and self['version']:
-            self.__load_version_path(config_app)
-
 
     def __update_option(self, config_container):
         if 'option' not in config_container:
@@ -91,24 +73,3 @@ class Scenario(Common):
         for k in _SCENARIO_PATH_ITEMS:
             if k in self:
                 self[k] = expand_path(self[k])
-
-    def __load_version_path(self, config_app):
-        self.__version_path = {}
-
-        if 'software_root' not in self:
-            raise ConfigScenarioError('"software_root" not specified in configuration')
-
-        self.__version_path['release_dir'] = os.path.join(self['software_root'], config_app['release_work_dir'])
-        self.__version_path['main_dir'] = os.path.join(self.__version_path['release_dir'], self['version'])
-        self.__version_path['def_dir'] = os.path.join(self.__version_path['main_dir'], 'def')
-        self.__version_path['config_dir'] = os.path.join(self.__version_path['def_dir'], 'config')
-        self.__version_path['handler_dir'] = os.path.join(self.__version_path['def_dir'], 'handler')
-        self.__version_path['handler_python_dir'] = os.path.join(self.__version_path['main_dir'], 'handler')
-        self.__version_path['handler_module_dir'] = os.path.join(self.__version_path['main_dir'], 'handler', HANDLER_MODULE_NAME)
-        self.__version_path['status_dir'] = os.path.join(self.__version_path['main_dir'], 'status')
-        self.__version_path['install_status_file'] = os.path.join(self.__version_path['status_dir'], 'install.yml')
-
-
-    @property
-    def version_path(self):
-        return self.__version_path

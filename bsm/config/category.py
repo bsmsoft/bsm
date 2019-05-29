@@ -1,6 +1,5 @@
 from bsm.config.common import Common
 
-from bsm.env import Env as BsmEnv
 
 def _load_category(ctg, cfg, config_app, config_scenario):
     result = {}
@@ -26,6 +25,7 @@ def _load_category(ctg, cfg, config_app, config_scenario):
         result['config_package_dir'] = os.path.join(result['work_dir'], 'version', config_scenario['version'])
 
     return result
+
 
 class Category(Common):
     def load(self, config_app, config_scenario, config_release):

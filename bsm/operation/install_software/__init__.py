@@ -22,12 +22,8 @@ _logger = get_logger()
 
 
 class Install(Base):
-    def execute(self, install_type):
-        if install_type == 'release':
-            self.__install_release()
-        elif install_type == 'software':
-            self.__install_software()
-        else:
+    def execute(self):
+        pass
 
 class Install(object):
     def __init__(self, config_user, config_version, config_release):

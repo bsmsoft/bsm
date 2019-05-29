@@ -101,6 +101,10 @@ class Bsm(object):
         return self.__operation.execute('install-release')
 
     @__auto_reload
+    def install_package(self, category=None, subdir=None, version=None):
+        return self.__operation.execute('install-package')
+
+    @__auto_reload
     def install_software(self):
         return self.__operation.execute('install-software')
 
