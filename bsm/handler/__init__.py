@@ -28,8 +28,8 @@ class Handler(object):
         if not self.__extra_python_path:
             return
         _logger.debug('Clear python path: {0}'.format(self.__extra_python_path))
-        sys.path.remove(self.__extra_python_dir)
-        self.__extra_python_dir = None
+        sys.path.remove(self.__extra_python_path)
+        self.__extra_python_path = None
 
     def run(self, handler_name, *args, **kwargs):
         for m in self.__module_list:

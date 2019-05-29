@@ -37,17 +37,19 @@ class Bsm(object):
 
     def __auto_reload(method):
         def inner(self, *args, **kargs):
-            self.__reload_config()
+            self.__watch_config()
             return method(self, *args, **kargs)
         return inner
 
-    def __reload_config(self):
+    def __watch_config(self):
         if self.__config_entry == self.__config_entry_input:
             return
-        self.__config_entry = copy.deepcopy(self.__config_entry_input)
-        self.__config = Config(self.__config_entry)
-        self.__operation = Operation(self.__config, self.__env)
+        self.reload_config()
 
+
+    def reload_config(self):
+        self.__config_entry = copy.deepcopy(self.__config_entry_input)
+        self.__config.reset(self.__config_entry)
 
     def config_entry(self):
         return self.__config_entry_input

@@ -23,7 +23,9 @@ from bsm.config.packages import Packages as ConfigPackages
 class Config(collections.MutableMapping):
     def __init__(self, config_entry={}, initial_env=None):
         self.__initial_env = initial_env
+        self.reset(config_entry)
 
+    def reset(self, config_entry={}):
         self.__config = {}
         self.__config['entry'] = ConfigCommon(config_entry)
 
