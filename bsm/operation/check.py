@@ -7,7 +7,7 @@ class Check(Base):
         param['config_release'] = self._config['release'].data_copy
 
         try:
-            return run_handler('checker', param, self._config['scenario'].version_path['handler_dir'])
+            return run_handler('checker', param, self._config['release_path']['handler_dir'])
         except LoadError as e:
             _logger.debug('Checker load failed: {0}'.format(e))
         except Exception as e:

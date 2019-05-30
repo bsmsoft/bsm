@@ -38,7 +38,7 @@ class InstallRelease(Base):
 
     def __install_definition(self):
         conf = self._config['scenario']
-        def_dir = conf.version_path['def_dir']
+        def_dir = self._config['release_path']['def_dir']
 
         if 'release_source' in conf and conf['release_source']:
             _install_from_dir(conf['release_source'], def_dir)
@@ -46,10 +46,10 @@ class InstallRelease(Base):
             _install_from_git_repo(conf['release_repo'], conf['version'], def_dir)
 
     def __install_handler(self):
-        version_path = self._config['scenario'].version_path
-        def_dir = version_path['def_dir']
-        handler_dir = version_path['handler_dir']
-        handler_module_dir = version_path['handler_module_dir']
+        conf = self._config['release_path']
+        def_dir = conf['def_dir']
+        handler_dir = conf['handler_dir']
+        handler_module_dir = conf['handler_module_dir']
 
         safe_cpdir(handler_dir, handler_module_dir)
 
