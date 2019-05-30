@@ -119,15 +119,6 @@ def config(ctx, version, config_type, item_name):
 
 
 @cli.command()
-@click.option('--save', is_flag=True, help='Save example user configuration to file')
-@click.pass_context
-def config_example(ctx, save):
-    '''Display configuration example'''
-    cmd = Cmd()
-    cmd.execute('config-example', ctx.obj, save)
-
-
-@cli.command()
 @click.option('--category', type=str, help='Category to be installed')
 @click.option('--subdir', type=str, help='Sub directory for package')
 @click.option('--version', type=str, help='Package version')

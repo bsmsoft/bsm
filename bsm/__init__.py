@@ -71,14 +71,6 @@ class Bsm(object):
     def config(self, config_type):
         return self.__config[config_type].data
 
-    @__auto_reload
-    def config_user_example(self):
-        try:
-            return open(self.__config['app']['example_config_user']).read()
-        except Exception as e:
-            _logger.warn('Open user config example failed: %s' % e)
-            return ''
-
 
     @__auto_reload
     def option(self):

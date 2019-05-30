@@ -20,6 +20,9 @@ from bsm.config.release import Release as ConfigRelease
 from bsm.config.category import Category as ConfigCategory
 from bsm.config.packages import Packages as ConfigPackages
 
+from bsm.logger import get_logger
+_logger = get_logger()
+
 
 class Config(collections.MutableMapping):
     def __init__(self, config_entry={}, initial_env=None):
@@ -60,6 +63,15 @@ class Config(collections.MutableMapping):
     def __load_app(self):
         self.__config['app'] = ConfigApp()
         self['app'].load(self['entry'].get('app_root', ''))
+
+    def __load_example(self):
+        self.__config['example'] = ConfigCommon()
+        self['example']['path'] = self['app']['example_config_user']
+        try:
+            self['example']['content'] = open(self['app']['example_config_user']).read()
+        except Exception as e:
+            _logger.warn('Open user config example failed: %s' % e)
+            self['example']['content'] = ''
 
     def __load_env(self):
         self.__config['env'] = ConfigEnv()
