@@ -1,3 +1,7 @@
+''' This package comes from https://github.com/xianghuzhao/paradag
+It can also be installed by "pip install paradag"
+'''
+
 import random
 
 
