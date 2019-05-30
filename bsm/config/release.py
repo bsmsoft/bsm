@@ -38,22 +38,36 @@ def _compare_version(ver1, ver2):
 
     return 0
 
+def _walk_rel_dir(directory, rel_dir=''):
+    if not os.path.isdir(directory):
+        raise StopIteration
+    res = os.listdir(directory)
+    for r in res:
+        full_path = os.path.join(directory, r)
+        if os.path.isfile(full_path):
+            yield (full_path, rel_dir, r)
+            continue
+        if os.path.isdir(full_path):
+            new_rel_dir = os.path.join(rel_dir, r)
+            for next_full_path, next_rel_dir, next_f in _walk_rel_dir(full_path, new_rel_dir):
+                yield (next_full_path, next_rel_dir, next_f)
+
 
 class Release(Common):
-    def load(self, config_app, config_scenario, config_attribute):
+    def load(self, config_app, config_scenario, config_release_path, config_attribute):
         if 'version' not in config_scenario or not config_scenario['version']:
             return
 
-        self.__load_config(config_scenario)
+        self.__load_config(config_scenario, config_release_path)
 
-        self.__transform(config_scenario, config_app, config_attribute)
+        self.__transform(config_app, config_scenario, config_release_path, config_attribute)
 
         self.__check_bsm_version()
 
         self.__check_version_consistency(config_scenario)
 
-    def __load_config(self, config_scenario):
-        config_dir = os.path.join(config_scenario.version_path['config_dir'])
+    def __load_config(self, config_scenario, config_release_path):
+        config_dir = os.path.join(config_release_path['config_dir'])
         if not os.path.isdir(config_dir):
             raise ConfigReleaseError('Release version "{0}" not found'.format(config_scenario['version']))
 
@@ -69,23 +83,22 @@ class Release(Common):
 
     def __load_package_config(self, package_dir):
         self['package'] = {}
-        for root, dirs, files in os.walk(package_dir):
-            for f in files:
-                if not f.endswith('.yml') and not f.endswith('.yaml'):
-                    continue
-                pkg_name = os.path.splitext(f)[0]
-                full_path = os.path.join(root, f)
-                self['package'][pkg_name] = load_config(full_path)
+        for full_path, rel_dir, f in _walk_rel_dir(package_dir):
+            if not f.endswith('.yml') and not f.endswith('.yaml'):
+                continue
+            pkg_name = os.path.splitext(f)[0]
+            self['package'][os.path.join(rel_dir, pkg_name)] = load_config(full_path)
 
-    def __transform(self, config_scenario, config_app, config_attribute):
+    def __transform(self, config_app, config_scenario, config_release_path, config_attribute):
         param = {}
-        param['config_scenario'] = config_scenario.data_copy
         param['config_app'] = config_app.data_copy
-        param['config_attribute'] = config_attribute.data_copy
+        param['config_scenario'] = config_scenario.data_copy
+        param['config_release_path'] = config_release_path.data_copy
         param['config_release'] = self.data_copy
+        param['config_attribute'] = config_attribute.data_copy
 
         try:
-            with Handler(config_scenario.version_path['handler_python_dir']) as h:
+            with Handler(config_release_path['handler_python_dir']) as h:
                 h.run('transform_release', param)
                 if isinstance(result, dict):
                     self.clear()

@@ -18,6 +18,7 @@ from bsm.config.scenario import Scenario as ConfigScenario
 from bsm.config.release_path import ReleasePath as ConfigReleasePath
 from bsm.config.release import Release as ConfigRelease
 from bsm.config.category import Category as ConfigCategory
+from bsm.config.install import Install as ConfigInstall
 from bsm.config.packages import Packages as ConfigPackages
 
 from bsm.logger import get_logger
@@ -126,7 +127,7 @@ class Config(collections.MutableMapping):
 
     def __load_release(self):
         self.__config['release'] = ConfigRelease()
-        self['release'].load(self['app'], self['scenario'], self['attribute'])
+        self['release'].load(self['app'], self['scenario'], self['release_path'], self['attribute'])
 
     def __load_category(self):
         self.__config['category'] = ConfigCategory()
@@ -134,7 +135,7 @@ class Config(collections.MutableMapping):
 
     def __load_install(self):
         self.__config['install'] = ConfigInstall()
-        self['install'].load(self['release'])
+        self['install'].load(self['release'], self['category'])
 
     def __load_packages(self):
         self.__config['packages'] = ConfigPackages()

@@ -101,7 +101,7 @@ class Cmd(object):
                         obj['output']['shell'], final_output, env_changes, cmd_result.script_types)
         except ConfigReleaseError as e:
             _logger.error(str(e))
-            _logger.critical('Can not load release version: {0}'.format(cmd_kwargs.get('version_name')))
+            _logger.critical('Can not load release version: {0}'.format(bsm.config('entry')['scenario']))
             sys.exit(2)
         except Exception as e:
             _logger.critical('Fatal error ({0}): {1}'.format(type(e).__name__, e))
