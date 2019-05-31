@@ -21,6 +21,9 @@ from bsm.config.category import Category as ConfigCategory
 from bsm.config.install import Install as ConfigInstall
 from bsm.config.packages import Packages as ConfigPackages
 
+from bsm.handler import Handler
+from bsm.handler import HandlerNotFoundError
+
 from bsm.logger import get_logger
 _logger = get_logger()
 
@@ -123,18 +126,24 @@ class Config(collections.MutableMapping):
 
     def __load_attribute(self):
         self.__config['attribute'] = ConfigCommon()
+        if 'handler_python_dir' not in self['release_path']:
+            return
         try:
-            self['attribute'].update(run_handler(self['release_path']['handler_python_dir'], 'attribute'))
-        except Exception as e:
-            pass
+            with Handler(self['release_path']['handler_python_dir']) as h:
+                self['attribute'].update(h.run('attribute'))
+        except HandlerNotFoundError:
+            _logger.debug('Handler for attribute not found')
 
     # Release defined options, for display purpose only
     def __load_option(self):
         self.__config['option'] = ConfigCommon()
+        if 'handler_python_dir' not in self['release_path']:
+            return
         try:
-            self['option'].update(run_handler(self['release_path']['handler_python_dir'], 'option'))
-        except Exception as e:
-            pass
+            with Handler(self['release_path']['handler_python_dir']) as h:
+                self['option'].update(h.run('option'))
+        except HandlerNotFoundError:
+            _logger.debug('Handler for option not found')
 
     def __load_release(self):
         self.__config['release'] = ConfigRelease()
