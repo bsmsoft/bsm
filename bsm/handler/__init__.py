@@ -36,7 +36,7 @@ class Handler(object):
             try:
                 f = load_func(m+'.'+handler_name, 'run')
             except Exception as e:
-                _logger.debug('Failed to load handler {0} / {1}'.format(m, handler_name))
+                _logger.debug('Not able to load handler {0} / {1}'.format(m, handler_name))
                 continue
 
             try:

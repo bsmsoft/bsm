@@ -32,7 +32,10 @@ class Config(collections.MutableMapping):
 
     def reset(self, config_entry={}):
         self.__config = {}
-        self.__config['entry'] = ConfigCommon(config_entry)
+        self.__config['entry'] = ConfigCommon()
+        for k, v in config_entry.items():
+            if v is not None:
+                self['entry'][k] = v
 
 
     # This method implements the lazy load of configs
@@ -125,6 +128,7 @@ class Config(collections.MutableMapping):
         except Exception as e:
             pass
 
+    # Release defined options, for display purpose only
     def __load_option(self):
         self.__config['option'] = ConfigCommon()
         try:
@@ -142,7 +146,7 @@ class Config(collections.MutableMapping):
 
     def __load_install(self):
         self.__config['install'] = ConfigInstall()
-        self['install'].load(self['release'], self['category'])
+        self['install'].load(self['app'], self['scenario'], self['release_path'], self['attribute'], self['release'], self['category'])
 
     def __load_packages(self):
         self.__config['packages'] = ConfigPackages()

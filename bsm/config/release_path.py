@@ -17,7 +17,7 @@ class ReleasePath(Common):
         self['release_dir'] = os.path.join(config_scenario['software_root'], config_app['release_work_dir'])
 
         if not ('version' in config_scenario and config_scenario['version']):
-            _logger.warn('"version" not specified')
+            _logger.debug('"version" not specified in config release_path')
             return
 
         self['main_dir'] = os.path.join(self['release_dir'], config_scenario['version'])

@@ -44,7 +44,7 @@ class Scenario(Common):
         self.update(_filter_scenario_config(config_user, _SCENARIO_GLOBAL_ITEMS))
         self.__update_option(config_user)
 
-        if 'scenario' in config_entry:
+        if 'scenario' in config_entry and config_entry['scenario']:
             scenario = config_entry['scenario']
             self['scenario'] = scenario
 

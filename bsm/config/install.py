@@ -1,7 +1,11 @@
 import os
+import sys
 import copy
 
 from bsm.config.common import Common
+
+from bsm.handler import Handler
+from bsm.handler import HandlerNotFoundError
 
 from bsm.logger import get_logger
 _logger = get_logger()
@@ -9,11 +13,15 @@ _logger = get_logger()
 
 class Install(Common):
     def load(self, config_app, config_scenario, config_release_path, config_attribute, config_release, config_category):
+        if not ('version' in config_scenario and config_scenario['version']):
+            _logger.debug('"version" not specified in config install')
+            return
+
         category_priority = config_release.get('setting', {}).get('category_priority', [])
 
-        for ctg, ctg_cfg in config_category.items():
-            if ctg_cfg['install']:
-                self[ctg] = {}
+#        for ctg, ctg_cfg in config_category.items():
+#            if ctg_cfg['install']:
+#                self[ctg] = {}
 
         sys.path.insert(0, config_release_path['handler_python_dir'])
 

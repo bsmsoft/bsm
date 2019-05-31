@@ -55,7 +55,8 @@ def _walk_rel_dir(directory, rel_dir=''):
 
 class Release(Common):
     def load(self, config_app, config_scenario, config_release_path, config_attribute):
-        if 'version' not in config_scenario or not config_scenario['version']:
+        if not ('version' in config_scenario and config_scenario['version']):
+            _logger.debug('"version" not specified in config release')
             return
 
         self.__load_config(config_scenario, config_release_path)
