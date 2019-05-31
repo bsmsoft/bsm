@@ -10,7 +10,6 @@ class Install(Base):
     def execute(self, reinstall, update, no_software, force, yes):
         if update or not self.__release_exist():
             self._bsm.install_release()
-            self._bsm.reload_config()
 
         if not no_software:
             pass

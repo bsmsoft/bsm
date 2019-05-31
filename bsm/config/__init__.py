@@ -33,7 +33,9 @@ class Config(collections.MutableMapping):
         self.__initial_env = initial_env
         self.reset(config_entry)
 
-    def reset(self, config_entry={}):
+    def reset(self, config_entry=None):
+        if config_entry is None and 'entry' in self:
+            config_entry = self['entry']
         self.__config = {}
         self.__config['entry'] = ConfigCommon()
         for k, v in config_entry.items():
@@ -122,7 +124,11 @@ class Config(collections.MutableMapping):
 
     def __load_release_path(self):
         self.__config['release_path'] = ConfigReleasePath()
-        self['release_path'].load(self['scenario'], self['app'])
+        self['release_path'].load(self['scenario'], self['app']['release_work_dir'])
+
+    def __load_release_status(self):
+        self.__config['release_status'] = ConfigCommon()
+        self['release_status'].load_from_file(self['release_path']['status_file'])
 
     def __load_attribute(self):
         self.__config['attribute'] = ConfigCommon()
@@ -135,8 +141,8 @@ class Config(collections.MutableMapping):
             _logger.debug('Handler for attribute not found')
 
     # Release defined options, for display purpose only
-    def __load_option(self):
-        self.__config['option'] = ConfigCommon()
+    def __load_option_list(self):
+        self.__config['option_list'] = ConfigCommon()
         if 'handler_python_dir' not in self['release_path']:
             return
         try:

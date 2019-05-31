@@ -18,7 +18,7 @@ def _config_from_file(config_file):
             _logger.warn('Config file is not a dict: {0}'.format(config_file))
             _logger.warn('Use empty dict instead')
     except ConfigError as e:
-        _logger.debug('Load config file "{0}" failed: {1}'.format(config_file, e))
+        _logger.debug('Load config file failed: {0}'.format(e))
         _logger.debug('Use empty dict instead')
     return dict()
 
@@ -43,7 +43,6 @@ class Common(collections.MutableMapping):
 
     def __len__(self):
         return len(self.__data)
-
 
     def __repr__(self):
         return repr(self.__data)

@@ -96,7 +96,7 @@ def ls(ctx, software_root):
 
 
 @cli.command()
-@click.option('--version', type=str, help='Release version')
+@click.option('--version', '-n', type=str, help='Release version')
 @click.argument('config-type', type=str, required=False)
 @click.argument('item-name', type=str, required=False)
 @click.pass_context

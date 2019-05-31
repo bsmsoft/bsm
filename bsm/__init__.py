@@ -51,9 +51,10 @@ class Bsm(object):
         self.__config_entry = copy.deepcopy(self.__config_entry_input)
         self.__config.reset(self.__config_entry)
 
-    def config_entry(self):
-        return self.__config_entry_input
 
+    @property
+    def entry(self):
+        return self.__config_entry_input
 
     def switch(self, scenario):
         self.__config_entry_input['scenario'] = scenario
@@ -94,7 +95,7 @@ class Bsm(object):
 
     @__auto_reload
     def install_package(self, category=None, subdir=None, version=None):
-        return self.__operation.execute('install-package')
+        return self.__operation.execute('install-package', category, subdir, version)
 
     @__auto_reload
     def install_software(self):

@@ -44,6 +44,8 @@ class InstallRelease(Base):
         self.__install_definition()
         self.__install_handler()
 
+        self._config.reset()
+
         return self._config['scenario']['version']
 
     def __install_definition(self):
