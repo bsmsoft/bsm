@@ -6,6 +6,7 @@ from bsm.util import safe_cpdir
 from bsm.util import safe_rmdir
 
 from bsm.operation import Base
+from bsm.operation.util import list_versions
 
 
 class ReleaseVersionNotExistError(Exception):
@@ -17,12 +18,15 @@ def _install_from_dir(src_dir, dst_dir):
     safe_cpdir(src_dir, dst_dir)
 
 
-def _install_from_git_repo(src_repo, release_version, dst_dir):
-    git = Git(dst_dir)
+def _install_from_git_repo(src_repo, release_version, version_pattern, dst_dir, git_temp):
+    git = Git(dst_dir, git_temp=git_temp)
 
-    release_tag = 'v'+release_version
-    if release_tag not in git.ls_remote_tags(src_repo):
+    versions = list_versions(src_repo, version_pattern, git)
+
+    if release_version not in versions:
         raise ReleaseVersionNotExistError('Release version "{0}" does not exist in repo {1}'.format(release_version, src_repo))
+
+    release_tag = versions[release_version]
 
     safe_rmdir(dst_dir)
 
@@ -45,11 +49,13 @@ class InstallRelease(Base):
     def __install_definition(self):
         conf = self._config['scenario']
         def_dir = self._config['release_path']['def_dir']
+        version_pattern = self._config['app']['version_pattern']
+        git_temp = self._config['app'].get('git_temp')
 
         if 'release_source' in conf and conf['release_source']:
             _install_from_dir(conf['release_source'], def_dir)
         elif 'version' in conf and conf['version']:
-            _install_from_git_repo(conf['release_repo'], conf['version'], def_dir)
+            _install_from_git_repo(conf['release_repo'], conf['version'], version_pattern, def_dir, git_temp)
         else:
             _logger.warn('No release specified, nothing to do')
 

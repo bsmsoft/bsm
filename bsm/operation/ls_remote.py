@@ -1,6 +1,8 @@
 from bsm.operation import Base
 from bsm.operation.util import list_versions
 
+from bsm.git import Git
+
 from bsm.logger import get_logger
 _logger = get_logger()
 
@@ -13,6 +15,6 @@ class LsRemote(Base):
         else:
             version_pattern = self._config['app']['version_stable_pattern']
 
-        git_temp = self._config['app'].get('git_temp')
+        git = Git(git_temp=self._config['app'].get('git_temp'))
 
-        return list_versions(release_repo, version_pattern, git_temp)
+        return list_versions(release_repo, version_pattern, git)
