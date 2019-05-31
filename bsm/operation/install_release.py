@@ -33,8 +33,14 @@ def _install_from_git_repo(src_repo, release_version, dst_dir):
 
 class InstallRelease(Base):
     def execute(self):
+        if 'version' not in self._config['scenario']:
+            _logger.warn('No release specified, nothing to do')
+            return ''
+
         self.__install_definition()
         self.__install_handler()
+
+        return self._config['scenario']['version']
 
     def __install_definition(self):
         conf = self._config['scenario']
@@ -44,6 +50,8 @@ class InstallRelease(Base):
             _install_from_dir(conf['release_source'], def_dir)
         elif 'version' in conf and conf['version']:
             _install_from_git_repo(conf['release_repo'], conf['version'], def_dir)
+        else:
+            _logger.warn('No release specified, nothing to do')
 
     def __install_handler(self):
         conf = self._config['release_path']

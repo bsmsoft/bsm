@@ -74,17 +74,6 @@ def upgrade(ctx):
 
 
 @cli.command()
-@click.argument('version', type=str, required=False)
-@click.pass_context
-def option(ctx, version):
-    '''Display the available options'''
-    cmd = Cmd()
-    if not version:
-        ctx.obj['config_entry']['scenario'] = version
-    cmd.execute('option', ctx.obj)
-
-
-@cli.command()
 @click.option('--release-repo', '-t', type=str, help='Repository with release information')
 @click.option('--all', '-a', 'list_all', is_flag=True, help='List all versions')
 @click.option('--tag', '-g', is_flag=True, help='List tags')
@@ -146,11 +135,12 @@ def ls_pkg(ctx):
 @click.option('--option', '-o', type=str, multiple=True, help='Options for installation')
 @click.option('--reinstall', is_flag=True, help='Reinstall all packages')
 @click.option('--update', is_flag=True, help='Update version information before installation')
+@click.option('--no-software', is_flag=True, help='Do not install softwares, only install the release')
 @click.option('--force', '-f', is_flag=True, help='Skip checking system requirements')
 @click.option('--yes', '-y', is_flag=True, help='Install without confirmation')
 @click.argument('version', type=str)
 @click.pass_context
-def install(ctx, software_root, release_repo, release_source, option, reinstall, update, force, yes, version):
+def install(ctx, software_root, release_repo, release_source, option, reinstall, update, no_software, force, yes, version):
     '''Install specified release version'''
     cmd = Cmd()
     ctx.obj['config_entry']['software_root'] = software_root
@@ -158,7 +148,7 @@ def install(ctx, software_root, release_repo, release_source, option, reinstall,
     ctx.obj['config_entry']['release_source'] = release_source
     ctx.obj['config_entry']['option'] = parse_lines(option)
     ctx.obj['config_entry']['scenario'] = version
-    cmd.execute('install', ctx.obj, reinstall=reinstall, update=update, force=force, yes=yes)
+    cmd.execute('install', ctx.obj, reinstall, update, no_software, force, yes)
 
 
 @cli.command()

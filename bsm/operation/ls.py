@@ -10,7 +10,7 @@ class Ls(Base):
         local_versions = []
 
         try:
-            release_dir = os.path.join(self._config['scenario']['software_root'], self._config['app']['release_work_dir'])
+            release_dir = self._config['release_path']['release_dir']
             version_dirs = os.listdir(release_dir)
             for version_dir in version_dirs:
                 try:

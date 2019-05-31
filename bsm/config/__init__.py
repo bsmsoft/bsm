@@ -125,6 +125,13 @@ class Config(collections.MutableMapping):
         except Exception as e:
             pass
 
+    def __load_option(self):
+        self.__config['option'] = ConfigCommon()
+        try:
+            self['option'].update(run_handler(self['release_path']['handler_python_dir'], 'option'))
+        except Exception as e:
+            pass
+
     def __load_release(self):
         self.__config['release'] = ConfigRelease()
         self['release'].load(self['app'], self['scenario'], self['release_path'], self['attribute'])
@@ -142,6 +149,11 @@ class Config(collections.MutableMapping):
         self['packages'].load(self['app'], self['env'], self['release'], self['category'])
 
 
+    def config(self, config_type):
+        if isinstance(self[config_type], ConfigCommon):
+            return self[config_type].data
+        return self[config_type]
+
     @property
     def data(self):
-        return {k:v.data for k, v in self.items()}
+        return {k: self.config(k) for k in self}

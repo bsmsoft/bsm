@@ -99,14 +99,14 @@ class Release(Common):
 
         try:
             with Handler(config_release_path['handler_python_dir']) as h:
-                h.run('transform_release', param)
+                result = h.run('transform_release', param)
                 if isinstance(result, dict):
                     self.clear()
                     self.update(result)
         except HandlerNotFoundError as e:
-            _logger.debug('Transformer not found: {0}'.format(e))
+            _logger.debug('Transformer for release not found: {0}'.format(e))
         except Exception as e:
-            _logger.error('Transformer run error: {0}'.format(e))
+            _logger.error('Transformer for release run error: {0}'.format(e))
             raise
 
     def __check_bsm_version(self):
