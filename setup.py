@@ -50,6 +50,7 @@ setup(
     install_requires = [
         'click',
         'PyYAML',
+        'packaging',
     ],
     include_package_data = True,
     tests_require = [

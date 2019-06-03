@@ -28,4 +28,5 @@ class Category(Common):
         if self[ctg]['share_env']:
             self[ctg]['config_package_dir'] = os.path.join(self[ctg]['work_dir'], 'shared')
         else:
-            self[ctg]['config_package_dir'] = os.path.join(self[ctg]['work_dir'], 'version', config_scenario['version'])
+            self[ctg]['config_package_dir'] = os.path.join(self[ctg]['work_dir'], 'release', config_scenario['version'])
+        self[ctg]['install_dir'] = os.path.join(self[ctg]['work_dir'], 'install')

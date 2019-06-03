@@ -1,5 +1,7 @@
 import os
-import re
+
+from packaging.specifiers import SpecifierSet
+from packaging.specifiers import InvalidSpecifier
 
 from bsm.config.common import Common
 
@@ -20,23 +22,6 @@ _AVAILABLE_RELEASE_CONFIG = ('version', 'setting')
 class ConfigReleaseError(Exception):
     pass
 
-
-def _compare_version(ver1, ver2):
-    for i in range(3):
-        if len(ver1) <= i:
-            c1 = -1
-        else:
-            c1 = ver1[i]
-
-        if len(ver2) <= i:
-            c2 = -1
-        else:
-            c2 = ver2[i]
-
-        if c1 != c2:
-            return c1 - c2
-
-    return 0
 
 def _walk_rel_dir(directory, rel_dir=''):
     if not os.path.isdir(directory):
@@ -111,26 +96,18 @@ class Release(Common):
             raise
 
     def __check_bsm_version(self):
-        version_require = self.get('setting', {}).get('bsm', {}).get('require', {})
-        _logger.debug('Version require: {0}'.format(version_require))
+        version_require = self.get('setting', {}).get('bsm', {}).get('require', '')
+        _logger.debug('Version require: "{0}"'.format(version_require))
         if not version_require:
             return
 
-        m = re.match('(\d+)\.(\d+)\.(\d+)', BSM_VERSION)
-        if not m:
-            raise ConfigReleaseError('Can not verify bsm version: {0}'.format(BSM_VERSION))
-        major, minor, patch = m.groups()
-        bsm_ver_frag = [int(major), int(minor), int(patch)]
+        try:
+            spec = SpecifierSet(version_require, prereleases=True)
+        except InvalidSpecifier as e:
+            raise ConfigReleaseError('Require statement not correct: {0}'.format(e))
 
-        for comp, ver in version_require.items():
-            ver_frag = [int(i) for i in ver.split('.')]
-            result = _compare_version(bsm_ver_frag, ver_frag)
-            if comp == '<' and result >= 0 or \
-                    comp == '<=' and result > 0 or \
-                    comp == '=' and result != 0 or \
-                    comp == '>=' and result < 0 or \
-                    comp == '>' and result <= 0:
-                raise ConfigReleaseError('BSM version does not follow: {0} {1} {2}'.format(BSM_VERSION, comp, ver))
+        if BSM_VERSION not in spec:
+            raise ConfigReleaseError('BSM version "{0}" does not follow: {1}'.format(BSM_VERSION, version_require))
 
     def __check_version_consistency(self, config_scenario):
         version = config_scenario.get('version')

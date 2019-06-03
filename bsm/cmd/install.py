@@ -20,6 +20,6 @@ class Install(Base):
         try:
             self._bsm.config('release')
         except ConfigReleaseError as e:
-            _logger.debug('Release load error: {0}'.format(e))
+            _logger.debug('Release can not be loaded and should be installed: {0}'.format(e))
             return False
         return True

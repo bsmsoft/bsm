@@ -6,6 +6,8 @@ import subprocess
 import datetime
 import pprint
 
+from packaging import version
+
 
 def camel_to_snake(name, delim='_'):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1{0}\2'.format(delim), name)
@@ -19,6 +21,15 @@ def is_str(var):
     if sys.version_info[0] >= 3:
         return isinstance(var, str)
     return isinstance(var, basestring)
+
+
+def version_compare(ver1, ver2):
+    if version.parse(version1) == version.parse(version2):
+        return 0
+    if version.parse(version1) > version.parse(version2):
+        return 1
+    if version.parse(version1) < version.parse(version2):
+        return -1
 
 
 def ensure_list(item):
