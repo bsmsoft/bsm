@@ -50,31 +50,20 @@ class InstallRelease(Base):
 
     def __install_definition(self):
         conf = self._config['scenario']
-        def_dir = self._config['release_path']['def_dir']
+        content_dir = self._config['release_path']['content_dir']
         version_pattern = self._config['app']['version_pattern']
         git_temp = self._config['app'].get('git_temp')
 
         if 'release_source' in conf and conf['release_source']:
-            _install_from_dir(conf['release_source'], def_dir)
+            _install_from_dir(conf['release_source'], content_dir)
         elif 'version' in conf and conf['version']:
-            _install_from_git_repo(conf['release_repo'], conf['version'], version_pattern, def_dir, git_temp)
+            _install_from_git_repo(conf['release_repo'], conf['version'], version_pattern, content_dir, git_temp)
         else:
             _logger.warn('No release specified, nothing to do')
 
     def __install_handler(self):
         conf = self._config['release_path']
-        def_dir = conf['def_dir']
         handler_dir = conf['handler_dir']
         handler_module_dir = conf['handler_module_dir']
 
         safe_cpdir(handler_dir, handler_module_dir)
-
-        handler_init = []
-        handler_init.append(os.path.join(handler_module_dir, '__init__.py'))
-        for d in os.listdir(handler_module_dir):
-            if os.path.isdir(os.path.join(handler_module_dir, d)):
-                handler_init.append(os.path.join(handler_module_dir, d, '__init__.py'))
-
-        for f in handler_init:
-            if not os.path.exists(f):
-                open(f, 'w').close()

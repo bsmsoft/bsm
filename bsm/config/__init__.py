@@ -18,7 +18,7 @@ from bsm.config.scenario import Scenario as ConfigScenario
 from bsm.config.release_path import ReleasePath as ConfigReleasePath
 from bsm.config.release import Release as ConfigRelease
 from bsm.config.category import Category as ConfigCategory
-from bsm.config.install import Install as ConfigInstall
+from bsm.config.package_install import PackageInstall as ConfigPackageInstall
 from bsm.config.packages import Packages as ConfigPackages
 
 from bsm.handler import Handler
@@ -147,7 +147,7 @@ class Config(collections.MutableMapping):
             return
         try:
             with Handler(self['release_path']['handler_python_dir']) as h:
-                self['option'].update(h.run('option'))
+                self['option_list'].update(h.run('option'))
         except HandlerNotFoundError:
             _logger.debug('Handler for option not found')
 
@@ -159,9 +159,9 @@ class Config(collections.MutableMapping):
         self.__config['category'] = ConfigCategory()
         self['category'].load(self['app'], self['scenario'], self['release'])
 
-    def __load_install(self):
-        self.__config['install'] = ConfigInstall()
-        self['install'].load(self['app'], self['scenario'], self['release_path'], self['attribute'], self['release'], self['category'])
+    def __load_package_install(self):
+        self.__config['package_install'] = ConfigPackageInstall()
+        self['package_install'].load(self['app'], self['scenario'], self['release_path'], self['attribute'], self['release'], self['category'])
 
     def __load_packages(self):
         self.__config['packages'] = ConfigPackages()

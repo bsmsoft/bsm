@@ -21,9 +21,9 @@ class ReleasePath(Common):
             return
 
         self['main_dir'] = os.path.join(self['release_dir'], config_scenario['version'])
-        self['def_dir'] = os.path.join(self['main_dir'], 'def')
-        self['config_dir'] = os.path.join(self['def_dir'], 'config')
-        self['handler_dir'] = os.path.join(self['def_dir'], 'handler')
+        self['content_dir'] = os.path.join(self['main_dir'], 'content')
+        self['config_dir'] = os.path.join(self['content_dir'], 'config')
+        self['handler_dir'] = os.path.join(self['content_dir'], 'handler')
         self['handler_python_dir'] = os.path.join(self['main_dir'], 'handler')
         self['handler_module_dir'] = os.path.join(self['main_dir'], 'handler', HANDLER_MODULE_NAME)
         self['status_dir'] = os.path.join(self['main_dir'], 'status')
