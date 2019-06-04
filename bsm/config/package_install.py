@@ -43,7 +43,11 @@ class PackageInstall(Common):
 
         category_install = [ctg for ctg, ctg_cfg in config_category.items() if ctg_cfg['install']]
 
-        self.__load_install_setting(config_release)
+        all_steps = config_release.get('setting', {}).get('install', {}).get('steps', [])
+        if len(all_steps) != len(set(all_steps)):
+            raise ConfigInstallStepError('Duplicated steps found in: {0}'.format(all_steps))
+        if len(all_steps) == 0:
+            _logger.warn('No install steps specified')
 
         sys.path.insert(0, config_release_path['handler_python_dir'])
 
@@ -112,12 +116,14 @@ class PackageInstall(Common):
                 final_config['config']['name'] = pkg_name
                 final_config['config']['category'] = category_name
                 final_config['config']['subdir'] = subdir
-                final_config['config']['version'] = ver
+                if 'version' not in final_config['config']:
+                    final_config['config']['version'] = ver
 
-                final_config['package_path'] = self.__package_path(config_category, final_config['config'])
-                final_config['install_path'] = self.__install_path(config_category, final_config['config'])
+                final_config['common_path'] = self.__common_path(config_category, final_config['config'])
+                self.__expand_package_path(final_config['common_path']['main_dir'], final_config['config'])
+                self.__expand_env(final_config['config'])
 
-                final_config['step'] = self.__install_step(final_config['config'])
+                final_config['step'] = self.__install_step(all_steps, final_config['config'])
 
         sys.path.remove(config_release_path['handler_python_dir'])
 
@@ -149,49 +155,62 @@ class PackageInstall(Common):
 
         return copy.deepcopy(pkg_cfg)
 
-    def __package_path(self, config_category, pkg_cfg):
-        package_path = {}
+    def __common_path(self, config_category, pkg_cfg):
+        result = {}
         ctg_cfg = config_category[pkg_cfg['category']]
         if ctg_cfg['version_dir']:
-            package_path['main_dir'] = os.path.join(ctg_cfg['root'], pkg_cfg['subdir'], pkg_cfg['name'], pkg_cfg['version'])
-            package_path['config_dir'] = os.path.join(ctg_cfg['config_package_dir'], pkg_cfg['subdir'], pkg_cfg['name'], 'versions', pkg_cfg['version'])
+            result['main_dir'] = os.path.join(ctg_cfg['root'], pkg_cfg['subdir'], pkg_cfg['name'], pkg_cfg['version'])
+            result['work_dir'] = os.path.join(ctg_cfg['install_dir'], pkg_cfg['subdir'], pkg_cfg['name'], 'versions', pkg_cfg['version'])
+            result['config_dir'] = os.path.join(ctg_cfg['config_package_dir'], pkg_cfg['subdir'], pkg_cfg['name'], 'versions', pkg_cfg['version'])
         else:
-            package_path['main_dir'] = os.path.join(ctg_cfg['root'], pkg_cfg['subdir'], pkg_cfg['name'])
-            package_path['config_dir'] = os.path.join(ctg_cfg['config_package_dir'], pkg_cfg['subdir'], pkg_cfg['name'], 'head')
-        package_path['config_file'] = os.path.join(package_path['config_dir'], 'package.yml')
-        return package_path
+            result['main_dir'] = os.path.join(ctg_cfg['root'], pkg_cfg['subdir'], pkg_cfg['name'])
+            result['work_dir'] = os.path.join(ctg_cfg['install_dir'], pkg_cfg['subdir'], pkg_cfg['name'], 'head')
+            result['config_dir'] = os.path.join(ctg_cfg['config_package_dir'], pkg_cfg['subdir'], pkg_cfg['name'], 'head')
+        result['config_file'] = os.path.join(result['config_dir'], 'package.yml')
+        result['temp_dir'] = os.path.join(result['work_dir'], 'temp')
+        result['status_dir'] = os.path.join(result['work_dir'], 'status')
+        result['log_dir'] = os.path.join(result['work_dir'], 'log')
+        return result
 
-    def __install_path(self, config_category, pkg_cfg):
-        install_path = {}
-        ctg_cfg = config_category[pkg_cfg['category']]
-        if ctg_cfg['version_dir']:
-            install_path['work_dir'] = os.path.join(ctg_cfg['install_dir'], pkg_cfg['subdir'], pkg_cfg['name'], 'versions', pkg_cfg['version'])
-        else:
-            install_path['work_dir'] = os.path.join(ctg_cfg['install_dir'], pkg_cfg['subdir'], pkg_cfg['name'], 'head')
-        install_path['temp_dir'] = os.path.join(ctg_cfg['work_dir'], 'temp')
-        install_path['status_dir'] = os.path.join(ctg_cfg['work_dir'], 'status')
-        install_path['log_dir'] = os.path.join(ctg_cfg['work_dir'], 'log')
-        return install_path
+    def __expand_package_path(self, package_main_dir, pkg_cfg):
+        pkg_path = pkg_cfg.get('path', {})
+        for k, v in pkg_path.items():
+            pkg_path[k] = os.path.join(package_main_dir, v)
 
-    def __load_install_setting(self, config_release):
-        setting_install = config_release.get('setting', {}).get('install', {})
-        self.__all_steps = setting_install.get('steps', [])
-        self.__atomic_start = setting_install.get('atomic_start')
-        self.__atomic_end = setting_install.get('atomic_end')
+    def __expand_env(self, pkg_cfg):
+        format_dict = {}
+        format_dict['name'] = pkg_cfg['name']
+        format_dict['category'] = pkg_cfg['category']
+        format_dict['subdir'] = pkg_cfg['subdir']
+        format_dict['version'] = pkg_cfg['version']
+        format_dict.update(pkg_cfg.get('path', {}))
 
-        if len(self.__all_steps) != len(set(self.__all_steps)):
-            raise ConfigInstallStepError('Duplicated steps found: {0}'.format(self.__all_steps))
+        env_prepend_path = pkg_cfg.get('env', {}).get('prepend_path', {})
+        for k, v in env_prepend_path.items():
+            result = []
+            for i in ensure_list(v):
+                result.append(i.format(**format_dict))
+            env_prepend_path[k] = result
 
-        if self.__atomic_start not in self.__all_steps or self.__atomic_end not in self.__all_steps:
-            raise ConfigInstallStepError('Can not find atomic start/end: {0}/{1}'.format(self.__atomic_start, self.__atomic_end))
+        env_append_path = pkg_cfg.get('env', {}).get('append_path', {})
+        for k, v in env_append_path.items():
+            result = []
+            for i in ensure_list(v):
+                result.append(i.format(**format_dict))
+            env_append_path[k] = result
 
-        if self.__all_steps.index(self.__atomic_start) > self.__all_steps.index(self.__atomic_end):
-            raise ConfigInstallStepError('atomic_start should not be after atomic_end')
+        env_set_env = pkg_cfg.get('env', {}).get('set_env', {})
+        for k, v in env_set_env.items():
+            env_set_env[k] = v.format(**format_dict)
 
-    def __install_step(self, pkg_cfg):
+        env_alias = pkg_cfg.get('env', {}).get('alias', {})
+        for k, v in env_alias.items():
+            env_alias[k] = v.format(**format_dict)
+
+    def __install_step(self, all_steps, pkg_cfg):
         result = []
 
-        for action in self.__all_steps:
+        for action in all_steps:
             config_action = ensure_list(pkg_cfg.get('install', {}).get(action, []))
 
             sub_index = 0
