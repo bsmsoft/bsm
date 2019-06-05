@@ -229,8 +229,8 @@ class PackageInstall(Common):
                 sub_index += 1
 
             if step == atomic_start:
-                result['atomic_start'] = result['steps'][-sub_index]
+                result['atomic_start_index'] = len(result['steps']) - sub_index
             if step == atomic_end:
-                result['atomic_end'] = result['steps'][-1]
+                result['atomic_end_index'] = len(result['steps']) - 1
 
         return result

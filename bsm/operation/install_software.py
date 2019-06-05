@@ -47,7 +47,7 @@ class Install(Base):
                 for package in self._config['package_install'][category][subdir]:
                     for version, value in self._config['package_install'][category][subdir][package].items():
                         previous_vertex = None
-                        for step in value['step']:
+                        for step in value['step']['steps']:
                             vertex_pkg = (category, package, subdir, version, step['action'], step['sub_action'])
                             self.__dag.add_vertex(vertex_pkg)
                             if previous_vertex is not None:
