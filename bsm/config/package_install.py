@@ -14,7 +14,7 @@ from bsm.logger import get_logger
 _logger = get_logger()
 
 
-class ConfigPackageInstallStepError(Exception):
+class ConfigPackageInstallError(Exception):
     pass
 
 
@@ -42,12 +42,6 @@ class PackageInstall(Common):
             return
 
         category_install = [ctg for ctg, ctg_cfg in config_category.items() if ctg_cfg['install']]
-
-        all_steps = config_release.get('setting', {}).get('install', {}).get('steps', [])
-        if len(all_steps) != len(set(all_steps)):
-            raise ConfigInstallStepError('Duplicated steps found in: {0}'.format(all_steps))
-        if len(all_steps) == 0:
-            _logger.warn('No install steps specified')
 
         sys.path.insert(0, config_release_path['handler_python_dir'])
 
@@ -118,7 +112,7 @@ class PackageInstall(Common):
                 self.__expand_package_path(final_config['common_path']['main_dir'], final_config['config'])
                 self.__expand_env(final_config['config'])
 
-                final_config['step'] = self.__install_step(all_steps, final_config['config'])
+                final_config['step'] = self.__install_step(config_release, final_config['config'])
 
         sys.path.remove(config_release_path['handler_python_dir'])
 
@@ -202,20 +196,41 @@ class PackageInstall(Common):
         for k, v in env_alias.items():
             env_alias[k] = v.format(**format_dict)
 
-    def __install_step(self, all_steps, pkg_cfg):
-        result = []
+    def __install_step(self, config_release, pkg_cfg):
+        all_steps = config_release.get('setting', {}).get('install', {}).get('steps', [])
+        if len(all_steps) != len(set(all_steps)):
+            raise ConfigPackageInstallError('Duplicated steps found in: {0}'.format(all_steps))
+        if len(all_steps) == 0:
+            _logger.warn('No install steps specified')
 
-        for action in all_steps:
-            config_action = ensure_list(pkg_cfg.get('install', {}).get(action, []))
+        atomic_start = config_release.get('setting', {}).get('install', {}).get('atomic_start')
+        atomic_end = config_release.get('setting', {}).get('install', {}).get('atomic_end')
+
+        if atomic_start not in all_steps or atomic_end not in all_steps:
+            raise ConfigPackageInstallError('Can not find atomic start/end: {0} ... {1}'.format(atomic_start, atomic_end))
+        if all_steps.index(atomic_start) > all_steps.index(atomic_end):
+            raise ConfigPackageInstallError('atomic_start should not be after atomic_end')
+
+        result = {}
+        result['steps'] = []
+
+        for step in all_steps:
+            config_action = ensure_list(pkg_cfg.get('install', {}).get(step, []))
 
             sub_index = 0
             for cfg_action in config_action:
                 handler, param = _step_param(cfg_action)
                 if handler:
-                    result.append({'action': action, 'sub_action': sub_index, 'handler': handler, 'param': param})
+                    result['steps'].append({'action': step, 'sub_action': sub_index, 'handler': handler, 'param': param})
                     sub_index += 1
 
             if sub_index == 0:
-                result.append({'action': action, 'sub_action': sub_index, 'handler': '', 'param': {}})
+                result['steps'].append({'action': step, 'sub_action': sub_index, 'handler': '', 'param': {}})
+                sub_index += 1
+
+            if step == atomic_start:
+                result['atomic_start'] = result['steps'][-sub_index]
+            if step == atomic_end:
+                result['atomic_end'] = result['steps'][-1]
 
         return result
