@@ -98,15 +98,10 @@ class PackageInstall(Common):
                 self.setdefault(category_name, {})
                 self[category_name].setdefault(subdir, {})
                 self[category_name][subdir].setdefault(pkg_name, {})
-                if version_dir:
-                    self[category_name][subdir][pkg_name].setdefault(ver, {})
-                    if ver in self[category_name][subdir][pkg_name]:
-                        _logger.warn('Duplicated package found: category({0}), subdir({1}), package({2}), version({3})'.format(category_name, subdir, pkg_name, ver))
-                    final_config = self[category_name][subdir][pkg_name][ver]
-                else:
-                    if pkg_name in self[category_name][subdir]:
-                        _logger.warn('Duplicated package found: category({0}), subdir({1}), package({2})'.format(category_name, subdir, pkg_name))
-                    final_config = self[category_name][subdir][pkg_name]
+                self[category_name][subdir][pkg_name].setdefault(ver, {})
+                if ver in self[category_name][subdir][pkg_name]:
+                    _logger.warn('Duplicated package found: category({0}), subdir({1}), package({2}), version({3})'.format(category_name, subdir, pkg_name, ver))
+                final_config = self[category_name][subdir][pkg_name][ver]
 
                 final_config['config_origin'] = copy.deepcopy(pkg_cfg)
                 final_config['config_origin']['version'] = ver

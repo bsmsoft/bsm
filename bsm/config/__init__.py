@@ -170,9 +170,16 @@ class Config(collections.MutableMapping):
 
     def config(self, config_type):
         if isinstance(self[config_type], ConfigCommon):
-            return self[config_type].data
+            return self[config_type].data()
         return self[config_type]
 
-    @property
+    def config_copy(self, config_type):
+        if isinstance(self[config_type], ConfigCommon):
+            return self[config_type].data_copy()
+        return copy.deepcopy(self[config_type])
+
     def data(self):
         return {k: self.config(k) for k in self}
+
+    def data_copy(self):
+        return {k: self.config_copy(k) for k in self}

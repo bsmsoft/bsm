@@ -48,11 +48,9 @@ class Common(collections.MutableMapping):
         return repr(self.__data)
 
 
-    @property
     def data(self):
         return self.__data
 
-    @property
     def data_copy(self):
         return copy.deepcopy(self.__data)
 

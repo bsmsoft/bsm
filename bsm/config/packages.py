@@ -44,10 +44,8 @@ class Packages(Common):
                 self.__dir_list[path_key] = v.format(**self[pkg]['dir']['location'])
 
 
-    @property
     def data(self):
         return {k:v.data for k, v in self.items()}
 
-    @property
     def dir_list(self):
         return self.__dir_list

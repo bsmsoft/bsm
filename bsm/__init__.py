@@ -66,7 +66,7 @@ class Bsm(object):
 
     @__auto_reload
     def config_all(self):
-        return self.__config.data
+        return self.__config.data()
 
     @__auto_reload
     def config(self, config_type):
