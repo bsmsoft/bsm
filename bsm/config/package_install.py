@@ -36,7 +36,7 @@ def _step_param(config_action):
 
 
 class PackageInstall(Common):
-    def load(self, config_app, config_scenario, config_release_path, config_attribute, config_release, config_category):
+    def load(self, config_app, config_output, config_scenario, config_release_path, config_attribute, config_release, config_release_install, config_category):
         if not ('version' in config_scenario and config_scenario['version']):
             _logger.debug('"version" not specified in config install')
             return
@@ -45,8 +45,7 @@ class PackageInstall(Common):
 
         sys.path.insert(0, config_release_path['handler_python_dir'])
 
-        config_release_package = config_release.get('package', {})
-        for identifier, pkg_cfg in config_release_package.items():
+        for identifier, pkg_cfg in config_release.get('package', {}).items():
             frag = identifier.split(os.sep)
 
             # Use the first part as default category name
@@ -101,7 +100,7 @@ class PackageInstall(Common):
                 final_config['config_origin']['version'] = ver
 
                 final_config['config'] = self.__transform_package(category_name, pkg_name, subdir, ver, pkg_cfg,
-                        config_app, config_scenario, config_release_path, config_attribute, config_release, config_category)
+                        config_app, config_output, config_scenario, config_release_path, config_attribute, config_release, config_release_install, config_category)
                 final_config['config']['name'] = pkg_name
                 final_config['config']['category'] = category_name
                 final_config['config']['subdir'] = subdir
@@ -112,12 +111,12 @@ class PackageInstall(Common):
                 self.__expand_package_path(final_config['common_path']['main_dir'], final_config['config'])
                 self.__expand_env(final_config['config'])
 
-                final_config['step'] = self.__install_step(config_release, final_config['config'])
+                final_config['step'] = self.__install_step(config_release_install, final_config['config'])
 
         sys.path.remove(config_release_path['handler_python_dir'])
 
     def __transform_package(self, category, name, subdir, version, pkg_cfg,
-            config_app, config_scenario, config_release_path, config_attribute, config_release, config_category):
+            config_app, config_output, config_scenario, config_release_path, config_attribute, config_release, config_release_install, config_category):
         param = {}
         param['operation'] = 'install'
 
@@ -127,12 +126,13 @@ class PackageInstall(Common):
         param['version'] = version
 
         param['config_package'] = copy.deepcopy(pkg_cfg)
-        param['config_app'] = config_app.data_copy
-        param['config_scenario'] = config_scenario.data_copy
-        param['config_release_path'] = config_release_path.data_copy
-        param['config_attribute'] = config_attribute.data_copy
-        param['config_release'] = config_release.data_copy
-        param['config_category'] = config_category.data_copy
+        param['config_app'] = config_app.data_copy()
+        param['config_output'] = config_output.data_copy()
+        param['config_scenario'] = config_scenario.data_copy()
+        param['config_release_path'] = config_release_path.data_copy()
+        param['config_attribute'] = config_attribute.data_copy()
+        param['config_release'] = config_release.data_copy()
+        param['config_category'] = config_category.data_copy()
 
         try:
             with Handler() as h:
@@ -196,41 +196,23 @@ class PackageInstall(Common):
         for k, v in env_alias.items():
             env_alias[k] = v.format(**format_dict)
 
-    def __install_step(self, config_release, pkg_cfg):
-        all_steps = config_release.get('setting', {}).get('install', {}).get('steps', [])
-        if len(all_steps) != len(set(all_steps)):
-            raise ConfigPackageInstallError('Duplicated steps found in: {0}'.format(all_steps))
-        if len(all_steps) == 0:
-            _logger.warn('No install steps specified')
-
-        atomic_start = config_release.get('setting', {}).get('install', {}).get('atomic_start')
-        atomic_end = config_release.get('setting', {}).get('install', {}).get('atomic_end')
-
-        if atomic_start not in all_steps or atomic_end not in all_steps:
-            raise ConfigPackageInstallError('Can not find atomic start/end: {0} ... {1}'.format(atomic_start, atomic_end))
-        if all_steps.index(atomic_start) > all_steps.index(atomic_end):
-            raise ConfigPackageInstallError('atomic_start should not be after atomic_end')
-
+    def __install_step(self, config_release_install, pkg_cfg):
         result = {}
-        result['steps'] = []
 
-        for step in all_steps:
+        for step in config_release_install['steps']:
             config_action = ensure_list(pkg_cfg.get('install', {}).get(step, []))
 
             sub_index = 0
             for cfg_action in config_action:
                 handler, param = _step_param(cfg_action)
                 if handler:
-                    result['steps'].append({'action': step, 'sub_action': sub_index, 'handler': handler, 'param': param})
+                    result.setdefault(step, [])
+                    result[step].append({'handler': handler, 'param': param})
                     sub_index += 1
 
             if sub_index == 0:
-                result['steps'].append({'action': step, 'sub_action': sub_index, 'handler': '', 'param': {}})
+                result.setdefault(step, [])
+                result[step].append({'handler': '', 'param': {}})
                 sub_index += 1
-
-            if step == atomic_start:
-                result['atomic_start_index'] = len(result['steps']) - sub_index
-            if step == atomic_end:
-                result['atomic_end_index'] = len(result['steps']) - 1
 
         return result

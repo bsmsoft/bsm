@@ -5,7 +5,9 @@ import traceback
 
 from bsm.env import Env
 
-from bsm.loader import run_handler
+from bsm.handler import Handler
+from bsm.handler import HandlerNotFoundError
+
 from bsm.util import safe_mkdir
 
 from bsm.logger import get_logger
@@ -17,76 +19,95 @@ class InstallExecutorError(Exception):
 
 
 class Executor(object):
-    def __init__(self, config_user, config_version, config_release, step_info):
-        self.__config_user = config_user
-        self.__config_version = config_version
-        self.__config_release = config_release
-        self.__step_info = step_info
+    def __init__(self, config):
+        self.__config = config
+        self.__init_env()
 
-        # Create independent env for installation
+    # Create independent env for installation
+    def __init_env(self):
         self.__env = Env()
-        self.__env.clean()
-
-        self.__pkg_mgr = PackageManager(config_version, config_release)
+        self.__env.unload_packages()
+        self.__env.unload_release()
+        self.__env.unload_app()
+        self.__env.load_app(self.__config['app'])
+        self.__env.load_release(self.__config['scenario'], self.__config['release'])
 
     def param(self, vertex):
-        pkg, action, sub_action = vertex
+        ctg, subdir, pkg, version, step, sub_step = vertex
 
         par = {}
 
+        par['category'] = ctg
+        par['subdir'] = subdir
         par['package'] = pkg
-        par['action'] = action
-        par['sub_action'] = sub_action
+        par['version'] = version
+        par['step'] = step
+        par['sub_step'] = sub_step
 
-        step = self.__step_info.package_step(pkg, action, sub_action)
-        par['action_name'] = step.get('action')
-        par['action_param'] = step.get('param')
+        pkg_install_cfg = self.__config['package_install'][ctg][subdir][pkg][version]
 
-        par['log_file'] = os.path.join(self.__pkg_mgr.package_info(pkg)['dir']['log'], '{0}_{1}_{2}.log'.format(pkg, action, sub_action))
+        step_info = pkg_install_cfg['step'][step][sub_step]
+        par['action'] = step_info.get('handler')
+        par['action_param'] = step_info.get('param')
+
+        pkg_path = pkg_install_cfg['common_path']
+        par['common_path'] = copy.deepcopy(pkg_path)
+        par['log_file'] = os.path.join(pkg_path['log_dir'], '{0}_{1}_{2}.log'.format(pkg, step, sub_step))
         par['env'] = copy.deepcopy(self.__env.env_final())
 
-        par['config_user'] = copy.deepcopy(self.__config_user)
-        par['def_dir'] = self.__config_version.def_dir
-        par['pkg_info'] = copy.deepcopy(self.__pkg_mgr.package_info(pkg))
-        par['pkg_dir_list'] = copy.deepcopy(self.__pkg_mgr.package_dir_list())
+        par['config_package'] = copy.deepcopy(pkg_install_cfg['config'])
+        par['config_app'] = self.__config['app'].data_copy()
+        par['config_output'] = self.__config['output'].data_copy()
+        par['config_scenario'] = self.__config['scenario'].data_copy()
+        par['config_release_path'] = self.__config['release_path'].data_copy()
+        par['config_attribute'] = self.__config['attribute'].data_copy()
+        par['config_release'] = self.__config['release'].data_copy()
+        par['config_category'] = self.__config['category'].data_copy()
 
         return par
 
+    # This method must be thread safe
     # Do NOT access or modify any variables outside this function (global and member variables)
+    # All parameters are passed by "param" argument
     def execute(self, param):
         pkg = param['package']
-        action = param['action']
-        sub_action = param['sub_action']
+        step = param['step']
+        sub_step = param['sub_step']
 
-        if sub_action == 0:
-            action_full_name = '{0} - {1}'.format(pkg, action)
+        if sub_step == 0:
+            action_full_name = '{0} - {1}'.format(pkg, step)
         else:
-            action_full_name = '{0} - {1} - {2}'.format(pkg, action, sub_action)
+            action_full_name = '{0} - {1} - {2}'.format(pkg, step, sub_step)
 
         result = {}
 
         result['start'] = datetime.datetime.utcnow()
 
-        safe_mkdir(param['pkg_info']['dir']['log'])
+        safe_mkdir(os.path.dirname(param['log_file']))
 
         try:
-            result_action = run_handler('', 'install', param['action_name'], param)
+            with Handler() as h:
+                result_action = h.run('install', param)
+        except HandlerNotFoundError as e:
+            _logger.error('Install handler not found for "{0}"'.format(action_full_name))
+            raise
         except Exception as e:
-            _logger.critical('"{0}" install handler error: {1}'.format(action_full_name, e))
-            if param['config_user']['verbose']:
-                _logger.critical('\n{0}'.format(traceback.format_exc()))
+            _logger.error('"{0}" install handler error: {1}'.format(action_full_name, e))
+            if param['config_output']['verbose']:
+                _logger.error('\n{0}'.format(traceback.format_exc()))
             raise
 
-        result['success'] = False
-        if isinstance(result_action, bool) and result_action:
-            result['success'] = True
-        if isinstance(result_action, dict) and 'success' in result_action and result_action['success']:
-            result['success'] = True
+        if isinstance(result_action, bool):
+            result['success'] = result_action
+        elif isinstance(result_action, dict):
+            result['success'] = result_action.get('success', False)
+        else:
+            result['success'] = False
 
         if not result['success']:
             if isinstance(result_action, dict) and 'message' in result_action:
                 _logger.error('"{0}" execution error: {1}'.format(action_full_name, result_action['message']))
-            _logger.critical('"{0}" execution error. Find log in "{1}"'.format(action_full_name, param['log_file']))
+            _logger.error('"{0}" execution error. Find log in "{1}"'.format(action_full_name, param['log_file']))
             raise InstallExecutorError('"{0}" execution error'.format(action_full_name))
 
         result['action'] = result_action
@@ -99,7 +120,7 @@ class Executor(object):
 
     def report_finish(self, vertice_result):
         for vertex, result in vertice_result:
-            pkg, action, sub_action = vertex
+            ctg, subdir, pkg, version, step, sub_step = vertex
 
             if isinstance(result['action'], dict) and 'env_package' in result['action'] and result['action']['env_package']:
                 path_def = self.__config_release.config['setting'].get('path_def', {})
@@ -110,9 +131,9 @@ class Executor(object):
                 self.__pkg_mgr.save_release_status(pkg, result['end'])
 
             if result['success']:
-                _logger.info(' > {0} {1} {2} finished'.format(pkg, action, sub_action))
-                if self.__step_info.is_last_sub_action(pkg, action, sub_action):
-                    self.__pkg_mgr.save_action_status(pkg, action, result['start'], result['end'])
+                _logger.info(' > {0} {1} {2} finished'.format(pkg, step, sub_step))
+                if self.__step_info.is_last_sub_action(pkg, step, sub_step):
+                    self.__pkg_mgr.save_action_status(pkg, step, result['start'], result['end'])
 
     def report_running(self, vertice):
         if not vertice:
@@ -120,10 +141,11 @@ class Executor(object):
 
         running_vertice = []
         for v in vertice:
-            if v[2] == 0:
-                action_full_name = '{0}({1})'
+            ctg, subdir, pkg, version, step, sub_step = v
+            if sub_step == 0:
+                action_full_name = '{2}({4})'
             else:
-                action_full_name = '{0}({1}.{2})'
+                action_full_name = '{2}({4}.{5})'
             running_vertice.append(action_full_name.format(*v))
         _logger.info('Running: ' + ', '.join(running_vertice))
 

@@ -39,33 +39,16 @@ def _walk_rel_dir(directory, rel_dir=''):
 
 
 class Release(Common):
-    def load(self, config_app, config_scenario, config_release_path, config_attribute):
+    def load(self, config_app, config_output, config_scenario, config_release_path, config_release_origin, config_attribute):
         if not ('version' in config_scenario and config_scenario['version']):
             _logger.debug('"version" not specified in config release')
             return
 
-        self.__load_config(config_scenario, config_release_path)
-
-        self.__transform(config_app, config_scenario, config_release_path, config_attribute)
+        self.__transform(config_app, config_output, config_scenario, config_release_path, config_release_origin, config_attribute)
 
         self.__check_bsm_version()
 
         self.__check_version_consistency(config_scenario)
-
-    def __load_config(self, config_scenario, config_release_path):
-        config_dir = os.path.join(config_release_path['config_dir'])
-        if not os.path.isdir(config_dir):
-            raise ConfigReleaseError('Release version "{0}" not found'.format(config_scenario['version']))
-
-        for k in _AVAILABLE_RELEASE_CONFIG:
-            config_file = os.path.join(config_dir, k+'.yml')
-            try:
-                self[k] = load_config(config_file)
-            except ConfigError as e:
-                _logger.warn('Fail to load config file "{0}": {1}'.format(config_file, e))
-
-        package_dir = os.path.join(config_dir, 'package')
-        self.__load_package_config(package_dir)
 
     def __load_package_config(self, package_dir):
         self['package'] = {}
@@ -75,22 +58,23 @@ class Release(Common):
             pkg_name = os.path.splitext(f)[0]
             self['package'][os.path.join(rel_dir, pkg_name)] = load_config(full_path)
 
-    def __transform(self, config_app, config_scenario, config_release_path, config_attribute):
+    def __transform(self, config_app, config_output, config_scenario, config_release_path, config_release_origin, config_attribute):
         param = {}
-        param['config_app'] = config_app.data_copy
-        param['config_scenario'] = config_scenario.data_copy
-        param['config_release_path'] = config_release_path.data_copy
-        param['config_release'] = self.data_copy
-        param['config_attribute'] = config_attribute.data_copy
+        param['config_app'] = config_app.data_copy()
+        param['config_output'] = config_output.data_copy()
+        param['config_scenario'] = config_scenario.data_copy()
+        param['config_release_path'] = config_release_path.data_copy()
+        param['config_release_origin'] = config_release_origin.data_copy()
+        param['config_attribute'] = config_attribute.data_copy()
 
         try:
             with Handler(config_release_path['handler_python_dir']) as h:
                 result = h.run('transform_release', param)
                 if isinstance(result, dict):
-                    self.clear()
                     self.update(result)
         except HandlerNotFoundError as e:
             _logger.debug('Transformer for release not found: {0}'.format(e))
+            self.update(config_release_origin)
         except Exception as e:
             _logger.error('Transformer for release run error: {0}'.format(e))
             raise

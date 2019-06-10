@@ -16,8 +16,10 @@ from bsm.config.app import App as ConfigApp
 from bsm.config.env import Env as ConfigEnv
 from bsm.config.scenario import Scenario as ConfigScenario
 from bsm.config.release_path import ReleasePath as ConfigReleasePath
+from bsm.config.release_origin import ReleaseOrigin as ConfigReleaseOrigin
 from bsm.config.release import Release as ConfigRelease
 from bsm.config.category import Category as ConfigCategory
+from bsm.config.release_install import ReleaseInstall as ConfigReleaseInstall
 from bsm.config.package_install import PackageInstall as ConfigPackageInstall
 from bsm.config.packages import Packages as ConfigPackages
 
@@ -77,7 +79,8 @@ class Config(collections.MutableMapping):
         self.__config['example'] = ConfigCommon()
         self['example']['path'] = self['app']['example_config_user']
         try:
-            self['example']['content'] = open(self['app']['example_config_user']).read()
+            with open(self['app']['example_config_user']) as f:
+                self['example']['content'] = f.read()
         except Exception as e:
             _logger.warn('Open user config example failed: %s' % e)
             self['example']['content'] = ''
@@ -130,16 +133,6 @@ class Config(collections.MutableMapping):
         self.__config['release_status'] = ConfigCommon()
         self['release_status'].load_from_file(self['release_path']['status_file'])
 
-    def __load_attribute(self):
-        self.__config['attribute'] = ConfigCommon()
-        if 'handler_python_dir' not in self['release_path']:
-            return
-        try:
-            with Handler(self['release_path']['handler_python_dir']) as h:
-                self['attribute'].update(h.run('attribute'))
-        except HandlerNotFoundError:
-            _logger.debug('Handler for attribute not found')
-
     # Release defined options, for display purpose only
     def __load_option_list(self):
         self.__config['option_list'] = ConfigCommon()
@@ -151,17 +144,42 @@ class Config(collections.MutableMapping):
         except HandlerNotFoundError:
             _logger.debug('Handler for option not found')
 
+    def __load_release_origin(self):
+        self.__config['release_origin'] = ConfigReleaseOrigin()
+        self['release_origin'].load(self['app'], self['output'], self['scenario'], self['release_path'])
+
+    def __load_attribute(self):
+        self.__config['attribute'] = ConfigCommon()
+        if 'handler_python_dir' not in self['release_path']:
+            return
+        param = {}
+        param['config_app'] = self['app'].data_copy()
+        param['config_output'] = self['output'].data_copy()
+        param['config_scenario'] = self['scenario'].data_copy()
+        param['config_release_path'] = self['release_path'].data_copy()
+        param['config_release_origin'] = self['release_origin'].data_copy()
+        try:
+            with Handler(self['release_path']['handler_python_dir']) as h:
+                self['attribute'].update(h.run('attribute', param))
+        except HandlerNotFoundError:
+            _logger.debug('Handler for attribute not found')
+
     def __load_release(self):
         self.__config['release'] = ConfigRelease()
-        self['release'].load(self['app'], self['scenario'], self['release_path'], self['attribute'])
+        self['release'].load(self['app'], self['output'], self['scenario'], self['release_path'], self['release_origin'], self['attribute'])
 
     def __load_category(self):
         self.__config['category'] = ConfigCategory()
         self['category'].load(self['app'], self['scenario'], self['release'])
 
+    def __load_release_install(self):
+        self.__config['release_install'] = ConfigReleaseInstall()
+        self['release_install'].load(self['release'])
+
     def __load_package_install(self):
         self.__config['package_install'] = ConfigPackageInstall()
-        self['package_install'].load(self['app'], self['scenario'], self['release_path'], self['attribute'], self['release'], self['category'])
+        self['package_install'].load(self['app'], self['output'], self['scenario'], self['release_path'],
+            self['attribute'], self['release'], self['release_install'], self['category'])
 
     def __load_packages(self):
         self.__config['packages'] = ConfigPackages()

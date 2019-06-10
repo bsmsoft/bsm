@@ -1,34 +1,31 @@
 from bsm.handler import Handler
 from bsm.handler import HandlerNotFoundError
 
+from bsm.logger import get_logger
+_logger = get_logger()
+
+
 class Selector(object):
-    def __init__(self, config_user, config_version, config_release):
-        self.__config_user = config_user
-        self.__config_version = config_version
-        self.__config_release = config_release
+    def __init__(self, config):
+        self.__config = config
 
     def select(self, running, idle):
         param = {}
-        param['config_user'] = self.__config_user
-        param['config_version'] = self.__config_version.config
-        param['config_release'] = self.__config_release.config
+
+        param['config_app'] = self.__config['app'].data_copy()
+        param['config_output'] = self.__config['output'].data_copy()
+        param['config_scenario'] = self.__config['scenario'].data_copy()
+        param['config_release_path'] = self.__config['release_path'].data_copy()
+        param['config_release'] = self.__config['release'].data_copy()
+        param['config_attribute'] = self.__config['attribute'].data_copy()
+
         param['running'] = running
         param['idle'] = idle
 
         try:
-            with Handler(self._config['release_path']['handler_python_dir']) as h:
+            with Handler(self.__config['release_path']['handler_python_dir']) as h:
                 return h.run('selector', param)
-        except HandlerNotFoundError:
-            _logger.debug('Selector load failed: {0}'.format(e))
-            _logger.debug('Will randomly select one')
-            return [next(iter(idle))]
-        except Exception as e:
-            _logger.error('Selector run error: {0}'.format(e))
-            raise
-
-        try:
-            return run_handler('selector', param)
-        except LoadError as e:
+        except HandlerNotFoundError as e:
             _logger.debug('Selector load failed: {0}'.format(e))
             _logger.debug('Will randomly select one')
             return [next(iter(idle))]

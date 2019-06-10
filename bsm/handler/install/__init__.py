@@ -3,9 +3,9 @@ from bsm.loader import LoadError
 
 from bsm.handler import HandlerNotAvailableError
 
-def run(action, param):
+def run(param):
     try:
-        run_func = load_relative('install.'+action, 'run')
+        run_func = load_relative('install.'+param['action'], 'run')
     except LoadError as e:
         raise HandlerNotAvailableError
 

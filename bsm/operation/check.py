@@ -4,7 +4,7 @@ class Check(Base):
     def execute(self, check_type):
         param = {}
         param['check_type'] = check_type
-        param['config_release'] = self._config['release'].data_copy
+        param['config_release'] = self._config['release'].data_copy()
 
         try:
             return run_handler('checker', param, self._config['release_path']['handler_dir'])

@@ -132,7 +132,7 @@ def ls_pkg(ctx):
 @click.option('--release-repo', '-t', type=str, help='Repository for retrieving release information')
 @click.option('--release-source', '-i', type=str, help='Directory for retrieving release information. '
         'This will take precedence over "release-repo". Use this option only for debugging')
-@click.option('--option', '-o', type=str, multiple=True, help='Options for installation')
+@click.option('--option', '-o', type=str, multiple=True, help='Options for release')
 @click.option('--reinstall', is_flag=True, help='Reinstall all packages')
 @click.option('--update', is_flag=True, help='Update version information before installation')
 @click.option('--no-software', is_flag=True, help='Do not install softwares, only install the release')
@@ -154,7 +154,7 @@ def install(ctx, software_root, release_repo, release_source, option, reinstall,
 @cli.command()
 @click.option('--software-root', '-r', type=str, help='Local installed software root directory')
 @click.option('--default', '-d', is_flag=True, help='Also set the version as default')
-@click.option('--option', '-o', type=str, multiple=True, help='Options for installation')
+@click.option('--option', '-o', type=str, multiple=True, help='Options for the release')
 @click.argument('version', type=str)
 @click.pass_context
 def use(ctx, software_root, default, option, version):

@@ -140,21 +140,77 @@ class Env(object):
                     self.__unalias.append(e)
 
     def load_app(self, config_app):
+        self.unload_app()
+
         self.__env[self.__env_name['bsmcli_bin']] = self.__bsmcli_bin
 
-        env_info = self.__load_env(config_app['env'])
-        app_info = {}
-        app_info['env'] = env_info
-        self.__env[self.__env_name['app_info']] = _emit_info(app_info)
+        info = {}
+        info['env'] = self.__load_env(config_app.get('env', {}))
+        self.__env[self.__env_name['app_info']] = _emit_info(info)
 
     def unload_app(self):
         if self.__env_name['bsmcli_bin'] in self.__env:
             del self.__env[self.__env_name['bsmcli_bin']]
 
         if self.__env_name['app_info'] in self.__env:
-            app_info = _parse_info(self.__env[self.__env_name['app_info']])
-            self.__unload_env(app_info.get('env', {}))
+            info = _parse_info(self.__env[self.__env_name['app_info']])
+            self.__unload_env(info.get('env', {}))
             del self.__env[self.__env_name['app_info']]
+
+    def load_release(self, config_scenario, config_release):
+        self.unload_release()
+
+        self.__env[self.__env_name['software_root']] = config_scenario['software_root']
+        self.__env[self.__env_name['release_version']] = config_scenario['version']
+
+        info = {}
+        info['env'] = self.__load_env(config_release.get('env', {}))
+        self.__env[self.__env_name['release_info']] = _emit_info(info)
+
+    def unload_release(self):
+        if self.__env_name['software_root'] in self.__env:
+            del self.__env[self.__env_name['software_root']]
+        if self.__env_name['release_version'] in self.__env:
+            del self.__env[self.__env_name['release_version']]
+
+        if self.__env_name['release_info'] in self.__env:
+            info = _parse_info(self.__env[self.__env_name['release_info']])
+            self.__unload_env(info.get('env', {}))
+            del self.__env[self.__env_name['release_info']]
+
+    def load_package(self, config_package):
+        name = config_package['name']
+
+        self.unload_package(config_package[name])
+
+        info = {}
+        info['category'] = config_package['category']
+        info['subdir'] = config_package['subdir']
+        info['version'] = config_package['version']
+        info['env'] = self.__load_env(config_package.get('env', {}))
+
+        packages_info = {}
+        if self.__env_name['packages_info'] in self.__env:
+            packages_info = _parse_info(self.__env[self.__env_name['packages_info']])
+        packages_info[name] = info
+
+        self.__env[self.__env_name['packages_info']] = _emit_info(packages_info)
+
+    def unload_package(self, package):
+        if self.__env_name['packages_info'] in self.__env:
+            packages_info = _parse_info(self.__env[self.__env_name['packages_info']])
+            if package in packages_info:
+                self.__unload_env(packages_info[package].get('env', {}))
+                del packages_info[package]
+            if not packages_info:
+                del self.__env[self.__env_name['packages_info']]
+
+    def unload_packages(self):
+        if self.__env_name['packages_info'] in self.__env:
+            packages_info = _parse_info(self.__env[self.__env_name['packages_info']])
+            for package, info in packages_info.items():
+                self.__unload_env(info.get('env', {}))
+            del self.__env[self.__env_name['packages_info']]
 
     def env_final(self):
         return self.__env.copy()

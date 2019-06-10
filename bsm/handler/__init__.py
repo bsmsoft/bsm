@@ -1,5 +1,8 @@
 import sys
 
+from bsm.loader import load_func
+from bsm.loader import LoadError
+
 from bsm.const import HANDLER_MODULE_NAME
 
 from bsm.logger import get_logger
@@ -35,16 +38,16 @@ class Handler(object):
         for m in self.__module_list:
             try:
                 f = load_func(m+'.'+handler_name, 'run')
-            except Exception as e:
-                _logger.debug('Not able to load handler {0} / {1}'.format(m, handler_name))
+            except LoadError as e:
+                _logger.debug('Not able to load handler "{0}:{1}"'.format(m, handler_name))
                 continue
 
             try:
                 result = f(*args, **kwargs)
-                _logger.debug('Run handler {0} / {1}'.format(m, handler_name))
+                _logger.debug('Run handler "{0}:{1}"'.format(m, handler_name))
                 return result
             except HandlerNotAvailableError as e:
-                _logger.debug('Handler not available for {0} / {1}'.format(m, handler_name))
+                _logger.debug('Handler not available for "{0}:{1}"'.format(m, handler_name))
                 continue
 
         raise HandlerNotFoundError('Could not find handler for "{0}"'.format(handler_name))
