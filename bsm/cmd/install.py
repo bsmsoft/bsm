@@ -12,7 +12,7 @@ class Install(Base):
             self._bsm.install_release()
 
         if not no_software:
-            pass
+            self._bsm.install_software()
 
         return self._bsm.config('scenario')['version']
 

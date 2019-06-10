@@ -4,7 +4,6 @@ import datetime
 import traceback
 
 from bsm.env import Env
-from bsm.package_manager import PackageManager
 
 from bsm.loader import run_handler
 from bsm.util import safe_mkdir
