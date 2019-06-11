@@ -21,7 +21,7 @@ from bsm.config.release import Release as ConfigRelease
 from bsm.config.category import Category as ConfigCategory
 from bsm.config.release_install import ReleaseInstall as ConfigReleaseInstall
 from bsm.config.package_install import PackageInstall as ConfigPackageInstall
-from bsm.config.packages import Packages as ConfigPackages
+from bsm.config.package_install_path import PackageInstallPath as ConfigPackageInstallPath
 
 from bsm.handler import Handler
 from bsm.handler import HandlerNotFoundError
@@ -178,12 +178,12 @@ class Config(collections.MutableMapping):
 
     def __load_package_install(self):
         self.__config['package_install'] = ConfigPackageInstall()
-        self['package_install'].load(self['app'], self['output'], self['scenario'], self['release_path'],
+        self['package_install'].load(self['entry'], self['app'], self['output'], self['scenario'], self['release_path'],
             self['attribute'], self['release'], self['release_install'], self['category'])
 
-    def __load_packages(self):
-        self.__config['packages'] = ConfigPackages()
-        self['packages'].load(self['app'], self['env'], self['release'], self['category'])
+    def __load_package_install_path(self):
+        self.__config['package_install_path'] = ConfigPackageInstallPath()
+        self['package_install_path'].load(self['release'], self['category'], self['package_install'])
 
 
     def config(self, config_type):

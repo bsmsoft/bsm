@@ -1,4 +1,5 @@
 import sys
+import datetime
 
 from bsm.paradag import Dag
 from bsm.paradag import dag_run
@@ -9,6 +10,7 @@ from bsm.operation.util.install.selector import Selector as InstallSelector
 from bsm.operation.util.install.executor import Executor as InstallExecutor
 
 from bsm.util import ensure_list
+from bsm.util import safe_mkdir
 
 from bsm.operation import Base
 
@@ -71,6 +73,17 @@ class InstallSoftware(Base):
         processor = MultiThreadProcessor()
         executor = InstallExecutor(self._config)
 
+        start_time = datetime.datetime.utcnow()
+
         sys.path.insert(0, self._config['release_path']['handler_python_dir'])
         dag_run(self.__dag, selector=selector, processor=processor, executor=executor)
         sys.path.remove(self._config['release_path']['handler_python_dir'])
+
+        end_time = datetime.datetime.utcnow()
+
+        safe_mkdir(self._config['release_path']['status_dir'])
+        self._config['release_status']['install'] = {}
+        self._config['release_status']['install']['start'] = start_time
+        self._config['release_status']['install']['end'] = end_time
+        self._config['release_status']['install']['finished'] = True
+        self._config['release_status'].save_to_file(self._config['release_path']['status_file'])

@@ -9,6 +9,11 @@ from bsm.handler import HandlerNotFoundError
 
 from bsm.util import is_str
 from bsm.util import ensure_list
+from bsm.util import safe_mkdir
+
+from bsm.util.config import load_config
+from bsm.util.config import dump_config
+from bsm.util.config import ConfigError
 
 from bsm.logger import get_logger
 _logger = get_logger()
@@ -17,13 +22,62 @@ _logger = get_logger()
 class ConfigPackageInstallError(Exception):
     pass
 
+class ConfigPackageInstallParamError(Exception):
+    pass
+
+
+def _config_from_file(config_file):
+    try:
+        loaded_data = load_config(config_file)
+        if isinstance(loaded_data, dict):
+            return loaded_data
+        else:
+            _logger.warn('Config file is not a dict: {0}'.format(config_file))
+            _logger.warn('Use empty dict instead')
+    except ConfigError as e:
+        return dict()
+
+def _package_param(identifier, pkg_cfg):
+    frag = identifier.split(os.sep)
+
+    # Use the last part as default package name
+    if 'name' in pkg_cfg:
+        pkg_name = pkg_cfg['name']
+    elif frag[-1]:
+        pkg_name = frag[-1]
+    else:
+        _logger.error('Package name not found for {0}'.format(identifier))
+        raise ConfigPackageInstallParamError
+
+    frag = frag[:-1]
+
+    # Use the first part as default category name
+    if 'category' in pkg_cfg:
+        category_name = pkg_cfg['category']
+    elif len(frag) > 0:
+        category_name = frag[0]
+    else:
+        _logger.warn('Category not specified for {0}'.format(identifier))
+        raise ConfigPackageInstallParamError
+
+    frag = frag[1:]
+
+    # Use the middle part as default subdir
+    if 'subdir' in pkg_cfg:
+        subdir = pkg_cfg['subdir']
+    elif frag:
+        subdir = os.path.join(*frag)
+    else:
+        subdir = ''
+
+    return (category_name, pkg_name, subdir)
 
 def _step_param(config_action):
     if not config_action:
-        return None, None
+        return None, {}
 
     if is_str(config_action):
-        return config_action, None
+        return config_action, {}
 
     if isinstance(config_action, dict):
         if len(config_action) > 1:
@@ -32,50 +86,30 @@ def _step_param(config_action):
         handler = next(iter(config_action))
         return handler, config_action[handler]
 
-    return None, None
+    return None, {}
 
 
 class PackageInstall(Common):
-    def load(self, config_app, config_output, config_scenario, config_release_path, config_attribute, config_release, config_release_install, config_category):
+    def load(self, config_entry, config_app, config_output, config_scenario, config_release_path, config_attribute, config_release, config_release_install, config_category):
         if not ('version' in config_scenario and config_scenario['version']):
             _logger.debug('"version" not specified in config install')
             return
+
+        reinstall = config_entry.get('reinstall', False)
 
         category_install = [ctg for ctg, ctg_cfg in config_category.items() if ctg_cfg['install']]
 
         sys.path.insert(0, config_release_path['handler_python_dir'])
 
         for identifier, pkg_cfg in config_release.get('package', {}).items():
-            frag = identifier.split(os.sep)
-
-            # Use the first part as default category name
-            if 'category' in pkg_cfg:
-                category_name = pkg_cfg['category']
-            elif len(frag) > 1:
-                category_name = frag[0]
-            else:
-                _logger.warn('Category not specified for {0}'.format(identifier))
+            try:
+                category_name, pkg_name, subdir = _package_param(identifier, pkg_cfg)
+            except ConfigPackageInstallParamError:
                 continue
 
             if category_name not in category_install:
+                _logger.warn('Category "{0}" could not be installed for package "{1}"'.format(category_name, pkg_name))
                 continue
-
-            # Use the last part as default package name
-            if 'name' in pkg_cfg:
-                pkg_name = pkg_cfg['name']
-            elif frag[-1]:
-                pkg_name = frag[-1]
-            else:
-                _logger.error('Package name not found for {0}'.format(identifier))
-                continue
-
-            # Use the middle part as default subdir
-            if 'subdir' in pkg_cfg:
-                subdir = pkg_cfg['subdir']
-            elif frag[1:-1]:
-                subdir = os.path.join(*frag[1:-1])
-            else:
-                subdir = ''
 
             version = ensure_list(pkg_cfg.get('version', []))
 
@@ -99,7 +133,7 @@ class PackageInstall(Common):
                 final_config['config_origin'] = copy.deepcopy(pkg_cfg)
                 final_config['config_origin']['version'] = ver
 
-                final_config['config'] = self.__transform_package(category_name, pkg_name, subdir, ver, pkg_cfg,
+                final_config['config'] = self.__transform_package(category_name, subdir, pkg_name, ver, pkg_cfg,
                         config_app, config_output, config_scenario, config_release_path, config_attribute, config_release, config_release_install, config_category)
                 final_config['config']['name'] = pkg_name
                 final_config['config']['category'] = category_name
@@ -107,22 +141,40 @@ class PackageInstall(Common):
                 if 'version' not in final_config['config']:
                     final_config['config']['version'] = ver
 
-                final_config['common_path'] = self.__common_path(config_category, final_config['config'])
-                self.__expand_package_path(final_config['common_path']['main_dir'], final_config['config'])
+                final_config['package_path'] = self.__package_path(config_category, final_config['config'])
+                self.__expand_package_path(final_config['package_path']['main_dir'], final_config['config'])
                 self.__expand_env(final_config['config'])
 
-                final_config['step'] = self.__install_step(config_release_install, final_config['config'])
+                final_config['install_status'] = self.__install_status(final_config['package_path']['status_install_file'])
+
+                final_config['step'] = self.__install_step(config_release_install, final_config['config'], final_config['install_status'], reinstall)
 
         sys.path.remove(config_release_path['handler_python_dir'])
 
-    def __transform_package(self, category, name, subdir, version, pkg_cfg,
+    def package_install_config(self, category, subdir, name, version):
+        if category not in self or subdir not in self[category] or name not in self[category][subdir] or version not in self[category][subdir][name]:
+            _logger.error('Package not found for installation: {0}.{1}.{2}.{3}'.format(category, name, subdir, version))
+            raise ConfigPackageInstallError
+        return self[category][subdir][name][version]
+
+    def save_install_status(self, category, subdir, name, version):
+        pkg_install_cfg = self.package_install_config(category, subdir, name, version)
+        safe_mkdir(pkg_install_cfg['package_path']['status_dir'])
+        dump_config(pkg_install_cfg['install_status'], pkg_install_cfg['package_path']['status_install_file'])
+
+    def save_package_config(self, category, subdir, name, version):
+        pkg_install_cfg = self.package_install_config(category, subdir, name, version)
+        safe_mkdir(pkg_install_cfg['package_path']['config_dir'])
+        dump_config(pkg_install_cfg['config_origin'], pkg_install_cfg['package_path']['config_file'])
+
+    def __transform_package(self, category, subdir, name, version, pkg_cfg,
             config_app, config_output, config_scenario, config_release_path, config_attribute, config_release, config_release_install, config_category):
         param = {}
         param['operation'] = 'install'
 
-        param['name'] = name
         param['category'] = category
         param['subdir'] = subdir
+        param['name'] = name
         param['version'] = version
 
         param['config_package'] = copy.deepcopy(pkg_cfg)
@@ -144,7 +196,7 @@ class PackageInstall(Common):
 
         return copy.deepcopy(pkg_cfg)
 
-    def __common_path(self, config_category, pkg_cfg):
+    def __package_path(self, config_category, pkg_cfg):
         result = {}
         ctg_cfg = config_category[pkg_cfg['category']]
         if ctg_cfg['version_dir']:
@@ -158,6 +210,7 @@ class PackageInstall(Common):
         result['config_file'] = os.path.join(result['config_dir'], 'package.yml')
         result['temp_dir'] = os.path.join(result['work_dir'], 'temp')
         result['status_dir'] = os.path.join(result['work_dir'], 'status')
+        result['status_install_file'] = os.path.join(result['status_dir'], 'install.yml')
         result['log_dir'] = os.path.join(result['work_dir'], 'log')
         return result
 
@@ -196,10 +249,16 @@ class PackageInstall(Common):
         for k, v in env_alias.items():
             env_alias[k] = v.format(**format_dict)
 
-    def __install_step(self, config_release_install, pkg_cfg):
+    def __install_status(self, status_install_file):
+        return _config_from_file(status_install_file)
+
+    def __install_step(self, config_release_install, pkg_cfg, install_status, reinstall):
         result = {}
 
         for step in config_release_install['steps']:
+            finished = install_status.get('steps', {}).get(step, {}).get('finished', False)
+            install = reinstall or not finished
+
             config_action = ensure_list(pkg_cfg.get('install', {}).get(step, []))
 
             sub_index = 0
@@ -207,12 +266,12 @@ class PackageInstall(Common):
                 handler, param = _step_param(cfg_action)
                 if handler:
                     result.setdefault(step, [])
-                    result[step].append({'handler': handler, 'param': param})
+                    result[step].append({'handler': handler, 'param': param, 'install': install})
                     sub_index += 1
 
             if sub_index == 0:
                 result.setdefault(step, [])
-                result[step].append({'handler': '', 'param': {}})
+                result[step].append({'handler': '', 'param': {}, 'install': False})
                 sub_index += 1
 
         return result

@@ -22,6 +22,7 @@ class Executor(object):
     def __init__(self, config):
         self.__config = config
         self.__init_env()
+        self.__current_running = set()
 
     # Create independent env for installation
     def __init_env(self):
@@ -44,14 +45,15 @@ class Executor(object):
         par['step'] = step
         par['sub_step'] = sub_step
 
-        pkg_install_cfg = self.__config['package_install'][ctg][subdir][pkg][version]
+        pkg_install_cfg = self.__config['package_install'].package_install_config(ctg, subdir, pkg, version)
 
         step_info = pkg_install_cfg['step'][step][sub_step]
         par['action'] = step_info.get('handler')
         par['action_param'] = step_info.get('param')
+        par['action_install'] = step_info.get('install', False)
 
-        pkg_path = pkg_install_cfg['common_path']
-        par['common_path'] = copy.deepcopy(pkg_path)
+        pkg_path = pkg_install_cfg['package_path']
+        par['package_path'] = copy.deepcopy(pkg_path)
         par['log_file'] = os.path.join(pkg_path['log_dir'], '{0}_{1}_{2}.log'.format(pkg, step, sub_step))
         par['env'] = copy.deepcopy(self.__env.env_final())
 
@@ -63,6 +65,7 @@ class Executor(object):
         par['config_attribute'] = self.__config['attribute'].data_copy()
         par['config_release'] = self.__config['release'].data_copy()
         par['config_category'] = self.__config['category'].data_copy()
+        par['config_package_install_path'] = self.__config['package_install_path'].data_copy()
 
         return par
 
@@ -75,9 +78,13 @@ class Executor(object):
         sub_step = param['sub_step']
 
         if sub_step == 0:
-            action_full_name = '{0} - {1}'.format(pkg, step)
+            step_full_name = '{0} - {1}'.format(pkg, step)
         else:
-            action_full_name = '{0} - {1} - {2}'.format(pkg, step, sub_step)
+            step_full_name = '{0} - {1} - {2}'.format(pkg, step, sub_step)
+
+        if not param['action_install']:
+            _logger.debug('Skip step: {0}'.format(step_full_name))
+            return {'success': True, 'skip': True}
 
         result = {}
 
@@ -89,10 +96,10 @@ class Executor(object):
             with Handler() as h:
                 result_action = h.run('install', param)
         except HandlerNotFoundError as e:
-            _logger.error('Install handler not found for "{0}"'.format(action_full_name))
+            _logger.error('Install handler not found for "{0}"'.format(step_full_name))
             raise
         except Exception as e:
-            _logger.error('"{0}" install handler error: {1}'.format(action_full_name, e))
+            _logger.error('"{0}" install handler error: {1}'.format(step_full_name, e))
             if param['config_output']['verbose']:
                 _logger.error('\n{0}'.format(traceback.format_exc()))
             raise
@@ -106,9 +113,9 @@ class Executor(object):
 
         if not result['success']:
             if isinstance(result_action, dict) and 'message' in result_action:
-                _logger.error('"{0}" execution error: {1}'.format(action_full_name, result_action['message']))
-            _logger.error('"{0}" execution error. Find log in "{1}"'.format(action_full_name, param['log_file']))
-            raise InstallExecutorError('"{0}" execution error'.format(action_full_name))
+                _logger.error('"{0}" execution error: {1}'.format(step_full_name, result_action['message']))
+            _logger.error('"{0}" execution error. Find log in "{1}"'.format(step_full_name, param['log_file']))
+            raise InstallExecutorError('"{0}" execution error'.format(step_full_name))
 
         result['action'] = result_action
         result['end'] = datetime.datetime.utcnow()
@@ -119,34 +126,61 @@ class Executor(object):
         pass
 
     def report_finish(self, vertice_result):
+        steps = self.__config['release_install']['steps']
+        atomic_start = self.__config['release_install']['atomic_start']
+        atomic_end = self.__config['release_install']['atomic_end']
+
         for vertex, result in vertice_result:
             ctg, subdir, pkg, version, step, sub_step = vertex
 
-            if isinstance(result['action'], dict) and 'env_package' in result['action'] and result['action']['env_package']:
-                path_def = self.__config_release.config['setting'].get('path_def', {})
-                pkg_info = self.__pkg_mgr.package_info(pkg)
-                self.__env.set_package(path_def, pkg_info)
+            pkg_install_cfg = self.__config['package_install'].package_install_config(ctg, subdir, pkg, version)
 
-            if isinstance(result['action'], dict) and 'save_release_status' in result['action'] and result['action']['save_release_status']:
-                self.__pkg_mgr.save_release_status(pkg, result['end'])
+            if step == atomic_end and sub_step == (len(pkg_install_cfg['step'][step]) - 1):
+                _logger.debug('Load package env for {0}'.format(pkg))
+                self.__env.load_package(pkg_install_cfg['config'])
 
             if result['success']:
-                _logger.info(' > {0} {1} {2} finished'.format(pkg, step, sub_step))
-                if self.__step_info.is_last_sub_action(pkg, step, sub_step):
-                    self.__pkg_mgr.save_action_status(pkg, step, result['start'], result['end'])
+                if not result.get('skip'):
+                    _logger.info(' > {0} {1} {2} finished'.format(pkg, step, sub_step))
+                    if sub_step == (len(pkg_install_cfg['step'][step]) - 1):
+                        _logger.debug('Save install status for {0}'.format(pkg))
+                        pkg_install_cfg['install_status'].setdefault('steps', {})
+                        pkg_install_cfg['install_status']['steps'][step] = {}
+                        pkg_install_cfg['install_status']['steps'][step]['finished'] = True
+                        pkg_install_cfg['install_status']['steps'][step]['start'] = result['start']
+                        pkg_install_cfg['install_status']['steps'][step]['end'] = result['end']
+                        self.__config['package_install'].save_install_status(ctg, subdir, pkg, version)
+                if step == steps[-1] and sub_step == (len(pkg_install_cfg['step'][step]) - 1):
+                    _logger.debug('Save package config for {0}'.format(pkg))
+                    pkg_install_cfg['install_status']['finished'] = True
+                    self.__config['package_install'].save_install_status(ctg, subdir, pkg, version)
+                    self.__config['package_install'].save_package_config(ctg, subdir, pkg, version)
 
     def report_running(self, vertice):
         if not vertice:
             return
 
-        running_vertice = []
+        new_running = set()
         for v in vertice:
             ctg, subdir, pkg, version, step, sub_step = v
+            pkg_install_cfg = self.__config['package_install'].package_install_config(ctg, subdir, pkg, version)
+            if not pkg_install_cfg['step'][step][sub_step].get('install'):
+                continue
+            new_running.add(v)
+
+        if new_running == self.__current_running:
+            return
+
+        self.__current_running = new_running
+
+        running_vertice = []
+        for v in self.__current_running:
+            ctg, subdir, pkg, version, step, sub_step = v
             if sub_step == 0:
-                action_full_name = '{2}({4})'
+                step_full_name = '{2}({4})'
             else:
-                action_full_name = '{2}({4}.{5})'
-            running_vertice.append(action_full_name.format(*v))
+                step_full_name = '{2}({4}.{5})'
+            running_vertice.append(step_full_name.format(*v))
         _logger.info('Running: ' + ', '.join(running_vertice))
 
     def deliver(self, vertex, result):

@@ -7,11 +7,11 @@ _logger = get_logger()
 
 
 class Install(Base):
-    def execute(self, reinstall, update, no_software, force, yes):
+    def execute(self, update, without_software, force, yes):
         if update or not self.__release_exist():
             self._bsm.install_release()
 
-        if not no_software:
+        if not without_software:
             self._bsm.install_software()
 
         return self._bsm.config('scenario')['version']

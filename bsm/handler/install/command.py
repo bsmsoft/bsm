@@ -1,11 +1,11 @@
 from bsm.util import call_and_log
 
 def run(param):
-    package_dir = param['pkg_info']['dir']['package']
+    package_dir = param['package_path']['main_dir']
     cwd = param['action_param'].get('cwd', package_dir)
 
     cmd = param['action_param']['cmd']
-    if not isinstance(cmd[0], list):
+    if not isinstance(cmd, list):
         cmd = [cmd]
 
     env = param.get('env')

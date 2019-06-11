@@ -4,6 +4,8 @@ import json
 
 from bsm.const import BSMCLI_CMD
 
+from bsm.util import ensure_list
+
 
 def _parse_path(path_str):
     return path_str.split(os.pathsep)
@@ -12,7 +14,7 @@ def _emit_path(path_list):
     return os.pathsep.join(path_list)
 
 def _parse_info(info_str):
-    return json.loads(info)
+    return json.loads(info_str)
 
 def _emit_info(info):
     return json.dumps(info, separators=(',',':'))
@@ -181,7 +183,7 @@ class Env(object):
     def load_package(self, config_package):
         name = config_package['name']
 
-        self.unload_package(config_package[name])
+        self.unload_package(name)
 
         info = {}
         info['category'] = config_package['category']
