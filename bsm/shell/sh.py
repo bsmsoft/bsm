@@ -13,13 +13,13 @@ class Sh(Base):
         return '\n'.join(newlines) + '\n'
 
     def set_env(self, env_name, env_value):
-        return 'export {0}="{1}"\n'.format(env_name, env_value)
+        return 'export {0}=\'{1}\'\n'.format(env_name, env_value)
 
     def unset_env(self, env_name):
         return 'unset {0}\n'.format(env_name)
 
     def alias(self, alias_name, alias_value):
-        return 'alias {0}="{1}"\n'.format(alias_name, alias_value)
+        return 'alias {0}=\'{1}\'\n'.format(alias_name, alias_value)
 
     def unalias(self, alias_name):
         return 'unalias {0}\n'.format(alias_name)

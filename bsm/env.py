@@ -14,7 +14,10 @@ def _emit_path(path_list):
     return os.pathsep.join(path_list)
 
 def _parse_info(info_str):
-    return json.loads(info_str)
+    try:
+        return json.loads(info_str)
+    except:
+        return {}
 
 def _emit_info(info):
     return json.dumps(info, separators=(',',':'))
@@ -72,7 +75,7 @@ class Env(object):
 
         original_path_list = _parse_path(self.__env[env_name])
 
-        final_path_list = [x for x in original_path_list if x not in [path_list]]
+        final_path_list = [x for x in original_path_list if x not in path_list]
 
         if not final_path_list:
             del self.__env[env_name]
@@ -166,7 +169,7 @@ class Env(object):
         self.__env[self.__env_name['release_version']] = config_scenario['version']
 
         info = {}
-        info['env'] = self.__load_env(config_release.get('env', {}))
+        info['env'] = self.__load_env(config_release.get('setting', {}).get('env', {}))
         self.__env[self.__env_name['release_info']] = _emit_info(info)
 
     def unload_release(self):
@@ -218,6 +221,20 @@ class Env(object):
         return self.__env.copy()
 
     def apply_changes(self):
+        set_env = {}
+        unset_env = []
+        for e, v in self.__env.items():
+            if e not in self.__old_env or self.__old_env[e] != v:
+                set_env[e] = v
+        for e, v in self.__old_env.items():
+            if e not in self.__env:
+                unset_env.append(e)
+
+        alias = self.__alias
+        unalias = self.__unalias
+
         self.__old_env = self.__env.copy()
         self.__alias = {}
-        return {'set_env': {}, 'unset_env': [], 'alias': {}, 'unalias': []}
+        self.__unalias = []
+
+        return {'set_env': set_env, 'unset_env': unset_env, 'alias': alias, 'unalias': unalias}

@@ -74,6 +74,18 @@ def upgrade(ctx):
 
 
 @cli.command()
+@click.option('--version', '-n', type=str, help='Release version')
+@click.argument('config-type', type=str, required=False)
+@click.argument('item-name', type=str, required=False)
+@click.pass_context
+def config(ctx, version, config_type, item_name):
+    '''Display configuration, mostly for debug purpose'''
+    cmd = Cmd()
+    ctx.obj['config_entry']['scenario'] = version
+    cmd.execute('config', ctx.obj, config_type, item_name)
+
+
+@cli.command()
 @click.option('--release-repo', '-t', type=str, help='Repository with release information')
 @click.option('--all', '-a', 'list_all', is_flag=True, help='List all versions')
 @click.option('--tag', '-g', is_flag=True, help='List tags')
@@ -93,18 +105,6 @@ def ls(ctx, software_root):
     cmd = Cmd()
     ctx.obj['software_root'] = software_root
     cmd.execute('ls', ctx.obj)
-
-
-@cli.command()
-@click.option('--version', '-n', type=str, help='Release version')
-@click.argument('config-type', type=str, required=False)
-@click.argument('item-name', type=str, required=False)
-@click.pass_context
-def config(ctx, version, config_type, item_name):
-    '''Display configuration, mostly for debug purpose'''
-    cmd = Cmd()
-    ctx.obj['config_entry']['scenario'] = version
-    cmd.execute('config', ctx.obj, config_type, item_name)
 
 
 @cli.command()
@@ -129,9 +129,9 @@ def ls_pkg(ctx):
 
 @cli.command()
 @click.option('--software-root', '-r', type=str, help='Local installed software root directory')
-@click.option('--release-repo', '-t', type=str, help='Repository for retrieving release information')
-@click.option('--release-source', '-i', type=str, help='Directory for retrieving release information. '
-        'This will take precedence over "release-repo". Use this option only for debugging')
+@click.option('--release-repo', type=str, help='Repository for retrieving release information')
+@click.option('--release-source', type=str, help='Directory for retrieving release information. '
+        'This will take precedence over "release-repo". Use this option only for development')
 @click.option('--option', '-o', type=str, multiple=True, help='Options for release')
 @click.option('--reinstall', is_flag=True, help='Reinstall all packages')
 @click.option('--update', is_flag=True, help='Update version information before installation')
@@ -156,23 +156,24 @@ def install(ctx, software_root, release_repo, release_source, option, reinstall,
 @click.option('--software-root', '-r', type=str, help='Local installed software root directory')
 @click.option('--default', '-d', is_flag=True, help='Also set the version as default')
 @click.option('--option', '-o', type=str, multiple=True, help='Options for the release')
+@click.option('--without-package', '-p', is_flag=True, help='Do not include packages environment')
 @click.argument('version', type=str)
 @click.pass_context
-def use(ctx, software_root, default, option, version):
+def use(ctx, software_root, default, option, without_package, version):
     '''Switch environment to given release version'''
     cmd = Cmd()
-    ctx.obj['software_root'] = software_root
+    ctx.obj['config_entry']['software_root'] = software_root
     ctx.obj['config_entry']['option'] = parse_lines(option)
     ctx.obj['config_entry']['scenario'] = version
-    cmd.execute('use', ctx.obj, default=default)
+    cmd.execute('use', ctx.obj, default, without_package)
 
 
 @cli.command()
 @click.pass_context
 def clean(ctx):
     '''Clean the current release version environment'''
-    cmd = Cmd('clean')
-    cmd.execute(ctx.obj)
+    cmd = Cmd()
+    cmd.execute('clean', ctx.obj)
 
 
 @cli.command()

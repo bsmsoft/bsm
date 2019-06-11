@@ -11,6 +11,8 @@ from bsm.handler import HandlerNotFoundError
 from bsm.util.config import load_config
 from bsm.util.config import ConfigError
 
+from bsm.util import ensure_list
+
 from bsm.logger import get_logger
 _logger = get_logger()
 
@@ -46,6 +48,8 @@ class Release(Common):
 
         self.__transform(config_app, config_output, config_scenario, config_release_path, config_release_origin, config_attribute)
 
+        self.__expand_env(config_scenario)
+
         self.__check_bsm_version()
 
         self.__check_version_consistency(config_scenario)
@@ -78,6 +82,30 @@ class Release(Common):
         except Exception as e:
             _logger.error('Transformer for release run error: {0}'.format(e))
             raise
+
+    def __expand_env(self, config_scenario):
+        release_env = self.get('setting', {}).get('env', {})
+        env_prepend_path = release_env.get('prepend_path', {})
+        for k, v in env_prepend_path.items():
+            result = []
+            for i in ensure_list(v):
+                result.append(i.format(**config_scenario))
+            env_prepend_path[k] = result
+
+        env_append_path = release_env.get('append_path', {})
+        for k, v in env_append_path.items():
+            result = []
+            for i in ensure_list(v):
+                result.append(i.format(**config_scenario))
+            env_append_path[k] = result
+
+        env_set_env = release_env.get('set_env', {})
+        for k, v in env_set_env.items():
+            env_set_env[k] = v.format(**config_scenario)
+
+        env_alias = release_env.get('alias', {})
+        for k, v in env_alias.items():
+            env_alias[k] = v.format(**config_scenario)
 
     def __check_bsm_version(self):
         version_require = self.get('setting', {}).get('bsm', {}).get('require', '')

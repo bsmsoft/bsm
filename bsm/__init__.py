@@ -24,6 +24,7 @@ class Bsm(object):
         add_stream_logger(self.__config['output']['verbose'], self.__config['output']['quiet'])
 
         self.__env = Env(initial_env=initial_env, env_prefix=self.__config['app']['env_prefix'])
+        self.__env.load_app(self.__config['app'])
 
         self.__operation = Operation(self.__config, self.__env)
 
@@ -106,8 +107,12 @@ class Bsm(object):
         return self.__operation.execute('ls')
 
     @__auto_reload
-    def use(self):
-        self.__operation.execute('use')
+    def use(self, without_package=False):
+        self.__operation.execute('use', without_package)
+
+    @__auto_reload
+    def clean(self):
+        self.__operation.execute('clean')
 
     @__auto_reload
     def ls_package(self):
