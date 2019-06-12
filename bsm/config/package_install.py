@@ -3,7 +3,7 @@ import sys
 import copy
 
 from bsm.config.common import Common
-from bsm.config.util.install import transform_package, package_path, expand_package_path, expand_env, install_status, install_step
+from bsm.config.util.install import transform_package, package_path, expand_package_path, expand_package_env, install_status, install_step
 
 from bsm.util import ensure_list
 from bsm.util import safe_mkdir
@@ -111,7 +111,7 @@ class PackageInstall(Common):
 
                 final_config['package_path'] = package_path(config_app, config_category, final_config['config'])
                 expand_package_path(final_config['package_path']['main_dir'], final_config['config'])
-                expand_env(final_config['config'])
+                expand_package_env(final_config['config'])
 
                 final_config['install_status'] = install_status(final_config['package_path']['status_install_file'])
 

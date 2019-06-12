@@ -42,6 +42,7 @@ def _step_param(config_action):
 
     return None, {}
 
+
 def transform_package(operation, category, subdir, name, version, pkg_cfg,
         config_app, config_output, config_scenario, config_release_path, config_attribute, config_release, config_release_install, config_category):
     param = {}
@@ -94,7 +95,7 @@ def expand_package_path(package_main_dir, pkg_cfg):
     for k, v in pkg_path.items():
         pkg_path[k] = os.path.join(package_main_dir, v)
 
-def expand_env(pkg_cfg):
+def expand_package_env(pkg_cfg):
     format_dict = {}
     format_dict['name'] = pkg_cfg['name']
     format_dict['category'] = pkg_cfg['category']

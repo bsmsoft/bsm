@@ -8,8 +8,6 @@ from bsm.util.option import parse_lines
 @click.group(context_settings=dict(help_option_names=['-h', '--help']))
 @click.option('--verbose', '-v', is_flag=True, help='Verbose mode, also print debug information')
 @click.option('--quiet', '-q', is_flag=True, help='Quiet mode, only print error information')
-#@click.option('--app', '-a', type=str, help='Application ID')
-#@click.option('--config-app', type=str, help='Application configuration file path')
 @click.option('--app-root', type=str, hidden=True, help='Application configuration directory')
 @click.option('--shell', type=str, hidden=True, help='Type of shell script')
 @click.option('--config-user', type=str, help='User configuration file path')
