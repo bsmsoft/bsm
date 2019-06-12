@@ -31,7 +31,7 @@ class Executor(object):
         self.__env.unload_release()
         self.__env.unload_app()
         self.__env.load_app(self.__config['app'])
-        self.__env.load_release(self.__config['scenario'], self.__config['option'], self.__config['release'])
+        self.__env.load_release(self.__config['entry'], self.__config['scenario'], self.__config['release'])
 
     def param(self, vertex):
         ctg, subdir, pkg, version, step, sub_step = vertex

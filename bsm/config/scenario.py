@@ -34,23 +34,23 @@ class Scenario(Common):
 
         self.update(_filter_scenario_config(config_user, _SCENARIO_GLOBAL_ITEMS))
 
+        scenario = None
         if 'scenario' in config_entry and config_entry['scenario']:
             scenario = config_entry['scenario']
+        elif 'scenario' in config_env and config_env['scenario']:
+            scenario = config_env['scenario']
+
+        if scenario:
             self['scenario'] = scenario
 
-            if 'scenario' in config_user and scenario in config_user['scenario']:
-                self.update(_filter_scenario_config(config_user['scenario'][scenario], ['option'], True))
+            self.update(_filter_scenario_config(config_user.get('scenario', {}).get(scenario, {}), ['option', 'category'], True))
 
             if 'version' not in self:
                 self['version'] = scenario
 
         self.update(_filter_scenario_config(config_env, _SCENARIO_GLOBAL_ITEMS))
-        if 'release_version' in config_env:
-            self['version'] = config_env['release_version']
 
         self.update(_filter_scenario_config(config_entry, _SCENARIO_ENTRY_ITEMS))
-        if 'release_version' in config_entry:
-            self['version'] = config_entry['release_version']
 
         self.__expand_path()
 

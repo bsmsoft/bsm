@@ -153,7 +153,7 @@ class Config(collections.MutableMapping):
         return cfg
 
     def __load_option(self):
-        return ConfigOption(self['entry'], self['user'], self['env'], self['option_list'])
+        return ConfigOption(self['entry'], self['env'], self['user'], self['option_list'])
 
     def __load_release_origin(self):
         return ConfigReleaseOrigin(self['app'], self['output'], self['scenario'], self['release_path'])
@@ -187,7 +187,7 @@ class Config(collections.MutableMapping):
         return ConfigRelease(self['app'], self['output'], self['scenario'], self['option'], self['release_path'], self['release_origin'], self['attribute'])
 
     def __load_category(self):
-        return ConfigCategory(self['app'], self['scenario'], self['attribute'], self['release'])
+        return ConfigCategory(self['entry'], self['app'], self['env'], self['user'], self['scenario'], self['attribute'], self['release'])
 
     def __load_release_install(self):
         return ConfigReleaseInstall(self['release'])

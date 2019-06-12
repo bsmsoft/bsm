@@ -46,7 +46,8 @@ class Env(object):
 
         self.__env_name['software_root']   = env_prefix + '_SOFTWARE_ROOT'
         self.__env_name['release_version'] = env_prefix + '_RELEASE_VERSION'
-        self.__env_name['release_option']  = env_prefix + '_RELEASE_OPTION'
+        self.__env_name['scenario']        = env_prefix + '_SCENARIO'
+        self.__env_name['option']          = env_prefix + '_OPTION'
         self.__env_name['release_info']    = env_prefix + '_RELEASE_INFO'
         self.__env_name['packages_info']   = env_prefix + '_PACKAGES_INFO'
 
@@ -163,12 +164,13 @@ class Env(object):
             self.__unload_env(info.get('env', {}))
             del self.__env[self.__env_name['app_info']]
 
-    def load_release(self, config_scenario, config_option, config_release):
+    def load_release(self, config_entry, config_scenario, config_release):
         self.unload_release()
 
-        self.__env[self.__env_name['software_root']] = config_scenario['software_root']
-        self.__env[self.__env_name['release_version']] = config_scenario['version']
-        self.__env[self.__env_name['release_option']] = _emit_info(config_option.data())
+        self.__env[self.__env_name['software_root']] = config_scenario.get('software_root')
+        self.__env[self.__env_name['release_version']] = config_scenario.get('version')
+        self.__env[self.__env_name['scenario']] = config_entry.get('scenario')
+        self.__env[self.__env_name['option']] = _emit_info(config_entry.get('option', {}))
 
         info = {}
         info['env'] = self.__load_env(config_release.get('setting', {}).get('env', {}))
@@ -176,20 +178,17 @@ class Env(object):
 
     def current_release(self):
         result = {}
-        for k in ['software_root', 'release_version']:
+        for k in ['software_root', 'release_version', 'scenario']:
             if self.__env_name[k] in self.__env:
                 result[k] = self.__env[self.__env_name[k]]
-        if self.__env_name['release_option'] in self.__env:
-            result['option'] = _parse_info(self.__env[self.__env_name['release_option']])
+        if self.__env_name['option'] in self.__env:
+            result['option'] = _parse_info(self.__env[self.__env_name['option']])
         return result
 
     def unload_release(self):
-        if self.__env_name['software_root'] in self.__env:
-            del self.__env[self.__env_name['software_root']]
-        if self.__env_name['release_version'] in self.__env:
-            del self.__env[self.__env_name['release_version']]
-        if self.__env_name['release_option'] in self.__env:
-            del self.__env[self.__env_name['release_option']]
+        for k in ['software_root', 'release_version', 'scenario', 'option']:
+            if self.__env_name[k] in self.__env:
+                del self.__env[self.__env_name[k]]
 
         if self.__env_name['release_info'] in self.__env:
             info = _parse_info(self.__env[self.__env_name['release_info']])

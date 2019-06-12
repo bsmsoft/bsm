@@ -4,11 +4,35 @@ from bsm.config.common import Common
 
 from bsm.util import expand_path
 
+from bsm.logger import get_logger
+_logger = get_logger()
+
+
 class Category(Common):
-    def __init__(self, config_app, config_scenario, config_attribute, config_release):
+    def __init__(self, config_entry, config_app, config_env, config_user, config_scenario, config_attribute, config_release):
         super(Category, self).__init__()
 
-        for ctg, ctg_cfg in config_release.get('setting', {}).get('category', {}).items():
+        self.__update_category(config_release.get('setting', {}), config_app, config_scenario, config_attribute)
+
+        self.__update_category(config_user, config_app, config_scenario, config_attribute)
+
+        scenario = None
+        if 'scenario' in config_entry and config_entry['scenario']:
+            scenario = config_entry['scenario']
+        elif 'scenario' in config_env and config_env['scenario']:
+            scenario = config_env['scenario']
+
+        if scenario:
+            self.__update_category(config_user.get('scenario', {}).get(scenario, {}), config_app, config_scenario, config_attribute)
+
+    def __update_category(self, config_container, config_app, config_scenario, config_attribute):
+        if 'category' not in config_container:
+            return
+
+        for ctg, ctg_cfg in config_container['category'].items():
+            if ctg in self:
+                _logger.warn('Conflict category: {0}'.format(ctg))
+                continue
             self.__load_category(ctg, ctg_cfg, config_app, config_scenario, config_attribute)
 
     def __load_category(self, ctg, ctg_cfg, config_app, config_scenario, config_attribute):
