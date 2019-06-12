@@ -42,12 +42,12 @@ class Category(Common):
         self[ctg]['install'] = ctg_cfg.get('install', False)
         self[ctg]['auto_env'] = ctg_cfg.get('auto_env', False)
         self[ctg]['version_dir'] = ctg_cfg.get('version_dir', False)
-        self[ctg]['share_env'] = ctg_cfg.get('share_env', False)
+        self[ctg]['shared'] = ctg_cfg.get('shared', False)
 
         if 'root' not in ctg_cfg:
             self[ctg]['install'] = False
             self[ctg]['auto_env'] = False
-            self[ctg]['share_env'] = False
+            self[ctg]['shared'] = False
             return
 
         format_dict = {}
@@ -56,7 +56,7 @@ class Category(Common):
         self[ctg]['root'] = expand_path(ctg_cfg['root'].format(**format_dict))
 
         self[ctg]['work_dir'] = os.path.join(self[ctg]['root'], config_app['category_work_dir'])
-        if self[ctg]['share_env']:
+        if self[ctg]['shared']:
             self[ctg]['config_package_dir'] = os.path.join(self[ctg]['work_dir'], 'shared')
         else:
             self[ctg]['config_package_dir'] = os.path.join(self[ctg]['work_dir'], 'release', config_scenario['version'])
