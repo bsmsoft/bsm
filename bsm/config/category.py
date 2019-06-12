@@ -2,14 +2,16 @@ import os
 
 from bsm.config.common import Common
 
+from bsm.util import expand_path
+
 class Category(Common):
-    def __init__(self, config_app, config_scenario, config_release):
+    def __init__(self, config_app, config_scenario, config_attribute, config_release):
         super(Category, self).__init__()
 
-        for ctg, ctg_cfg in config_release.get('setting', {}).get('categories', {}).items():
-            self.__load_category(ctg, ctg_cfg, config_app, config_scenario)
+        for ctg, ctg_cfg in config_release.get('setting', {}).get('category', {}).items():
+            self.__load_category(ctg, ctg_cfg, config_app, config_scenario, config_attribute)
 
-    def __load_category(self, ctg, ctg_cfg, config_app, config_scenario):
+    def __load_category(self, ctg, ctg_cfg, config_app, config_scenario, config_attribute):
         self[ctg] = {}
         self[ctg]['name'] = ctg
         self[ctg]['pre_check'] = ctg_cfg.get('pre_check', False)
@@ -24,7 +26,10 @@ class Category(Common):
             self[ctg]['share_env'] = False
             return
 
-        self[ctg]['root'] = ctg_cfg['root'].format(**config_scenario)
+        format_dict = {}
+        format_dict.update(config_attribute)
+        format_dict.update(config_scenario)
+        self[ctg]['root'] = expand_path(ctg_cfg['root'].format(**format_dict))
 
         self[ctg]['work_dir'] = os.path.join(self[ctg]['root'], config_app['category_work_dir'])
         if self[ctg]['share_env']:

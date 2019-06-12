@@ -187,7 +187,7 @@ class Config(collections.MutableMapping):
         return ConfigRelease(self['app'], self['output'], self['scenario'], self['option'], self['release_path'], self['release_origin'], self['attribute'])
 
     def __load_category(self):
-        return ConfigCategory(self['app'], self['scenario'], self['release'])
+        return ConfigCategory(self['app'], self['scenario'], self['attribute'], self['release'])
 
     def __load_release_install(self):
         return ConfigReleaseInstall(self['release'])
