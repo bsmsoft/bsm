@@ -16,14 +16,8 @@ class Category(Common):
 
         self.__update_category(config_user, config_app, config_scenario, config_attribute)
 
-        scenario = None
-        if 'scenario' in config_entry and config_entry['scenario']:
-            scenario = config_entry['scenario']
-        elif 'scenario' in config_env and config_env['scenario']:
-            scenario = config_env['scenario']
-
-        if scenario:
-            self.__update_category(config_user.get('scenario', {}).get(scenario, {}), config_app, config_scenario, config_attribute)
+        if config_scenario.get('scenario'):
+            self.__update_category(config_user.get('scenario', {}).get(config_scenario['scenario'], {}), config_app, config_scenario, config_attribute)
 
     def __update_category(self, config_container, config_app, config_scenario, config_attribute):
         if 'category' not in config_container:
