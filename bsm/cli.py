@@ -73,13 +73,15 @@ def upgrade(ctx):
 
 @cli.command()
 @click.option('--version', '-n', type=str, help='Release version')
+@click.option('--option', '-o', type=str, multiple=True, help='Options for release')
 @click.argument('config-type', type=str, required=False)
 @click.argument('item-name', type=str, required=False)
 @click.pass_context
-def config(ctx, version, config_type, item_name):
+def config(ctx, version, option, config_type, item_name):
     '''Display configuration, mostly for debug purpose'''
     cmd = Cmd()
     ctx.obj['config_entry']['scenario'] = version
+    ctx.obj['config_entry']['option'] = parse_lines(option)
     cmd.execute('config', ctx.obj, config_type, item_name)
 
 
@@ -133,12 +135,12 @@ def ls_pkg(ctx):
 @click.option('--option', '-o', type=str, multiple=True, help='Options for release')
 @click.option('--reinstall', is_flag=True, help='Reinstall all packages')
 @click.option('--update', is_flag=True, help='Update version information before installation')
-@click.option('--without-software', is_flag=True, help='Do not install softwares, only install the release')
+@click.option('--without-package', is_flag=True, help='Do not install packages, only install the release')
 @click.option('--force', '-f', is_flag=True, help='Skip checking system requirements')
 @click.option('--yes', '-y', is_flag=True, help='Install without confirmation')
 @click.argument('version', type=str)
 @click.pass_context
-def install(ctx, software_root, release_repo, release_source, option, reinstall, update, without_software, force, yes, version):
+def install(ctx, software_root, release_repo, release_source, option, reinstall, update, without_package, force, yes, version):
     '''Install specified release version'''
     cmd = Cmd()
     ctx.obj['config_entry']['software_root'] = software_root
@@ -147,7 +149,7 @@ def install(ctx, software_root, release_repo, release_source, option, reinstall,
     ctx.obj['config_entry']['option'] = parse_lines(option)
     ctx.obj['config_entry']['scenario'] = version
     ctx.obj['config_entry']['reinstall'] = reinstall
-    cmd.execute('install', ctx.obj, update, without_software, force, yes)
+    cmd.execute('install', ctx.obj, update, without_package, force, yes)
 
 
 @cli.command()

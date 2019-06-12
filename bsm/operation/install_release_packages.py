@@ -17,7 +17,7 @@ from bsm.logger import get_logger
 _logger = get_logger()
 
 
-class InstallSoftware(Base):
+class InstallReleasePackages(Base):
     def execute(self):
         self.__build_dag()
         self.__dag_run()

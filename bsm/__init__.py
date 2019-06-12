@@ -99,8 +99,8 @@ class Bsm(object):
         return self.__operation.execute('install-package', category, subdir, version)
 
     @__auto_reload
-    def install_software(self):
-        return self.__operation.execute('install-software')
+    def install_release_packages(self):
+        return self.__operation.execute('install-release-packages')
 
     @__auto_reload
     def ls(self):
