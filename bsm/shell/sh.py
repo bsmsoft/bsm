@@ -25,7 +25,7 @@ class Sh(Base):
         return 'unalias {0} 2>/dev/null\n'.format(alias_name)
 
     def source(self, script_path):
-        return '. {0}\n'.format(script_path)
+        return '. \'{0}\'\n'.format(script_path)
 
     def script_init(self):
         python_exe = sys.executable or 'python'

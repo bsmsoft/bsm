@@ -1,9 +1,7 @@
 import collections
 import copy
 
-from bsm.util.config import load_config
-from bsm.util.config import dump_config
-from bsm.util.config import ConfigError
+from bsm.util.config import load_config, dump_config, ConfigError
 
 from bsm.logger import get_logger
 _logger = get_logger()

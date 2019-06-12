@@ -13,6 +13,6 @@ class Exit(Base):
             shell.add_script('exit')
             output = shell.script
 
-#        self._bsm.clean()
+        self._bsm.exit()
 
         return CmdResult(output, 'exit')

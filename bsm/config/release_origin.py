@@ -2,8 +2,8 @@ import os
 
 from bsm.config.common import Common
 
-from bsm.util.config import load_config
-from bsm.util.config import ConfigError
+from bsm.util import walk_rel_dir
+from bsm.util.config import load_config, ConfigError
 
 from bsm.logger import get_logger
 _logger = get_logger()
@@ -13,21 +13,6 @@ _AVAILABLE_RELEASE_CONFIG = ('version', 'setting')
 
 class ConfigReleaseOriginError(Exception):
     pass
-
-
-def _walk_rel_dir(directory, rel_dir=''):
-    if not os.path.isdir(directory):
-        raise StopIteration
-    res = os.listdir(directory)
-    for r in res:
-        full_path = os.path.join(directory, r)
-        if os.path.isfile(full_path):
-            yield (full_path, rel_dir, r)
-            continue
-        if os.path.isdir(full_path):
-            new_rel_dir = os.path.join(rel_dir, r)
-            for next_full_path, next_rel_dir, next_f in _walk_rel_dir(full_path, new_rel_dir):
-                yield (next_full_path, next_rel_dir, next_f)
 
 
 class ReleaseOrigin(Common):
@@ -55,8 +40,11 @@ class ReleaseOrigin(Common):
 
     def __load_package_config(self, package_dir):
         self['package'] = {}
-        for full_path, rel_dir, f in _walk_rel_dir(package_dir):
+        for full_path, rel_dir, f in walk_rel_dir(package_dir):
             if not f.endswith('.yml') and not f.endswith('.yaml'):
                 continue
             pkg_name = os.path.splitext(f)[0]
-            self['package'][os.path.join(rel_dir, pkg_name)] = load_config(full_path)
+            try:
+                self['package'][os.path.join(rel_dir, pkg_name)] = load_config(full_path)
+            except ConfigError as e:
+                _logger.warn('Fail to load package config file "{0}": {1}'.format(full_path, e))

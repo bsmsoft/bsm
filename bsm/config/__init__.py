@@ -20,6 +20,7 @@ from bsm.config.release_origin import ReleaseOrigin as ConfigReleaseOrigin
 from bsm.config.release import Release as ConfigRelease
 from bsm.config.category import Category as ConfigCategory
 from bsm.config.release_install import ReleaseInstall as ConfigReleaseInstall
+from bsm.config.package_runtime import PackageRuntime as ConfigPackageRuntime
 from bsm.config.package_install import PackageInstall as ConfigPackageInstall
 from bsm.config.package_install_path import PackageInstallPath as ConfigPackageInstallPath
 
@@ -176,10 +177,15 @@ class Config(collections.MutableMapping):
         self.__config['release_install'] = ConfigReleaseInstall()
         self['release_install'].load(self['release'])
 
+    def __load_package_runtime(self):
+        self.__config['package_runtime'] = ConfigPackageRuntime()
+        self['package_runtime'].load(self['app'], self['output'], self['scenario'], self['release_path'],
+                self['attribute'], self['release'], self['category'])
+
     def __load_package_install(self):
         self.__config['package_install'] = ConfigPackageInstall()
         self['package_install'].load(self['entry'], self['app'], self['output'], self['scenario'], self['release_path'],
-            self['attribute'], self['release'], self['release_install'], self['category'])
+                self['attribute'], self['release'], self['release_install'], self['category'])
 
     def __load_package_install_path(self):
         self.__config['package_install_path'] = ConfigPackageInstallPath()

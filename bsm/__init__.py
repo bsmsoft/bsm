@@ -83,8 +83,8 @@ class Bsm(object):
         return self.__operation.execute('ls_remote', list_all)
 
     @__auto_reload
-    def check_build(self):
-        return self.__operation.execute('check', 'build')
+    def check_install(self):
+        return self.__operation.execute('check', 'install')
 
     @__auto_reload
     def check_runtime(self):
@@ -108,11 +108,17 @@ class Bsm(object):
 
     @__auto_reload
     def use(self, without_package=False):
-        self.__operation.execute('use', without_package)
+        self.__operation.execute('load-release')
+        if not without_package:
+            self.__operation.execute('load-release-packages')
 
     @__auto_reload
     def clean(self):
         self.__operation.execute('clean')
+
+    @__auto_reload
+    def exit(self):
+        self.__operation.execute('exit')
 
     @__auto_reload
     def ls_package(self):

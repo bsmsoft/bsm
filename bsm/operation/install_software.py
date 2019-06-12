@@ -1,4 +1,3 @@
-import sys
 import datetime
 
 from bsm.paradag import Dag
@@ -75,9 +74,8 @@ class InstallSoftware(Base):
 
         start_time = datetime.datetime.utcnow()
 
-        sys.path.insert(0, self._config['release_path']['handler_python_dir'])
-        dag_run(self.__dag, selector=selector, processor=processor, executor=executor)
-        sys.path.remove(self._config['release_path']['handler_python_dir'])
+        with Handler(self._config['release_path']['handler_python_dir']):
+            dag_run(self.__dag, selector=selector, processor=processor, executor=executor)
 
         end_time = datetime.datetime.utcnow()
 

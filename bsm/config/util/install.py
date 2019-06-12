@@ -1,15 +1,12 @@
 import os
 import copy
 
-from bsm.handler import Handler
 from bsm.handler import HandlerNotFoundError
 
 from bsm.util import ensure_list
 from bsm.util import is_str
 
-from bsm.util.config import load_config
-from bsm.util.config import dump_config
-from bsm.util.config import ConfigError
+from bsm.util.config import load_config, ConfigError
 
 from bsm.logger import get_logger
 _logger = get_logger()
@@ -43,8 +40,8 @@ def _step_param(config_action):
     return None, {}
 
 
-def transform_package(operation, category, subdir, name, version, pkg_cfg,
-        config_app, config_output, config_scenario, config_release_path, config_attribute, config_release, config_release_install, config_category):
+def transform_package(handler, operation, category, subdir, name, version, pkg_cfg,
+        config_app, config_output, config_scenario, config_release_path, config_attribute, config_release, config_category):
     param = {}
     param['operation'] = operation
 
@@ -63,10 +60,9 @@ def transform_package(operation, category, subdir, name, version, pkg_cfg,
     param['config_category'] = config_category.data_copy()
 
     try:
-        with Handler() as h:
-            result = h.run('transform_package', param)
-            if isinstance(result, dict):
-                return result
+        result = handler.run('transform_package', param)
+        if isinstance(result, dict):
+            return result
     except HandlerNotFoundError as e:
         _logger.debug('Transformer for package not found: {0}'.format(e))
 

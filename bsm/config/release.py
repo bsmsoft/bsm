@@ -1,5 +1,3 @@
-import os
-
 from packaging.specifiers import SpecifierSet
 from packaging.specifiers import InvalidSpecifier
 
@@ -8,18 +6,12 @@ from bsm.config.common import Common
 from bsm.handler import Handler
 from bsm.handler import HandlerNotFoundError
 
-from bsm.util.config import load_config
-from bsm.util.config import ConfigError
-
 from bsm.util import ensure_list
-from bsm.util import walk_rel_dir
 
 from bsm.logger import get_logger
 _logger = get_logger()
 
 from bsm import BSM_VERSION
-
-_AVAILABLE_RELEASE_CONFIG = ('version', 'setting')
 
 
 class ConfigReleaseError(Exception):
@@ -33,20 +25,9 @@ class Release(Common):
             return
 
         self.__transform(config_app, config_output, config_scenario, config_release_path, config_release_origin, config_attribute)
-
         self.__expand_env(config_scenario)
-
         self.__check_bsm_version()
-
         self.__check_version_consistency(config_scenario)
-
-    def __load_package_config(self, package_dir):
-        self['package'] = {}
-        for full_path, rel_dir, f in walk_rel_dir(package_dir):
-            if not f.endswith('.yml') and not f.endswith('.yaml'):
-                continue
-            pkg_name = os.path.splitext(f)[0]
-            self['package'][os.path.join(rel_dir, pkg_name)] = load_config(full_path)
 
     def __transform(self, config_app, config_output, config_scenario, config_release_path, config_release_origin, config_attribute):
         param = {}
