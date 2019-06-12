@@ -27,7 +27,9 @@ def _filter_scenario_config(config, items, veto=False):
 
 
 class Scenario(Common):
-    def load(self, config_entry, config_app, config_env, config_user):
+    def __init__(self, config_entry, config_app, config_env, config_user):
+        super(Scenario, self).__init__()
+
         self.update(_filter_scenario_config(config_app, _SCENARIO_GLOBAL_ITEMS))
 
         self.update(_filter_scenario_config(config_user, _SCENARIO_GLOBAL_ITEMS))
@@ -42,7 +44,13 @@ class Scenario(Common):
             if 'version' not in self:
                 self['version'] = scenario
 
+        self.update(_filter_scenario_config(config_env, _SCENARIO_GLOBAL_ITEMS))
+        if 'release_version' in config_env:
+            self['version'] = config_env['release_version']
+
         self.update(_filter_scenario_config(config_entry, _SCENARIO_ENTRY_ITEMS))
+        if 'release_version' in config_entry:
+            self['version'] = config_entry['release_version']
 
         self.__expand_path()
 

@@ -5,7 +5,9 @@ from bsm.config.common import Common
 from bsm.util import expand_path
 
 class App(Common):
-    def load(self, app_root):
+    def __init__(self, app_root):
+        super(App, self).__init__()
+
         if app_root:
             self.__load_app_root(expand_path(app_root))
         self.__load_bsm_default()

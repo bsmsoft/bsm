@@ -1,7 +1,9 @@
 from bsm.config.common import Common
 
 class PackageInstallPath(Common):
-    def load(self, config_release, config_category, config_package_install):
+    def __init__(self, config_release, config_category, config_package_install):
+        super(PackageInstallPath, self).__init__()
+
         category_priority = config_release.get('setting', {}).get('category_priority', [])
         category_install = [ctg for ctg in category_priority if config_category.get(ctg, {}).get('install')]
         category_install += [ctg for ctg, cfg in config_category.items() if ctg not in category_install and cfg.get('install')]

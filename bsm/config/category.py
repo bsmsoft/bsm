@@ -3,7 +3,9 @@ import os
 from bsm.config.common import Common
 
 class Category(Common):
-    def load(self, config_app, config_scenario, config_release):
+    def __init__(self, config_app, config_scenario, config_release):
+        super(Category, self).__init__()
+
         for ctg, ctg_cfg in config_release.get('setting', {}).get('categories', {}).items():
             self.__load_category(ctg, ctg_cfg, config_app, config_scenario)
 

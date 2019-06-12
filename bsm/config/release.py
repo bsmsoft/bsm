@@ -19,7 +19,9 @@ class ConfigReleaseError(Exception):
 
 
 class Release(Common):
-    def load(self, config_app, config_output, config_scenario, config_option, config_release_path, config_release_origin, config_attribute):
+    def __init__(self, config_app, config_output, config_scenario, config_option, config_release_path, config_release_origin, config_attribute):
+        super(Release, self).__init__()
+
         if not ('version' in config_scenario and config_scenario['version']):
             _logger.debug('"version" not specified in config release')
             return

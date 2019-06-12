@@ -16,7 +16,9 @@ class ConfigReleaseOriginError(Exception):
 
 
 class ReleaseOrigin(Common):
-    def load(self, config_app, config_output, config_scenario, config_release_path):
+    def __init__(self, config_app, config_output, config_scenario, config_release_path):
+        super(ReleaseOrigin, self).__init__()
+
         if not ('version' in config_scenario and config_scenario['version']):
             _logger.debug('"version" not specified in config release origin')
             return

@@ -11,7 +11,9 @@ class ConfigReleaseInstallError(Exception):
 
 
 class ReleaseInstall(Common):
-    def load(self, config_release):
+    def __init__(self, config_release):
+        super(ReleaseInstall, self).__init__()
+
         install_cfg = config_release.get('setting', {}).get('install', {})
 
         self['steps'] = list(ensure_list(install_cfg.get('steps', [])))

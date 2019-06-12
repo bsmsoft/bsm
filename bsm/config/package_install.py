@@ -60,7 +60,9 @@ def _package_param(identifier, pkg_cfg):
 
 
 class PackageInstall(Common):
-    def load(self, config_entry, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category):
+    def __init__(self, config_entry, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category):
+        super(PackageInstall, self).__init__()
+
         if not ('version' in config_scenario and config_scenario['version']):
             _logger.debug('"version" not specified in config install')
             return

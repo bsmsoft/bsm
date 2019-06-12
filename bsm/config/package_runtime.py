@@ -44,7 +44,9 @@ def _package_param(rel_dir, version_dir):
 
 
 class PackageRuntime(Common):
-    def load(self, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_category):
+    def __init__(self, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_category):
+        super(PackageRuntime, self).__init__()
+
         category_priority = config_release.get('setting', {}).get('category_priority', [])
         category_runtime = [ctg for ctg in category_priority if config_category.get(ctg, {}).get('root')]
         category_runtime += [ctg for ctg, cfg in config_category.items() if ctg not in category_runtime and cfg.get('root')]

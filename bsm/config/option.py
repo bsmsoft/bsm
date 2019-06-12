@@ -5,7 +5,9 @@ _logger = get_logger()
 
 
 class Option(Common):
-    def load(self, config_entry, config_user, config_option_list):
+    def __init__(self, config_entry, config_user, config_env, config_option_list):
+        super(Option, self).__init__()
+
         self.__update_option(config_user)
 
         if 'scenario' in config_entry and config_entry['scenario']:
@@ -13,6 +15,8 @@ class Option(Common):
 
             if 'scenario' in config_user and scenario in config_user['scenario']:
                 self.__update_option(config_user['scenario'][scenario])
+
+        self.__update_option(config_env)
 
         self.__update_option(config_entry)
 

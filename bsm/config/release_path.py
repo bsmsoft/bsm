@@ -9,7 +9,9 @@ _logger = get_logger()
 
 
 class ReleasePath(Common):
-    def load(self, config_scenario, release_work_dir):
+    def __init__(self, config_scenario, release_work_dir):
+        super(ReleasePath, self).__init__()
+
         if 'software_root' not in config_scenario:
             _logger.warn('"software_root" not specified')
             return
