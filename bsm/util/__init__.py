@@ -64,6 +64,20 @@ def expand_path(path):
     temp_path = os.path.abspath(temp_path)
     return os.path.normpath(temp_path)
 
+def walk_rel_dir(directory, rel_dir=''):
+    if not os.path.isdir(directory):
+        raise StopIteration
+    res = os.listdir(directory)
+    for r in res:
+        full_path = os.path.join(directory, r)
+        if os.path.isfile(full_path):
+            yield (full_path, rel_dir, r)
+            continue
+        if os.path.isdir(full_path):
+            new_rel_dir = os.path.join(rel_dir, r)
+            for next_full_path, next_rel_dir, next_f in _walk_rel_dir(full_path, new_rel_dir):
+                yield (next_full_path, next_rel_dir, next_f)
+
 
 def check_output(args):
     p = subprocess.Popen(args, stdout=subprocess.PIPE)

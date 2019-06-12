@@ -37,7 +37,7 @@ class App(Common):
         self.setdefault('config_info_file', '~/.'+app_id+'.info')
         self.setdefault('release_work_dir', '.bsm')
         self.setdefault('category_work_dir', '.bsm')
-        self.setdefault('package_config_name', '.'+app_id+'.yml')
+        self.setdefault('config_package_file', 'package.yml')
         self.setdefault('env', {})
 
         self.setdefault('release_repo', 'https://github.com/bsmsoft/bsmdemo')

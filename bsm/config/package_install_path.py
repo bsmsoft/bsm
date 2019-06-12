@@ -4,6 +4,7 @@ class PackageInstallPath(Common):
     def load(self, config_release, config_category, config_package_install):
         category_priority = config_release.get('setting', {}).get('category_priority', [])
         category_install = [ctg for ctg in category_priority if config_category.get(ctg, {}).get('install')]
+        category_install += [ctg for ctg, cfg in config_category.items() if ctg not in category_install and cfg.get('install')]
 
         for category in category_install:
             for subdir in config_package_install[category]:

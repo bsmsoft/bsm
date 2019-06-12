@@ -22,7 +22,7 @@ class Sh(Base):
         return 'alias {0}=\'{1}\'\n'.format(alias_name, alias_value)
 
     def unalias(self, alias_name):
-        return 'unalias {0}\n'.format(alias_name)
+        return 'unalias {0} 2>/dev/null\n'.format(alias_name)
 
     def source(self, script_path):
         return '. {0}\n'.format(script_path)
