@@ -19,21 +19,22 @@ class ConfigReleaseError(Exception):
 
 
 class Release(Common):
-    def load(self, config_app, config_output, config_scenario, config_release_path, config_release_origin, config_attribute):
+    def load(self, config_app, config_output, config_scenario, config_option, config_release_path, config_release_origin, config_attribute):
         if not ('version' in config_scenario and config_scenario['version']):
             _logger.debug('"version" not specified in config release')
             return
 
-        self.__transform(config_app, config_output, config_scenario, config_release_path, config_release_origin, config_attribute)
+        self.__transform(config_app, config_output, config_scenario, config_option, config_release_path, config_release_origin, config_attribute)
         self.__expand_env(config_scenario)
         self.__check_bsm_version()
         self.__check_version_consistency(config_scenario)
 
-    def __transform(self, config_app, config_output, config_scenario, config_release_path, config_release_origin, config_attribute):
+    def __transform(self, config_app, config_output, config_scenario, config_option, config_release_path, config_release_origin, config_attribute):
         param = {}
         param['config_app'] = config_app.data_copy()
         param['config_output'] = config_output.data_copy()
         param['config_scenario'] = config_scenario.data_copy()
+        param['config_option'] = config_option.data_copy()
         param['config_release_path'] = config_release_path.data_copy()
         param['config_release_origin'] = config_release_origin.data_copy()
         param['config_attribute'] = config_attribute.data_copy()

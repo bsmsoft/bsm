@@ -60,7 +60,7 @@ def _package_param(identifier, pkg_cfg):
 
 
 class PackageInstall(Common):
-    def load(self, config_entry, config_app, config_output, config_scenario, config_release_path, config_attribute, config_release, config_release_install, config_category):
+    def load(self, config_entry, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category):
         if not ('version' in config_scenario and config_scenario['version']):
             _logger.debug('"version" not specified in config install')
             return
@@ -103,7 +103,7 @@ class PackageInstall(Common):
                     final_config['config_origin']['version'] = ver
 
                     final_config['config'] = transform_package(h, 'install', category_name, subdir, pkg_name, ver, pkg_cfg,
-                            config_app, config_output, config_scenario, config_release_path, config_attribute, config_release, config_category)
+                            config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_category)
                     final_config['config']['name'] = pkg_name
                     final_config['config']['category'] = category_name
                     final_config['config']['subdir'] = subdir

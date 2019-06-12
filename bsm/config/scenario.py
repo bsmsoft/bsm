@@ -26,18 +26,11 @@ def _filter_scenario_config(config, items, veto=False):
     return scenario_config
 
 
-class ConfigScenarioError(Exception):
-    pass
-
-
 class Scenario(Common):
     def load(self, config_entry, config_app, config_env, config_user):
-        self['option'] = {}
-
         self.update(_filter_scenario_config(config_app, _SCENARIO_GLOBAL_ITEMS))
 
         self.update(_filter_scenario_config(config_user, _SCENARIO_GLOBAL_ITEMS))
-        self.__update_option(config_user)
 
         if 'scenario' in config_entry and config_entry['scenario']:
             scenario = config_entry['scenario']
@@ -45,24 +38,13 @@ class Scenario(Common):
 
             if 'scenario' in config_user and scenario in config_user['scenario']:
                 self.update(_filter_scenario_config(config_user['scenario'][scenario], ['option'], True))
-                self.__update_option(config_user['scenario'][scenario])
 
             if 'version' not in self:
                 self['version'] = scenario
 
         self.update(_filter_scenario_config(config_entry, _SCENARIO_ENTRY_ITEMS))
-        self.__update_option(config_entry)
 
         self.__expand_path()
-
-
-    def __update_option(self, config_container):
-        if 'option' not in config_container:
-            return
-
-        config_option = config_container['option']
-        if isinstance(config_option, dict):
-            self['option'].update(config_option)
 
     def __expand_path(self):
         for k in _SCENARIO_PATH_ITEMS:

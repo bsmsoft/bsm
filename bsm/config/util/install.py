@@ -41,7 +41,7 @@ def _step_param(config_action):
 
 
 def transform_package(handler, operation, category, subdir, name, version, pkg_cfg,
-        config_app, config_output, config_scenario, config_release_path, config_attribute, config_release, config_category):
+        config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_category):
     param = {}
     param['operation'] = operation
 
@@ -54,6 +54,7 @@ def transform_package(handler, operation, category, subdir, name, version, pkg_c
     param['config_app'] = config_app.data_copy()
     param['config_output'] = config_output.data_copy()
     param['config_scenario'] = config_scenario.data_copy()
+    param['config_option'] = config_option.data_copy()
     param['config_release_path'] = config_release_path.data_copy()
     param['config_attribute'] = config_attribute.data_copy()
     param['config_release'] = config_release.data_copy()

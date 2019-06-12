@@ -44,7 +44,7 @@ def _package_param(rel_dir, version_dir):
 
 
 class PackageRuntime(Common):
-    def load(self, config_app, config_output, config_scenario, config_release_path, config_attribute, config_release, config_category):
+    def load(self, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_category):
         category_priority = config_release.get('setting', {}).get('category_priority', [])
         category_runtime = [ctg for ctg in category_priority if config_category.get(ctg, {}).get('root')]
         category_runtime += [ctg for ctg, cfg in config_category.items() if ctg not in category_runtime and cfg.get('root')]
@@ -72,7 +72,7 @@ class PackageRuntime(Common):
                         continue
 
                     final_pkg_cfg = transform_package(h, 'runtime', category, subdir, package, version, pkg_cfg,
-                            config_app, config_output, config_scenario, config_release_path, config_attribute, config_release, config_category)
+                            config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_category)
 
                     if not version_dir:
                         if 'version' in final_pkg_cfg and final_pkg_cfg['version']:

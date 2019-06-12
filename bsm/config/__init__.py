@@ -15,6 +15,7 @@ from bsm.config.common import Common as ConfigCommon
 from bsm.config.app import App as ConfigApp
 from bsm.config.env import Env as ConfigEnv
 from bsm.config.scenario import Scenario as ConfigScenario
+from bsm.config.option import Option as ConfigOption
 from bsm.config.release_path import ReleasePath as ConfigReleasePath
 from bsm.config.release_origin import ReleaseOrigin as ConfigReleaseOrigin
 from bsm.config.release import Release as ConfigRelease
@@ -145,6 +146,10 @@ class Config(collections.MutableMapping):
         except HandlerNotFoundError:
             _logger.debug('Handler for option not found')
 
+    def __load_option(self):
+        self.__config['option'] = ConfigOption()
+        self['option'].load(self['entry'], self['user'], self['option_list'])
+
     def __load_release_origin(self):
         self.__config['release_origin'] = ConfigReleaseOrigin()
         self['release_origin'].load(self['app'], self['output'], self['scenario'], self['release_path'])
@@ -157,6 +162,7 @@ class Config(collections.MutableMapping):
         param['config_app'] = self['app'].data_copy()
         param['config_output'] = self['output'].data_copy()
         param['config_scenario'] = self['scenario'].data_copy()
+        param['config_option'] = self['option'].data_copy()
         param['config_release_path'] = self['release_path'].data_copy()
         param['config_release_origin'] = self['release_origin'].data_copy()
         try:
@@ -167,7 +173,7 @@ class Config(collections.MutableMapping):
 
     def __load_release(self):
         self.__config['release'] = ConfigRelease()
-        self['release'].load(self['app'], self['output'], self['scenario'], self['release_path'], self['release_origin'], self['attribute'])
+        self['release'].load(self['app'], self['output'], self['scenario'], self['option'], self['release_path'], self['release_origin'], self['attribute'])
 
     def __load_category(self):
         self.__config['category'] = ConfigCategory()
@@ -179,12 +185,12 @@ class Config(collections.MutableMapping):
 
     def __load_package_runtime(self):
         self.__config['package_runtime'] = ConfigPackageRuntime()
-        self['package_runtime'].load(self['app'], self['output'], self['scenario'], self['release_path'],
+        self['package_runtime'].load(self['app'], self['output'], self['scenario'], self['option'], self['release_path'],
                 self['attribute'], self['release'], self['category'])
 
     def __load_package_install(self):
         self.__config['package_install'] = ConfigPackageInstall()
-        self['package_install'].load(self['entry'], self['app'], self['output'], self['scenario'], self['release_path'],
+        self['package_install'].load(self['entry'], self['app'], self['output'], self['scenario'], self['option'], self['release_path'],
                 self['attribute'], self['release'], self['release_install'], self['category'])
 
     def __load_package_install_path(self):
