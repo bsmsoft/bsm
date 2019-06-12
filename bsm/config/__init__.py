@@ -84,7 +84,7 @@ class Config(collections.MutableMapping):
             with open(self['app']['example_config_user']) as f:
                 self['example']['content'] = f.read()
         except Exception as e:
-            _logger.warn('Open user config example failed: %s' % e)
+            _logger.warn('Open user config example failed: {0}'.format(e))
             self['example']['content'] = ''
 
     def __load_env(self):
@@ -144,7 +144,10 @@ class Config(collections.MutableMapping):
             with Handler(self['release_path']['handler_python_dir']) as h:
                 self['option_list'].update(h.run('option'))
         except HandlerNotFoundError:
-            _logger.debug('Handler for option not found')
+            _logger.debug('Handler for option list not found')
+        except Exception as e:
+            _logger.error('Handler for option list run error: {0}'.format(e))
+            raise
 
     def __load_option(self):
         self.__config['option'] = ConfigOption()
@@ -170,6 +173,9 @@ class Config(collections.MutableMapping):
                 self['attribute'].update(h.run('attribute', param))
         except HandlerNotFoundError:
             _logger.debug('Handler for attribute not found')
+        except Exception as e:
+            _logger.error('Handler for attribute run error: {0}'.format(e))
+            raise
 
     def __load_release(self):
         self.__config['release'] = ConfigRelease()

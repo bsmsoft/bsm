@@ -26,8 +26,7 @@ class Selector(object):
             with Handler(self.__config['release_path']['handler_python_dir']) as h:
                 return h.run('selector', param)
         except HandlerNotFoundError as e:
-            _logger.debug('Selector load failed: {0}'.format(e))
-            _logger.debug('Will randomly select one')
+            _logger.debug('Selector not found, will randomly select one')
             return [next(iter(idle))]
         except Exception as e:
             _logger.error('Selector run error: {0}'.format(e))

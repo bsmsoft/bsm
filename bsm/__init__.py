@@ -75,10 +75,6 @@ class Bsm(object):
 
 
     @__auto_reload
-    def option(self):
-        return self.__operation.execute('option')
-
-    @__auto_reload
     def ls_remote(self, list_all=False):
         return self.__operation.execute('ls_remote', list_all)
 

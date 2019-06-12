@@ -64,8 +64,11 @@ def transform_package(handler, operation, category, subdir, name, version, pkg_c
         result = handler.run('transform_package', param)
         if isinstance(result, dict):
             return result
-    except HandlerNotFoundError as e:
-        _logger.debug('Transformer for package not found: {0}'.format(e))
+    except HandlerNotFoundError:
+        _logger.debug('Transformer for package not found')
+    except Exception as e:
+        _logger.error('Transformer for package run error: {0}'.format(e))
+        raise
 
     return copy.deepcopy(pkg_cfg)
 
