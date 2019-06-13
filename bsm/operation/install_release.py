@@ -67,3 +67,7 @@ class InstallRelease(Base):
         handler_module_dir = conf['handler_module_dir']
 
         safe_cpdir(handler_dir, handler_module_dir)
+
+        handler_init = os.path.join(handler_module_dir, '__init__.py')
+        if not os.path.exists(handler_init):
+            open(handler_init, 'w').close()
