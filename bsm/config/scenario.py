@@ -6,6 +6,7 @@ from bsm.util import ensure_list
 
 _SCENARIO_GLOBAL_ITEMS = ('software_root', 'release_repo')
 _SCENARIO_ENTRY_ITEMS = ('software_root', 'release_repo', 'release_source')
+_SCENARIO_SCENARIO_ITEMS = ('software_root', 'release_repo', 'release_source', 'version')
 _SCENARIO_PATH_ITEMS = ('software_root', 'release_source')
 
 
@@ -43,7 +44,7 @@ class Scenario(Common):
         if scenario:
             self['scenario'] = scenario
 
-            self.update(_filter_scenario_config(config_user.get('scenario', {}).get(scenario, {}), ['option', 'category'], True))
+            self.update(_filter_scenario_config(config_user.get('scenario', {}).get(scenario, {}), _SCENARIO_SCENARIO_ITEMS))
 
             if 'version' not in self:
                 self['version'] = scenario

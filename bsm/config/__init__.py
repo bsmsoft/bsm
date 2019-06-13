@@ -201,7 +201,7 @@ class Config(collections.MutableMapping):
                 self['attribute'], self['release'], self['release_install'], self['category'])
 
     def __load_package_install_path(self):
-        return ConfigPackageInstallPath(self['release'], self['category'], self['package_install'])
+        return ConfigPackageInstallPath(self['category'], self['package_install'])
 
 
     def config(self, config_type):

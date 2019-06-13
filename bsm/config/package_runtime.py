@@ -47,16 +47,14 @@ class PackageRuntime(Common):
     def __init__(self, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_category):
         super(PackageRuntime, self).__init__()
 
-        category_priority = config_release.get('setting', {}).get('category_priority', [])
-        category_runtime = [ctg for ctg in category_priority if config_category.get(ctg, {}).get('root')]
-        category_runtime += [ctg for ctg, cfg in config_category.items() if ctg not in category_runtime and cfg.get('root')]
+        category_runtime = [ctg for ctg, cfg in config_category['content'].items() if cfg.get('root')]
 
         _logger.debug('Category for runtime: {0}'.format(category_runtime))
 
         with Handler(config_release_path['handler_python_dir']) as h:
             for category in category_runtime:
-                version_dir = config_category[category]['version_dir']
-                config_package_dir = config_category[category]['config_package_dir']
+                version_dir = config_category['content'][category]['version_dir']
+                config_package_dir = config_category['content'][category]['config_package_dir']
 
                 for full_path, rel_dir, f in walk_rel_dir(config_package_dir):
                     if f != config_app['config_package_file']:

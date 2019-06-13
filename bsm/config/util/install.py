@@ -74,7 +74,7 @@ def transform_package(handler, operation, category, subdir, name, version, pkg_c
 
 def package_path(config_app, config_category, pkg_cfg):
     result = {}
-    ctg_cfg = config_category[pkg_cfg['category']]
+    ctg_cfg = config_category['content'][pkg_cfg['category']]
     if ctg_cfg['version_dir']:
         result['main_dir'] = os.path.join(ctg_cfg['root'], pkg_cfg['subdir'], pkg_cfg['name'], pkg_cfg['version'])
         result['work_dir'] = os.path.join(ctg_cfg['install_dir'], pkg_cfg['subdir'], pkg_cfg['name'], 'versions', pkg_cfg['version'])

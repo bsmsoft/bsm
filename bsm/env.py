@@ -219,7 +219,9 @@ class Env(object):
             if package in packages_info:
                 self.__unload_env(packages_info[package].get('env', {}))
                 del packages_info[package]
-            if not packages_info:
+            if packages_info:
+                self.__env[self.__env_name['packages_info']] = _emit_info(packages_info)
+            else:
                 del self.__env[self.__env_name['packages_info']]
 
     def unload_packages(self):

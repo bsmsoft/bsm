@@ -69,7 +69,7 @@ class PackageInstall(Common):
 
         reinstall = config_entry.get('reinstall', False)
 
-        category_install = [ctg for ctg, ctg_cfg in config_category.items() if ctg_cfg['install']]
+        category_install = [ctg for ctg, ctg_cfg in config_category['content'].items() if ctg_cfg['install']]
 
         with Handler(config_release_path['handler_python_dir']) as h:
             for identifier, pkg_cfg in config_release.get('package', {}).items():
@@ -84,7 +84,7 @@ class PackageInstall(Common):
 
                 version = ensure_list(pkg_cfg.get('version', []))
 
-                version_dir = config_category[category_name]['version_dir']
+                version_dir = config_category['content'][category_name]['version_dir']
                 if (not version_dir) and len(version) > 1:
                     _logger.warn('Only one version could be installed when category version_dir is false')
                     version = version[:1]
