@@ -24,6 +24,7 @@ class Category(Common):
         if config_scenario.get('scenario'):
             self.__update_content(config_user.get('scenario', {}).get(config_scenario['scenario'], {}), config_app, config_scenario, config_attribute)
 
+        # Remove duplicated
         self['priority'] = list(OrderedDict.fromkeys(self['priority']))
 
     def __update_content(self, config_container, config_app, config_scenario, config_attribute):
@@ -70,6 +71,6 @@ class Category(Common):
 
     def __update_priority(self, config_container):
         priority = ensure_list(config_container.get('category_priority', []))
-        priority = [ctg for ctg in priority if ctg in config_container.get('category', {})]
+        priority = [ctg for ctg in priority if ctg in self['content']]
         priority += [ctg for ctg in config_container.get('category', {}) if ctg not in priority]
         self['priority'] = priority + self['priority']
