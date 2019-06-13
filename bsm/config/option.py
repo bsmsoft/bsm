@@ -5,8 +5,10 @@ _logger = get_logger()
 
 
 class Option(Common):
-    def __init__(self, config_entry, config_env, config_user, config_scenario, config_option_list):
+    def __init__(self, config_entry, config_env, config_user, config_scenario, config_release_status, config_option_list):
         super(Option, self).__init__()
+
+        self.__update_option(config_release_status)
 
         self.__update_option(config_user)
 

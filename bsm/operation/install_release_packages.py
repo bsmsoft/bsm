@@ -79,9 +79,14 @@ class InstallReleasePackages(Base):
 
         end_time = datetime.datetime.utcnow()
 
-        safe_mkdir(self._config['release_path']['status_dir'])
         self._config['release_status']['install'] = {}
         self._config['release_status']['install']['start'] = start_time
         self._config['release_status']['install']['end'] = end_time
         self._config['release_status']['install']['finished'] = True
+        self._config['release_status']['option'] = {}
+        for opt in self._config['release_install']['options_to_save']:
+            if opt in self._config['option']:
+                self._config['release_status']['option'][opt] = self._config['option'][opt]
+
+        safe_mkdir(self._config['release_path']['status_dir'])
         self._config['release_status'].save_to_file(self._config['release_path']['status_file'])
