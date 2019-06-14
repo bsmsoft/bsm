@@ -83,11 +83,11 @@ def package_path(config_app, config_category, pkg_cfg):
         result['main_dir'] = os.path.join(ctg_cfg['root'], pkg_cfg['subdir'], pkg_cfg['name'])
         result['work_dir'] = os.path.join(ctg_cfg['install_dir'], pkg_cfg['subdir'], pkg_cfg['name'], 'head')
         result['config_dir'] = os.path.join(ctg_cfg['config_package_dir'], pkg_cfg['subdir'], pkg_cfg['name'], 'head')
-    result['config_file'] = os.path.join(result['config_dir'], config_app['config_package_file'])
-    result['temp_dir'] = os.path.join(result['work_dir'], 'temp')
+    result['misc_dir'] = os.path.join(result['work_dir'], 'misc')
     result['status_dir'] = os.path.join(result['work_dir'], 'status')
     result['status_install_file'] = os.path.join(result['status_dir'], 'install.yml')
     result['log_dir'] = os.path.join(result['work_dir'], 'log')
+    result['config_file'] = os.path.join(result['config_dir'], config_app['config_package_file'])
     return result
 
 def expand_package_path(package_main_dir, pkg_cfg):
