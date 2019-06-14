@@ -75,14 +75,14 @@ def upgrade(ctx):
 @click.option('--version', '-n', type=str, help='Release version')
 @click.option('--option', '-o', type=str, multiple=True, help='Options for release')
 @click.argument('config-type', type=str, required=False)
-@click.argument('item-name', type=str, required=False)
+@click.argument('item-list', nargs=-1, type=str, required=False)
 @click.pass_context
-def config(ctx, version, option, config_type, item_name):
+def config(ctx, version, option, config_type, item_list):
     '''Display configuration, mostly for debug purpose'''
     cmd = Cmd()
     ctx.obj['config_entry']['scenario'] = version
     ctx.obj['config_entry']['option'] = parse_lines(option)
-    cmd.execute('config', ctx.obj, config_type, item_name)
+    cmd.execute('config', ctx.obj, config_type, item_list)
 
 
 @cli.command()

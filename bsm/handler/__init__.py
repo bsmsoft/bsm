@@ -20,6 +20,7 @@ class Handler(object):
     def __init__(self, extra_python_path=None):
         self.__extra_python_path = extra_python_path
         if extra_python_path is not None:
+            _logger.debug('Prepend python path: {0}'.format(extra_python_path))
             sys.path.insert(0, extra_python_path)
 
         self.__module_list = [HANDLER_MODULE_NAME, 'bsm.handler']
