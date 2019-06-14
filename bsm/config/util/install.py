@@ -93,7 +93,7 @@ def package_path(config_app, config_category, pkg_cfg):
 def expand_package_path(package_main_dir, pkg_cfg):
     pkg_path = pkg_cfg.get('path', {})
     for k, v in pkg_path.items():
-        pkg_path[k] = os.path.join(package_main_dir, v)
+        pkg_path[k] = os.path.join(package_main_dir, v).rstrip(os.sep)
 
 def expand_package_env(pkg_cfg):
     format_dict = {}

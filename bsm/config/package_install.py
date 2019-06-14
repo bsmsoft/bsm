@@ -79,7 +79,7 @@ class PackageInstall(Common):
                     continue
 
                 if category_name not in category_install:
-                    _logger.warn('Category "{0}" could not be installed for package "{1}"'.format(category_name, pkg_name))
+                    _logger.debug('Package "{0}" could not be installed with category "{1}"'.format(pkg_name, category_name))
                     continue
 
                 version = ensure_list(pkg_cfg.get('version', []))
