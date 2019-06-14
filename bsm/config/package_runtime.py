@@ -36,7 +36,7 @@ def _package_param(rel_dir, version_dir):
 
     frag = frag[:-1]
     if frag:
-        subdir = os.path.join(*frag[:-1])
+        subdir = os.path.join(*frag)
     else:
         subdir = ''
 

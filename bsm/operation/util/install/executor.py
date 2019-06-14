@@ -19,14 +19,14 @@ class InstallExecutorError(Exception):
 
 
 class Executor(object):
-    def __init__(self, config):
+    def __init__(self, config, initial_env):
         self.__config = config
-        self.__init_env()
+        self.__init_env(initial_env)
         self.__current_running = set()
 
     # Create independent env for installation
-    def __init_env(self):
-        self.__env = Env()
+    def __init_env(self, initial_env):
+        self.__env = Env(initial_env=initial_env, env_prefix=self.__config['app']['env_prefix'])
         self.__env.unload_packages()
         self.__env.unload_release()
         self.__env.unload_app()
@@ -98,7 +98,7 @@ class Executor(object):
             with Handler() as h:
                 result_action = h.run('install', param)
         except HandlerNotFoundError as e:
-            _logger.error('Install handler not found for "{0}"'.format(step_full_name))
+            _logger.error('Install handler "{0}" not found for "{1}"'.format(param['action'], step_full_name))
             raise
         except Exception as e:
             _logger.error('"{0}" install handler error: {1}'.format(step_full_name, e))
@@ -145,7 +145,7 @@ class Executor(object):
                 if not result.get('skip'):
                     _logger.info(' > {0} {1} {2} finished'.format(pkg, step, sub_step))
                     if sub_step == (len(pkg_install_cfg['step'][step]) - 1):
-                        _logger.debug('Save install status for {0}'.format(pkg))
+                        _logger.debug('Save install status for {0} - {1}'.format(pkg, step))
                         pkg_install_cfg['install_status'].setdefault('steps', {})
                         pkg_install_cfg['install_status']['steps'][step] = {}
                         pkg_install_cfg['install_status']['steps'][step]['finished'] = True
@@ -153,10 +153,11 @@ class Executor(object):
                         pkg_install_cfg['install_status']['steps'][step]['end'] = result['end']
                         self.__config['package_install'].save_install_status(ctg, subdir, pkg, version)
                 if step == steps[-1] and sub_step == (len(pkg_install_cfg['step'][step]) - 1):
-                    _logger.debug('Save package config for {0}'.format(pkg))
-                    pkg_install_cfg['install_status']['finished'] = True
-                    self.__config['package_install'].save_install_status(ctg, subdir, pkg, version)
-                    self.__config['package_install'].save_package_config(ctg, subdir, pkg, version)
+                    if not pkg_install_cfg['install_status'].get('finished'):
+                        _logger.debug('Save package config for {0}'.format(pkg))
+                        pkg_install_cfg['install_status']['finished'] = True
+                        self.__config['package_install'].save_install_status(ctg, subdir, pkg, version)
+                        self.__config['package_install'].save_package_config(ctg, subdir, pkg, version)
 
     def report_running(self, vertice):
         if not vertice:

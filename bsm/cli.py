@@ -51,6 +51,7 @@ def home(ctx):
 def init(ctx, show_script):
     '''Initialize bsm environment'''
     cmd = Cmd()
+    ctx.obj['config_entry']['default_scenario'] = version
     cmd.execute('init', ctx.obj, show_script=show_script, shell=ctx.obj['output']['shell'])
 
 

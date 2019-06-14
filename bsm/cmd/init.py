@@ -13,6 +13,6 @@ class Init(Base):
             shell.add_script('init')
             output = shell.script
 
-#        self._bsm.default_load()
+        self._bsm.use()
 
         return CmdResult(output, 'init')

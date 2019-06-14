@@ -5,7 +5,7 @@ _logger = get_logger()
 
 
 class Option(Common):
-    def __init__(self, config_entry, config_env, config_user, config_scenario, config_release_status, config_option_list):
+    def __init__(self, config_entry, config_info, config_env, config_user, config_scenario, config_release_status, config_option_list):
         super(Option, self).__init__()
 
         self.__update_option(config_release_status)
@@ -15,7 +15,10 @@ class Option(Common):
         if config_scenario.get('scenario'):
             self.__update_option(config_user.get('scenario', {}).get(config_scenario['scenario'], {}))
 
-        self.__update_option(config_env)
+        if config_entry.get('default_scenario') and config_info.get('default', {}).get('scenario'):
+            self.__update_option(config_info.get('default', {}))
+        else:
+            self.__update_option(config_env)
 
         self.__update_option(config_entry)
 

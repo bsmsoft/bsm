@@ -72,7 +72,7 @@ class InstallReleasePackages(Base):
     def __dag_run(self):
         selector = InstallSelector(self._config)
         processor = MultiThreadProcessor()
-        executor = InstallExecutor(self._config)
+        executor = InstallExecutor(self._config, self._env.env_final())
 
         start_time = datetime.datetime.utcnow()
 

@@ -34,10 +34,11 @@ _logger = get_logger()
 
 class Config(collections.MutableMapping):
     def __init__(self, config_entry={}, initial_env=None):
-        self.__initial_env = initial_env
-        self.reset(config_entry)
+        self.reset(config_entry, initial_env)
 
-    def reset(self, config_entry=None):
+    def reset(self, config_entry=None, initial_env=None):
+        self.__initial_env = initial_env
+
         if config_entry is None and 'entry' in self:
             config_entry = self['entry']
         self.__config = {}
@@ -123,7 +124,7 @@ class Config(collections.MutableMapping):
         return cfg
 
     def __load_scenario(self):
-        return ConfigScenario(self['entry'], self['app'], self['env'], self['user'])
+        return ConfigScenario(self['entry'], self['app'], self['info'], self['env'], self['user'])
 
     def __load_release_path(self):
         return ConfigReleasePath(self['scenario'], self['app']['release_work_dir'])
@@ -153,7 +154,7 @@ class Config(collections.MutableMapping):
         return cfg
 
     def __load_option(self):
-        return ConfigOption(self['entry'], self['env'], self['user'], self['scenario'], self['release_status'], self['option_list'])
+        return ConfigOption(self['entry'], self['info'], self['env'], self['user'], self['scenario'], self['release_status'], self['option_list'])
 
     def __load_release_origin(self):
         return ConfigReleaseOrigin(self['app'], self['output'], self['scenario'], self['release_path'])

@@ -77,8 +77,10 @@ class Cmd(object):
 
         bsm = Bsm(obj['config_entry'])
 
+        output_format = obj['output']['format']
+
         try:
-            cmd = load_common(subcmd_name, 'bsm.cmd')(bsm, obj['output']['format'])
+            cmd = load_common(subcmd_name, 'bsm.cmd')(bsm, output_format)
         except Exception as e:
             raise CmdError('Can not load command "{0}": {1}'.format(subcmd_name, e))
 
@@ -93,7 +95,7 @@ class Cmd(object):
             if obj['output']['env']:
                 result_output = {'output': result_output, 'env_final': env_final, 'env_changes': env_changes}
 
-            output = Output(obj['output']['format'])
+            output = Output(output_format)
             final_output = output.dump(result_output)
 
             if obj['output']['shell']:

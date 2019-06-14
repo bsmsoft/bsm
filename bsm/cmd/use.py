@@ -9,4 +9,8 @@ class Use(Base):
             _logger.warn('Release version {0} is not fully installed'.format(self._bsm.config('scenario')['version']))
 
         self._bsm.use(without_package)
+
+        if default:
+            self._bsm.save_as_default()
+
         return self._bsm.config('scenario')['version']

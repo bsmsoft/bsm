@@ -14,7 +14,7 @@ class Ls(Base):
             version_dirs = os.listdir(release_dir)
             for version_dir in version_dirs:
                 try:
-                    with open(os.path.join(release_dir, version_dir, 'def', 'config', 'version.yml')) as f:
+                    with open(os.path.join(release_dir, version_dir, 'content', 'config', 'version.yml')) as f:
                         version_in_def = f.read().strip()
 
                     local_versions.append(version_dir)

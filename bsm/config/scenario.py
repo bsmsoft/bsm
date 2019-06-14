@@ -28,16 +28,20 @@ def _filter_scenario_config(config, items, veto=False):
 
 
 class Scenario(Common):
-    def __init__(self, config_entry, config_app, config_env, config_user):
+    def __init__(self, config_entry, config_app, config_info, config_env, config_user):
         super(Scenario, self).__init__()
 
         self.update(_filter_scenario_config(config_app, _SCENARIO_GLOBAL_ITEMS))
 
         self.update(_filter_scenario_config(config_user, _SCENARIO_GLOBAL_ITEMS))
 
+        use_default = bool(config_entry.get('default_scenario') and config_info.get('default', {}).get('scenario'))
+
         scenario = None
         if 'scenario' in config_entry and config_entry['scenario']:
             scenario = config_entry['scenario']
+        elif use_default:
+            scenario = config_info['default']['scenario']
         elif 'scenario' in config_env and config_env['scenario']:
             scenario = config_env['scenario']
 
@@ -49,7 +53,13 @@ class Scenario(Common):
             if 'version' not in self:
                 self['version'] = scenario
 
-        self.update(_filter_scenario_config(config_env, _SCENARIO_GLOBAL_ITEMS))
+
+        if use_default:
+            if config_info.get('default', {}).get('software_root'):
+                self['software_root'] = config_info['default']['software_root']
+        else:
+            if config_env.get('software_root'):
+                self['software_root'] = config_env['software_root']
 
         self.update(_filter_scenario_config(config_entry, _SCENARIO_ENTRY_ITEMS))
 
