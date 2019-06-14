@@ -8,6 +8,8 @@ from bsm.paradag.multi_thread_processor import MultiThreadProcessor
 from bsm.operation.util.install.selector import Selector as InstallSelector
 from bsm.operation.util.install.executor import Executor as InstallExecutor
 
+from bsm.handler import Handler
+
 from bsm.util import ensure_list
 from bsm.util import safe_mkdir
 
