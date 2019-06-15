@@ -121,6 +121,11 @@ class Bsm(object):
         self.__operation.execute('save-as-default')
 
     @__auto_reload
+    def current(self):
+        return self.__env.current_release()
+
+
+    @__auto_reload
     def ls_package(self):
         pass
 

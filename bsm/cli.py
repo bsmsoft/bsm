@@ -109,6 +109,14 @@ def ls(ctx, software_root):
 
 
 @cli.command()
+@click.pass_context
+def current(ctx):
+    '''List current release'''
+    cmd = Cmd()
+    cmd.execute('current', ctx.obj)
+
+
+@cli.command()
 @click.option('--category', type=str, help='Category to be installed')
 @click.option('--subdir', type=str, help='Sub directory for package')
 @click.option('--version', type=str, help='Package version')
@@ -122,10 +130,34 @@ def pkg_install(ctx, package):
 
 @cli.command()
 @click.pass_context
-def ls_pkg(ctx):
+def pkg_ls(ctx):
     '''List all packages of the current release versions'''
-    cmd = Cmd('ls-pkg')
-    cmd.execute(ctx.obj)
+    cmd = Cmd()
+    cmd.execute('pkg-ls', ctx.obj)
+
+
+@cli.command()
+@click.pass_context
+def pkg_use(ctx):
+    '''Initialize a new package'''
+    cmd = Cmd()
+    cmd.execute('pkg-use', ctx.obj)
+
+
+@cli.command()
+@click.pass_context
+def pkg_clean(ctx):
+    '''Initialize a new package'''
+    cmd = Cmd()
+    cmd.execute('pkg-clean', ctx.obj)
+
+
+@cli.command()
+@click.pass_context
+def pkg_init(ctx):
+    '''Initialize a new package'''
+    cmd = Cmd()
+    cmd.execute('pkg-init', ctx.obj)
 
 
 @cli.command()
