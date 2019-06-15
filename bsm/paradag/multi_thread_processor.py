@@ -5,8 +5,6 @@ try:
 except ImportError:
     from queue import Queue, Empty
 
-from bsm.paradag import VertexExecutionError
-
 
 def dag_thread(dag_queue, vertex, executor, param):
     try:
@@ -38,7 +36,7 @@ class MultiThreadProcessor(object):
 
             if isinstance(item[1], Exception):
                 self.__clear_threads(executor)
-                raise VertexExecutionError('Vertex "{0}" execution error: {1}'.format(item[0], item[1]))
+                raise item[1]
 
             return [item]
         except Empty:

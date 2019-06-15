@@ -14,9 +14,6 @@ class DagEdgeNotFoundError(Exception):
 class DagCycleError(Exception):
     pass
 
-class VertexExecutionError(Exception):
-    pass
-
 
 class DagData(object):
     def __init__(self):

@@ -31,7 +31,7 @@ class Executor(object):
         self.__env.unload_release()
         self.__env.unload_app()
         self.__env.load_app(self.__config['app'])
-        self.__env.load_release(self.__config['entry'], self.__config['scenario'], self.__config['release'])
+        self.__env.load_release(self.__config['scenario'], self.__config['option'], self.__config['release'])
 
     def param(self, vertex):
         ctg, subdir, pkg, version, step, sub_step = vertex
@@ -101,7 +101,7 @@ class Executor(object):
             _logger.error('Install handler "{0}" not found for "{1}"'.format(param['action'], step_full_name))
             raise
         except Exception as e:
-            _logger.error('"{0}" install handler error: {1}'.format(step_full_name, e))
+            _logger.error('Install handler "{0}" error for {1}: {2}'.format(param['action'], step_full_name, e))
             if param['config_output']['verbose']:
                 _logger.error('\n{0}'.format(traceback.format_exc()))
             raise

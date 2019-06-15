@@ -19,6 +19,10 @@ from bsm.logger import get_logger
 _logger = get_logger()
 
 
+class InstallPackageError(Exception):
+    pass
+
+
 class InstallReleasePackages(Base):
     def execute(self):
         self.__build_dag()

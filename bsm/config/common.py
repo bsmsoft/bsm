@@ -12,11 +12,9 @@ def _config_from_file(config_file):
         loaded_data = load_config(config_file)
         if isinstance(loaded_data, dict):
             return loaded_data
-        _logger.warn('Config file is not a dict: {0}'.format(config_file))
-        _logger.warn('Use empty dict instead')
+        _logger.warn('Config file is not a dict, use empty dict instead: {0}'.format(config_file))
     except ConfigError as e:
-        _logger.debug('Load config file failed: {0}'.format(e))
-        _logger.debug('Use empty dict instead')
+        _logger.debug('Load config file failed, use empty dict instead: {0}'.format(config_file))
     return dict()
 
 
