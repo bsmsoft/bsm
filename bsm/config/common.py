@@ -15,12 +15,12 @@ def _config_from_file(config_file):
         _logger.warn('Config file is not a dict, use empty dict instead: {0}'.format(config_file))
     except ConfigError as e:
         _logger.debug('Load config file failed, use empty dict instead: {0}'.format(config_file))
-    return dict()
+    return {}
 
 
 class Common(collections.MutableMapping):
     def __init__(self, *args, **kwargs):
-        self.__data = dict()
+        self.__data = {}
         self.update(dict(*args, **kwargs))
 
 

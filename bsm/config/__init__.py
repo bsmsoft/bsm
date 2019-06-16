@@ -4,13 +4,6 @@ import copy
 from bsm.util import expand_path
 
 
-class ConfigNotValidError(Exception):
-    pass
-
-class ConfigNoDirectModError(Exception):
-    pass
-
-
 from bsm.config.common import Common as ConfigCommon
 from bsm.config.app import App as ConfigApp
 from bsm.config.env import Env as ConfigEnv
@@ -32,6 +25,13 @@ from bsm.logger import get_logger
 _logger = get_logger()
 
 
+class ConfigNotValidError(Exception):
+    pass
+
+class ConfigNoDirectModError(Exception):
+    pass
+
+
 class Config(collections.MutableMapping):
     def __init__(self, config_entry={}, initial_env=None):
         self.reset(config_entry, initial_env)
@@ -40,7 +40,8 @@ class Config(collections.MutableMapping):
         self.__initial_env = initial_env
 
         if config_entry is None and 'entry' in self:
-            config_entry = self['entry']
+            config_entry = self['entry'].data()
+
         self.__config = {}
         self.__config['entry'] = ConfigCommon()
         for k, v in config_entry.items():

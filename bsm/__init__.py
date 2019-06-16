@@ -7,21 +7,31 @@ from bsm.config import Config
 from bsm.env import Env
 from bsm.operation import Operation
 
-from bsm.logger import add_stream_logger
+from bsm.logger import create_stream_logger
 from bsm.logger import get_logger
 _logger = get_logger()
 
 
 class Bsm(object):
     def __init__(self, config_entry={}, initial_env=None):
-        if initial_env is None:
-            initial_env = os.environ
+        self.reload(config_entry=config_entry, initial_env=initial_env)
 
-        self.__config_entry_input = config_entry
-        self.__config_entry = copy.deepcopy(self.__config_entry_input)
+
+    def reload(self, **kwargs):
+        if 'config_entry' in kwargs:
+            self.__config_entry = kwargs['config_entry']
+
+        if 'initial_env' in kwargs:
+            if kwargs['initial_env'] is None:
+                initial_env = os.environ
+            else:
+                initial_env = kwargs['initial_env']
+        else:
+            initial_env = self.__env.env_final()
+
         self.__config = Config(self.__config_entry, initial_env)
 
-        add_stream_logger(self.__config['output']['verbose'], self.__config['output']['quiet'])
+        create_stream_logger(self.__config['output']['verbose'], self.__config['output']['quiet'])
 
         self.__env = Env(initial_env=initial_env, env_prefix=self.__config['app']['env_prefix'])
         self.__env.load_app(self.__config['app'])
@@ -36,100 +46,58 @@ class Bsm(object):
         return BSM_HOME
 
 
-    def __auto_reload(method):
-        def inner(self, *args, **kargs):
-            self.__watch_config()
-            return method(self, *args, **kargs)
-        return inner
-
-    def __watch_config(self):
-        if self.__config_entry == self.__config_entry_input:
-            return
-        self.reload_config()
-
-
-    def reload_config(self):
-        self.__config_entry = copy.deepcopy(self.__config_entry_input)
-        self.__config.reset(self.__config_entry)
-
-
-    @property
-    def entry(self):
-        return self.__config_entry_input
-
-    def switch(self, scenario):
-        self.__config_entry_input['scenario'] = scenario
-
-
-    @__auto_reload
     def app(self):
         return self.__config['app']['id']
 
-    @__auto_reload
     def config_all(self):
         return self.__config.data()
 
-    @__auto_reload
     def config(self, config_type):
         return self.__config.config(config_type)
 
 
-    @__auto_reload
     def ls_remote(self, list_all=False):
         return self.__operation.execute('ls_remote', list_all)
 
-    @__auto_reload
     def check_install(self):
         return self.__operation.execute('check', 'install')
 
-    @__auto_reload
     def check_runtime(self):
         return self.__operation.execute('check', 'runtime')
 
-    @__auto_reload
     def install_release(self):
         return self.__operation.execute('install-release')
 
-    @__auto_reload
     def install_package(self, category=None, subdir=None, version=None):
         return self.__operation.execute('install-package', category, subdir, version)
 
-    @__auto_reload
     def install_release_packages(self):
         return self.__operation.execute('install-release-packages')
 
-    @__auto_reload
     def ls(self):
         return self.__operation.execute('ls')
 
-    @__auto_reload
     def use(self, without_package=False):
         self.__operation.execute('load-release')
         if not without_package:
             self.__operation.execute('load-release-packages')
 
-    @__auto_reload
     def clean(self):
         self.__operation.execute('clean')
 
-    @__auto_reload
     def exit(self):
         self.__operation.execute('exit')
 
-    @__auto_reload
     def save_as_default(self):
         self.__operation.execute('save-as-default')
 
-    @__auto_reload
     def current(self):
         return self.__env.current_release()
 
 
-    @__auto_reload
     def ls_package(self):
         pass
 
-    @__auto_reload
     def run_release_command(self, command, args):
         # run customized commands defined in release
         # like bsm run pack (only in current version)

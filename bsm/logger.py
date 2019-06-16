@@ -42,7 +42,7 @@ _FORMATTER = JsubFormatter('[%(asctime)s][%(name)s|%(levelname)-4.4s] %(message)
 _FORMATTER_SIMPLE = logging.Formatter('[%(levelname)s] %(message)s')
 
 
-def add_stream_logger(verbose=False, quiet=False):
+def create_stream_logger(verbose=False, quiet=False):
     logger = logging.getLogger(_MAIN_LOGGER_NAME)
 
     if verbose:
@@ -58,6 +58,7 @@ def add_stream_logger(verbose=False, quiet=False):
     else:
         ch.setFormatter(_FORMATTER_SIMPLE)
 
+    logger.handlers = []
     logger.addHandler(ch)
 
 def get_logger():
