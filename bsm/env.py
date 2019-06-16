@@ -59,6 +59,7 @@ class Env(object):
         python_bin_dir = os.path.dirname(sys.executable)
         self.__bsmcli_bin = os.path.join(python_bin_dir, BSMCLI_CMD)
 
+
     def __merge_path(self, env_name, path_list, append=False):
         original_path_list = []
         if env_name in self.__env:
@@ -83,6 +84,7 @@ class Env(object):
             del self.__env[env_name]
         else:
             self.__env[env_name] = _emit_path(final_path_list)
+
 
     def __load_env(self, config_env):
         env_info = {}
@@ -146,6 +148,7 @@ class Env(object):
                 else:
                     self.__unalias.append(e)
 
+
     def load_app(self, config_app):
         self.unload_app()
 
@@ -164,6 +167,7 @@ class Env(object):
             self.__unload_env(info.get('env', {}))
             del self.__env[self.__env_name['app_info']]
 
+
     def load_release(self, config_scenario, config_option, config_release):
         self.unload_release()
 
@@ -176,15 +180,6 @@ class Env(object):
         info['env'] = self.__load_env(config_release.get('setting', {}).get('env', {}))
         self.__env[self.__env_name['release_info']] = _emit_info(info)
 
-    def current_release(self):
-        result = {}
-        for k in ['software_root', 'release_version', 'scenario']:
-            if self.__env_name[k] in self.__env:
-                result[k] = self.__env[self.__env_name[k]]
-        if self.__env_name['option'] in self.__env:
-            result['option'] = _parse_info(self.__env[self.__env_name['option']])
-        return result
-
     def unload_release(self):
         for k in ['software_root', 'release_version', 'scenario', 'option']:
             if self.__env_name[k] in self.__env:
@@ -194,6 +189,16 @@ class Env(object):
             info = _parse_info(self.__env[self.__env_name['release_info']])
             self.__unload_env(info.get('env', {}))
             del self.__env[self.__env_name['release_info']]
+
+    def current_release(self):
+        result = {}
+        for k in ['software_root', 'release_version', 'scenario']:
+            if self.__env_name[k] in self.__env:
+                result[k] = self.__env[self.__env_name[k]]
+        if self.__env_name['option'] in self.__env:
+            result['option'] = _parse_info(self.__env[self.__env_name['option']])
+        return result
+
 
     def load_package(self, config_package):
         name = config_package['name']
@@ -230,6 +235,18 @@ class Env(object):
             for package, info in packages_info.items():
                 self.__unload_env(info.get('env', {}))
             del self.__env[self.__env_name['packages_info']]
+
+    def current_packages(self):
+        result = {}
+        if self.__env_name['packages_info'] in self.__env:
+            packages_info = _parse_info(self.__env[self.__env_name['packages_info']])
+            for package, info in packages_info.items():
+                result[package] = {}
+                result[package]['category'] = info['category']
+                result[package]['subdir'] = info['subdir']
+                result[package]['version'] = info['version']
+        return result
+
 
     def env_final(self):
         return self.__env.copy()

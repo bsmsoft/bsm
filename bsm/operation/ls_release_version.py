@@ -5,7 +5,7 @@ from bsm.operation import Base
 from bsm.logger import get_logger
 _logger = get_logger()
 
-class Ls(Base):
+class LsReleaseVersion(Base):
     def execute(self):
         local_versions = []
 

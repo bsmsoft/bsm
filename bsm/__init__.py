@@ -56,6 +56,13 @@ class Bsm(object):
         return self.__config.config(config_type)
 
 
+    def apply_env_changes(self):
+        return self.__env.apply_changes()
+
+    def env_final(self):
+        return self.__env.env_final()
+
+
     def ls_remote(self, list_all=False):
         return self.__operation.execute('ls_remote', list_all)
 
@@ -75,7 +82,7 @@ class Bsm(object):
         return self.__operation.execute('install-release-packages')
 
     def ls(self):
-        return self.__operation.execute('ls')
+        return self.__operation.execute('ls-release-version')
 
     def use(self, without_package=False):
         self.__operation.execute('load-release')
@@ -94,40 +101,14 @@ class Bsm(object):
     def current(self):
         return self.__env.current_release()
 
-
-    def ls_package(self):
-        pass
-
     def run_release_command(self, command, args):
         # run customized commands defined in release
         # like bsm run pack (only in current version)
         pass
 
 
-    def apply_env_changes(self):
-        return self.__env.apply_changes()
+    def ls_all_package(self):
+        return self.__operation.execute('ls-all-package')
 
-    def env_final(self):
-        return self.__env.env_final()
-
-    def default_version(self, shell=None):
-        try:
-            info = Info()
-            default_version = info.default_version
-            if default_version:
-                config_version = ConfigVersion(config_user, default_version)
-                config_release = ConfigRelease(config_version)
-
-                obj = BsmUse(config_user, config_version, config_release)
-                set_env, unset_env = obj.run()
-            else:
-                env = Env()
-                env.clean()
-                set_env, unset_env = env.env_change()
-
-            for e in unset_env:
-                shell.unset_env(e)
-            for k, v in set_env.items():
-                shell.set_env(k, v)
-        except Exception as e:
-            _logger.warn('Cat not load default version: {0}'.format(e))
+    def ls_active_package(self):
+        return self.__operation.execute('ls-active-package')

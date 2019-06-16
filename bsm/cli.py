@@ -129,11 +129,12 @@ def pkg_install(ctx, package):
 
 
 @cli.command()
+@click.option('--all', '-a', 'list_all', is_flag=True, help='List all available packages')
 @click.pass_context
-def pkg_ls(ctx):
+def pkg_ls(ctx, list_all):
     '''List all packages of the current release versions'''
     cmd = Cmd()
-    cmd.execute('pkg-ls', ctx.obj)
+    cmd.execute('pkg-ls', ctx.obj, list_all)
 
 
 @cli.command()
