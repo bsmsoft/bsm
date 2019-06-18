@@ -120,21 +120,29 @@ def current(ctx):
 @click.option('--category', type=str, help='Category to be installed')
 @click.option('--subdir', type=str, help='Sub directory for package')
 @click.option('--version', type=str, help='Package version')
+@click.option('--category-origin', type=str, help='Find reference package from category')
+@click.option('--subdir-origin', type=str, help='Find reference package from sub directory')
+@click.option('--version-origin', type=str, help='Find reference package from package version')
+@click.option('--option', '-o', type=str, multiple=True, help='Options for release')
+@click.option('--reinstall', is_flag=True, help='Reinstall all packages')
 @click.argument('package', type=str)
 @click.pass_context
-def pkg_install(ctx, package):
+def pkg_install(ctx, category, subdir, version, category_origin, subdir_origin, version_origin, package, option, reinstall):
     '''Install specified package'''
     cmd = Cmd()
-    cmd.execute('pkg-install', ctx.obj)
+    ctx.obj['config_entry']['option'] = parse_lines(option)
+    ctx.obj['config_entry']['reinstall'] = reinstall
+    cmd.execute('pkg-install', ctx.obj, category, subdir, version, category_origin, subdir_origin, version_origin, package)
 
 
 @cli.command()
 @click.option('--all', '-a', 'list_all', is_flag=True, help='List all available packages')
+@click.argument('package', type=str, required=False)
 @click.pass_context
-def pkg_ls(ctx, list_all):
+def pkg_ls(ctx, list_all, package):
     '''List all packages of the current release versions'''
     cmd = Cmd()
-    cmd.execute('pkg-ls', ctx.obj, list_all)
+    cmd.execute('pkg-ls', ctx.obj, list_all, package)
 
 
 @cli.command()
@@ -151,6 +159,14 @@ def pkg_clean(ctx):
     '''Initialize a new package'''
     cmd = Cmd()
     cmd.execute('pkg-clean', ctx.obj)
+
+
+@cli.command()
+@click.pass_context
+def pkg_edit(ctx):
+    '''Edit package configuration'''
+    cmd = Cmd()
+    cmd.execute('pkg-edit', ctx.obj)
 
 
 @cli.command()
@@ -200,6 +216,14 @@ def use(ctx, software_root, default, option, without_package, version):
     ctx.obj['config_entry']['option'] = parse_lines(option)
     ctx.obj['config_entry']['scenario'] = version
     cmd.execute('use', ctx.obj, default, without_package)
+
+
+@cli.command()
+@click.pass_context
+def refresh(ctx):
+    '''Refresh the current release version environment'''
+    cmd = Cmd()
+    cmd.execute('refresh', ctx.obj)
 
 
 @cli.command()

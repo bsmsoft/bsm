@@ -1,7 +1,16 @@
 from bsm.cmd import Base
+from bsm.cmd import CmdError
 
 class PkgLs(Base):
-    def execute(self, list_all):
+    def execute(self, list_all, package):
         if list_all:
-            return self._bsm.ls_all_package()
-        return self._bsm.ls_active_package()
+            packages = self._bsm.ls_all_package()
+        else:
+            packages = self._bsm.ls_active_package()
+
+        if package:
+            if package not in packages:
+                raise CmdError('Package "{0}" is not found'.format(package))
+            return packages[package]
+
+        return packages

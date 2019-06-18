@@ -5,12 +5,17 @@ _logger = get_logger()
 
 class LsAllPackage(Base):
     def execute(self):
-        packages = []
+        packages = {}
+
+        cur_pkgs = self._env.current_packages()
 
         for category in self._config['package_runtime']:
             for subdir in self._config['package_runtime'][category]:
                 for package in self._config['package_runtime'][category][subdir]:
                     for version, value in self._config['package_runtime'][category][subdir][package].items():
-                        packages.append((package, category, subdir, version))
+                        active = (package in cur_pkgs and category == cur_pkgs[package]['category'] and \
+                                subdir == cur_pkgs[package]['subdir'] and version == cur_pkgs[package]['version'])
+                        packages.setdefault(package, [])
+                        packages[package].append({'category': category, 'subdir': subdir, 'version': version, 'active': active})
 
         return packages

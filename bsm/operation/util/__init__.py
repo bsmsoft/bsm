@@ -1,9 +1,8 @@
 import re
 
-from bsm.operation import Base
-
 from bsm.logger import get_logger
 _logger = get_logger()
+
 
 def list_versions(release_repo, version_pattern, git):
     tags = git.ls_remote_tags(release_repo)

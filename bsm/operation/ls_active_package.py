@@ -5,9 +5,10 @@ _logger = get_logger()
 
 class LsActivePackage(Base):
     def execute(self):
-        packages = []
+        packages = {}
 
         for package, value in self._env.current_packages().items():
-            packages.append((package, value['category'], value['subdir'], value['version']))
+            packages.setdefault(package, [])
+            packages[package].append({'category': value['category'], 'subdir': value['subdir'], 'version': value['version']})
 
         return packages

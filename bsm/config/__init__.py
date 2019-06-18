@@ -16,7 +16,7 @@ from bsm.config.category import Category as ConfigCategory
 from bsm.config.release_install import ReleaseInstall as ConfigReleaseInstall
 from bsm.config.package_runtime import PackageRuntime as ConfigPackageRuntime
 from bsm.config.package_install import PackageInstall as ConfigPackageInstall
-from bsm.config.package_install_path import PackageInstallPath as ConfigPackageInstallPath
+from bsm.config.package_path import PackagePath as ConfigPackagePath
 
 from bsm.handler import Handler
 from bsm.handler import HandlerNotFoundError
@@ -195,15 +195,18 @@ class Config(collections.MutableMapping):
         return ConfigReleaseInstall(self['release'])
 
     def __load_package_runtime(self):
-        return ConfigPackageRuntime(self['app'], self['output'], self['scenario'], self['option'], self['release_path'],
-                self['attribute'], self['release'], self['category'])
+        return ConfigPackageRuntime(self['entry'], self['app'], self['output'], self['scenario'], self['option'], self['release_path'],
+                self['attribute'], self['release'], self['release_install'], self['category'])
 
     def __load_package_install(self):
         return ConfigPackageInstall(self['entry'], self['app'], self['output'], self['scenario'], self['option'], self['release_path'],
                 self['attribute'], self['release'], self['release_install'], self['category'])
 
+    def __load_package_runtime_path(self):
+        return ConfigPackagePath(self['release_path'], self['category'], self['package_runtime'])
+
     def __load_package_install_path(self):
-        return ConfigPackageInstallPath(self['category'], self['package_install'])
+        return ConfigPackagePath(self['release_path'], self['category'], self['package_install'])
 
 
     def config(self, config_type):

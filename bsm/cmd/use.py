@@ -13,4 +13,7 @@ class Use(Base):
         if default:
             self._bsm.save_as_default()
 
-        return self._bsm.config('scenario')['version']
+        result = {}
+        result['software_root'] = self._bsm.config('scenario').get('software_root', '')
+        result['release_version'] = self._bsm.config('scenario').get('version', '')
+        return result

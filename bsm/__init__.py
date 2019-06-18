@@ -75,9 +75,6 @@ class Bsm(object):
     def install_release(self):
         return self.__operation.execute('install-release')
 
-    def install_package(self, category=None, subdir=None, version=None):
-        return self.__operation.execute('install-package', category, subdir, version)
-
     def install_release_packages(self):
         return self.__operation.execute('install-release-packages')
 
@@ -101,11 +98,20 @@ class Bsm(object):
     def current(self):
         return self.__env.current_release()
 
+    def detect_category(self, directory):
+        return self.__operation.execute('detect-category', directory)
+
     def run_release_command(self, command, args):
         # run customized commands defined in release
         # like bsm run pack (only in current version)
         pass
 
+
+    def install_package(self, package, category=None, subdir=None, version=None, category_origin=None, subdir_origin=None, version_origin=None):
+        return self.__operation.execute('install-package', package, category, subdir, version, category_origin, subdir_origin, version_origin)
+
+    def build_package(self, category=None, subdir=None, version=None):
+        return self.__operation.execute('build')
 
     def ls_all_package(self):
         return self.__operation.execute('ls-all-package')

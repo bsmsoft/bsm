@@ -74,9 +74,17 @@ class InstallReleasePackages(Base):
                                 self.__dag.add_edge(end_vertex, start_vertex)
 
     def __dag_run(self):
+        # Get clean environment
+        env = Env(initial_env=self._env.env_final(), env_prefix=self._config['app']['env_prefix'])
+        env.unload_packages()
+        env.unload_release()
+        env.unload_app()
+        env.load_app(self.__config['app'])
+        env.load_release(self._config['scenario'], self._config['option'], self._config['release'])
+
         selector = InstallSelector(self._config)
         processor = MultiThreadProcessor()
-        executor = InstallExecutor(self._config, self._env.env_final())
+        executor = InstallExecutor(self._config, env.env_final())
 
         start_time = datetime.datetime.utcnow()
 
