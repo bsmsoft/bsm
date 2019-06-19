@@ -4,10 +4,6 @@ from bsm.handler import Handler
 
 from bsm.operation import Base
 
-from bsm.logger import get_logger
-_logger = get_logger()
-
-
 class FindPackage(Base):
     def execute(self, package, category=None, subdir=None, version=None, from_install=False):
         config_package_name = 'package_install' if from_install else 'package_runtime'

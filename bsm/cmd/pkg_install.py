@@ -9,6 +9,9 @@ _logger = get_logger()
 
 class PkgInstall(Base):
     def execute(self, category, subdir, version, category_origin, subdir_origin, version_origin, package, yes):
+        if 'release_version' not in self._bsm.current():
+            raise CmdError('No release loaded currently')
+
         if category is None:
             ctg, _ = self._bsm.detect_category(os.getcwd())
             if ctg:

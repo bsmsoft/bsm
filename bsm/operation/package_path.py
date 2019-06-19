@@ -24,7 +24,7 @@ class PackagePath(Base):
 
             _logger.debug('Find package result for "{0}": category "{1}", subdir "{2}", version "{3}"'.format(package, ctg, sd, ver))
 
-            if not ctg:
+            if ctg is None:
                 raise PackagePathError('Specified package "{0}" not found for category "{1}", subdir "{2}", version "{3}"'.format(package, category, subdir, version))
         else:
             ctg, sd, ver = category, subdir, version

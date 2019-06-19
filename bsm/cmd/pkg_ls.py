@@ -3,6 +3,9 @@ from bsm.cmd import CmdError
 
 class PkgLs(Base):
     def execute(self, list_all, package):
+        if 'release_version' not in self._bsm.current():
+            raise CmdError('No release loaded currently')
+
         if list_all:
             packages = self._bsm.ls_all_package()
         else:

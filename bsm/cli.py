@@ -157,7 +157,7 @@ def pkg_use(ctx, category, subdir, version, option, package):
     '''Use a package'''
     cmd = Cmd()
     ctx.obj['config_entry']['option'] = parse_lines(option)
-    cmd.execute('pkg-use', ctx.obj, category, subdir, version)
+    cmd.execute('pkg-use', ctx.obj, category, subdir, version, package)
 
 
 @cli.command()

@@ -8,19 +8,21 @@ from bsm.logger import get_logger
 _logger = get_logger()
 
 
+class ReleasePathError(Exception):
+    pass
+
+
 class ReleasePath(Common):
     def __init__(self, config_scenario, release_work_dir):
         super(ReleasePath, self).__init__()
 
         if 'software_root' not in config_scenario:
-            _logger.warn('"software_root" not specified')
-            return
+            raise ReleasePathError('"software_root" not specified in config scenario')
 
         self['release_dir'] = os.path.join(config_scenario['software_root'], release_work_dir)
 
         if not ('version' in config_scenario and config_scenario['version']):
-            _logger.debug('"version" not specified in config release_path')
-            return
+            raise ReleasePathError('"version" not specified in config scenario')
 
         self['main_dir'] = os.path.join(self['release_dir'], config_scenario['version'])
         self['content_dir'] = os.path.join(self['main_dir'], 'content')
