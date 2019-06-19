@@ -158,7 +158,9 @@ def find_top_priority(handler, category_priority, packages):
 
     top_category = None
     for pkg in packages:
-        if top_category is None or category_priority.index(pkg[0]) < category_priority.index(top_category):
+        if top_category is None or \
+                (top_category not in category_priority and pkg[0] in category_priority) or \
+                (top_category in category_priority and pkg[0] in category_priority and category_priority.index(pkg[0]) < category_priority.index(top_category)):
             top_category = pkg[0]
     packages = [p for p in packages if p[0] == top_category]
 
@@ -183,6 +185,8 @@ def find_package(handler, category_priority, config_package, name, category=None
     for ctg in config_package:
         if category is not None and category != ctg:
             continue
+        if category not in category_priority:
+            continue
         for sd in config_package[ctg]:
             if subdir is not None and subdir != sd:
                 continue
@@ -194,3 +198,21 @@ def find_package(handler, category_priority, config_package, name, category=None
                 packages.append((ctg, sd, ver))
 
     return find_top_priority(handler, category_priority, packages)
+
+def load_packages(handler, category_priority, config_package):
+    packages = {}
+
+    for category in config_package:
+        if category not in category_priority:
+            continue
+        for subdir in config_package[category]:
+            for package in config_package[category][subdir]:
+                for version in config_package[category][subdir][package]:
+                    packages.setdefault(package, [])
+                    packages[package].append((category, subdir, version))
+
+    result = {}
+    for package, value in packages.items():
+        result[package] = find_top_priority(handler, category_priority, value)
+
+    return result

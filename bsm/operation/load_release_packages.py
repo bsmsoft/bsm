@@ -1,3 +1,7 @@
+from bsm.config.util import load_packages
+
+from bsm.handler import Handler
+
 from bsm.operation import Base
 
 class LoadReleasePackages(Base):
@@ -7,10 +11,8 @@ class LoadReleasePackages(Base):
         category_priority = self._config['category']['priority']
         category_auto_env = [ctg for ctg in category_priority if self._config['category']['content'].get(ctg, {}).get('auto_env')]
 
-        for category in reversed(category_auto_env):
-            if category not in self._config['package_runtime']:
-                continue
-            for subdir in self._config['package_runtime'][category]:
-                for package in self._config['package_runtime'][category][subdir]:
-                    for version, value in self._config['package_runtime'][category][subdir][package].items():
-                        self._env.load_package(value['config'])
+        with Handler(self._config['release_path']['handler_python_dir']) as h:
+            for package, value in load_packages(h, category_auto_env, self._config['package_runtime']).items():
+                category, subdir, version = value
+                pkg_cfg = self._config['package_runtime'].package_config(category, subdir, package, version)
+                self._env.load_package(pkg_cfg['config'])
