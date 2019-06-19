@@ -6,70 +6,18 @@ from bsm.paradag.multi_thread_processor import MultiThreadProcessor
 from bsm.operation.util.install.selector import Selector as InstallSelector
 from bsm.operation.util.install.executor import Executor as InstallExecutor
 
-from bsm.operation import Base
-
-from bsm.config.util import find_package
-from bsm.config.util import package_path
-
-from bsm.util import safe_mkdir
-from bsm.util.config import dump_config
-
 from bsm.handler import Handler
+
+from bsm.operation import Base
 
 from bsm.logger import get_logger
 _logger = get_logger()
 
 
-class InstallPackageError(Exception):
-    pass
-
-
 class InstallPackage(Base):
-    def execute(self, package, category=None, subdir=None, version=None, category_origin=None, subdir_origin=None, version_origin=None):
-        ctg, sd, ver = self.__find_package(package, category, subdir, version, category_origin, subdir_origin, version_origin)
-
-        self.__build_dag(package, ctg, sd, ver)
+    def execute(self, package, category, subdir, version):
+        self.__build_dag(package, category, subdir, version)
         self.__dag_run()
-
-        return ctg, sd, ver
-
-    def __find_package(self, package, category, subdir, version, category_origin, subdir_origin, version_origin):
-        category_priority = self._config['category']['priority']
-        with Handler(self._config['release_path']['handler_python_dir']) as h:
-            ctg, sd, ver = find_package(h, category_priority, self._config['package_runtime'], package, category, subdir, version)
-            if ctg and sd and ver:
-                _logger.debug('Package config already available for {0}.{1}.{2}.{3}'.format(ctg, sd, package, ver))
-                return ctg, sd, ver
-
-            ctg_org, sd_org, ver_org = find_package(h, category_priority, self._config['package_runtime'], package, category_origin, subdir_origin, version_origin)
-            if ctg_org and sd_org and ver_org:
-                _logger.debug('Package reference found in config_package_runtime: {0}.{1}.{2}.{3}'.format(ctg_org, sd_org, package, ver_org))
-                pkg_cfg_origin = self._config['package_runtime'].package_config(ctg_org, sd_org, package, ver_org)['config_origin']
-            else:
-                _logger.debug('Try to find reference in config_package_install')
-                ctg_org, sd_org, ver_org = find_package(h, category_priority, self._config['package_install'], package, category_origin, subdir_origin, version_origin)
-                if not ctg_org:
-                    raise InstallPackageError('Could not find package reference to install {0}'.format(package))
-                _logger.debug('Package reference found in config_package_install: {0}.{1}.{2}.{3}'.format(ctg_org, sd_org, package, ver_org))
-                pkg_cfg_origin = self._config['package_install'].package_config(ctg_org, sd_org, package, ver_org)['config_origin']
-
-        ctg = category if category is not None else ctg_org
-        sd = subdir if subdir is not None else sd_org
-        ver = version if version is not None else ver_org
-
-        pkg_cfg = {}
-        pkg_cfg['name'] = package
-        pkg_cfg['category'] = ctg
-        pkg_cfg['subdir'] = sd
-        pkg_cfg['version'] = ver
-        pkg_path = package_path(self._config['app'], self._config['category'], pkg_cfg)
-        safe_mkdir(pkg_path['config_dir'])
-        dump_config(pkg_cfg_origin, pkg_path['config_file'])
-
-        self._config.reset()
-
-        return ctg, sd, ver
-
 
     def __build_dag(self, package, category, subdir, version):
         self.__dag = Dag()

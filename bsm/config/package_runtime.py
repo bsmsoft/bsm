@@ -91,7 +91,7 @@ class PackageRuntime(PackageBase):
                 final_config['config']['subdir'] = subdir
                 final_config['config']['version'] = version
 
-                final_config['package_path'] = package_path(config_app, config_category, final_config['config'])
+                final_config['package_path'] = package_path(config_app, config_category, category, subdir, package, version)
                 expand_package_path(final_config['package_path']['main_dir'], final_config['config'])
                 expand_package_env(final_config['config'])
 

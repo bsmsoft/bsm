@@ -72,17 +72,17 @@ def transform_package(handler, operation, category, subdir, name, version, pkg_c
 
     return copy.deepcopy(pkg_cfg)
 
-def package_path(config_app, config_category, pkg_cfg):
+def package_path(config_app, config_category, category, subdir, name, version):
     result = {}
-    ctg_cfg = config_category['content'][pkg_cfg['category']]
+    ctg_cfg = config_category['content'][category]
     if ctg_cfg['version_dir']:
-        result['main_dir'] = os.path.join(ctg_cfg['root'], pkg_cfg['subdir'], pkg_cfg['name'], pkg_cfg['version'])
-        result['work_dir'] = os.path.join(ctg_cfg['install_dir'], pkg_cfg['subdir'], pkg_cfg['name'], 'versions', pkg_cfg['version'])
-        result['config_dir'] = os.path.join(ctg_cfg['config_package_dir'], pkg_cfg['subdir'], pkg_cfg['name'], 'versions', pkg_cfg['version'])
+        result['main_dir'] = os.path.join(ctg_cfg['root'], subdir, name, version)
+        result['work_dir'] = os.path.join(ctg_cfg['install_dir'], subdir, name, 'versions', version)
+        result['config_dir'] = os.path.join(ctg_cfg['config_package_dir'], subdir, name, 'versions', version)
     else:
-        result['main_dir'] = os.path.join(ctg_cfg['root'], pkg_cfg['subdir'], pkg_cfg['name'])
-        result['work_dir'] = os.path.join(ctg_cfg['install_dir'], pkg_cfg['subdir'], pkg_cfg['name'], 'head')
-        result['config_dir'] = os.path.join(ctg_cfg['config_package_dir'], pkg_cfg['subdir'], pkg_cfg['name'], 'head')
+        result['main_dir'] = os.path.join(ctg_cfg['root'], subdir, name)
+        result['work_dir'] = os.path.join(ctg_cfg['install_dir'], subdir, name, 'head')
+        result['config_dir'] = os.path.join(ctg_cfg['config_package_dir'], subdir, name, 'head')
     result['misc_dir'] = os.path.join(result['work_dir'], 'misc')
     result['status_dir'] = os.path.join(result['work_dir'], 'status')
     result['status_install_file'] = os.path.join(result['status_dir'], 'install.yml')
@@ -185,7 +185,7 @@ def find_package(handler, category_priority, config_package, name, category=None
     for ctg in config_package:
         if category is not None and category != ctg:
             continue
-        if category not in category_priority:
+        if ctg not in category_priority:
             continue
         for sd in config_package[ctg]:
             if subdir is not None and subdir != sd:

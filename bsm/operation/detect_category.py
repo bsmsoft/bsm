@@ -21,4 +21,4 @@ class DetectCategory(Base):
             return None, None
 
         subdir = dir_expand[len(root_found):].strip(os.sep)
-        return category_found, root_found
+        return category_found, subdir

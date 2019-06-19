@@ -107,11 +107,23 @@ class Bsm(object):
         pass
 
 
-    def install_package(self, package, category=None, subdir=None, version=None, category_origin=None, subdir_origin=None, version_origin=None):
-        return self.__operation.execute('install-package', package, category, subdir, version, category_origin, subdir_origin, version_origin)
+    def find_package(self, package, category=None, subdir=None, version=None, from_install=False):
+        return self.__operation.execute('find-package', package, category, subdir, version, from_install)
 
-    def build_package(self, category=None, subdir=None, version=None):
-        return self.__operation.execute('build')
+    def package_path(self, package, category=None, subdir=None, version=None):
+        return self.__operation.execute('package-path', package, category, subdir, version)
+
+    def match_install_package(self, package, category=None, subdir=None, version=None, category_origin=None, subdir_origin=None, version_origin=None):
+        return self.__operation.execute('match-install-package', package, category, subdir, version, category_origin, subdir_origin, version_origin)
+
+    def install_package_config(self, package, category, subdir, version, category_origin, subdir_origin, version_origin, from_install=False):
+        return self.__operation.execute('install-package-config', package, category, subdir, version, category_origin, subdir_origin, version_origin, from_install)
+
+    def install_package(self, package, category, subdir, version):
+        return self.__operation.execute('install-package', package, category, subdir, version)
+
+    def build_package(self, package, category=None, subdir=None, version=None):
+        return self.__operation.execute('build-package')
 
     def ls_all_package(self):
         return self.__operation.execute('ls-all-package')

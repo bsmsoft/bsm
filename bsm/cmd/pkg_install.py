@@ -1,25 +1,47 @@
 import os
+import click
 
 from bsm.cmd import Base
+from bsm.cmd import CmdError
 
 from bsm.logger import get_logger
 _logger = get_logger()
 
 class PkgInstall(Base):
-    def execute(self, category, subdir, version, category_origin, subdir_origin, version_origin, package):
+    def execute(self, category, subdir, version, category_origin, subdir_origin, version_origin, package, yes):
         if category is None:
-            ctg, sd = self._bsm.detect_category(os.getcwd())
+            ctg, _ = self._bsm.detect_category(os.getcwd())
             if ctg:
                 category = ctg
+                _logger.info('Using current category: {0}'.format(category))
 
-        final_category, final_subdir, final_version = self._bsm.install_package(package, category, subdir, version, category_origin, subdir_origin, version_origin)
+        ctg, sd, ver, ctg_org, sd_org, ver_org, from_install = self._bsm.match_install_package(package, category, subdir, version, category_origin, subdir_origin, version_origin)
+        _logger.debug('Matched install package: To category "{0}", subdir "{1}", version "{2}", from category "{3}", subdir "{4}", version "{5}", from_install "{6}"'.format(ctg, sd, ver, ctg_org, sd_org, ver_org, from_install))
+
+        if ctg is None:
+            raise CmdError('Could not find out how to install the package "{0}"'.format(package))
+
+        pkg_path = self._bsm.package_path(package, ctg, sd, ver)
+        _logger.info('Will install package "{0}" to category "{1}", subdir "{2}", version "{3}"'.format(package, ctg, sd, ver))
+        _logger.info('The package directory will be: {0}"'.format(pkg_path['main_dir']))
+
+        if not yes and not click.confirm('Proceed with installation?', default=True, err=True):
+            return ''
+
+        # Install package config if not exist
+        if ctg_org is not None:
+            _logger.debug('Install package config for "{0}"'.format(package))
+            self._bsm.install_package_config(package, ctg, sd, ver, ctg_org, sd_org, ver_org, from_install)
+
+        self._bsm.install_package(package, ctg, sd, ver)
 
         _logger.info('Package "{0}" installed successfully'.format(package))
 
         result = {}
-        result['category'] = final_category
-        result['subdir'] = final_subdir
-        result['version'] = final_version
-        result['main_dir'] = self._bsm.config('package_runtime')[final_category][final_subdir][package][final_version]['package_path']['main_dir']
+        result['category'] = ctg
+        result['subdir'] = sd
+        result['name'] = package
+        result['version'] = ver
+        result['main_dir'] = pkg_path['main_dir']
 
         return result
