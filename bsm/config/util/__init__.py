@@ -3,6 +3,8 @@ import copy
 
 from bsm.handler import HandlerNotFoundError
 
+from bsm.config.package_base import ConfigPackageError
+
 from bsm.util import ensure_list
 from bsm.util import is_str
 
@@ -73,8 +75,15 @@ def transform_package(handler, operation, category, subdir, name, version, pkg_c
     return copy.deepcopy(pkg_cfg)
 
 def package_path(config_app, config_category, category, subdir, name, version):
-    result = {}
+    if category not in config_category['content']:
+        raise ConfigPackageError('Category not found: {0}'.format(category))
+
     ctg_cfg = config_category['content'][category]
+
+    if not ctg_cfg.get('root'):
+        raise ConfigPackageError('Category root is not properly set for: {0}'.format(category))
+
+    result = {}
     if ctg_cfg['version_dir']:
         result['main_dir'] = os.path.join(ctg_cfg['root'], subdir, name, version)
         result['work_dir'] = os.path.join(ctg_cfg['install_dir'], subdir, name, 'versions', version)
