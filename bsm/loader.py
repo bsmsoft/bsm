@@ -72,18 +72,15 @@ def load_common(name, module_prefix):
 
     return c
 
-def load_relative(module_name, attr_name):
-    caller = inspect.stack()[1]
-    caller_module = inspect.getmodule(caller[0])
-    caller_module_name = caller_module.__name__
-    parent_module_seq = caller_module_name.split('.')[:-1]
-    full_module_name = '.'.join(parent_module_seq + [module_name])
+def load_relative(module_cur, module_rel, attr_name):
+    parent_module_seq = module_cur.split('.')[:-1]
+    full_module_name = '.'.join(parent_module_seq + [module_rel])
 
     m = load_module(full_module_name)
 
     try:
         c = getattr(m, attr_name)
     except AttributeError as e:
-        raise AttributeNotFoundError('Attribute "{0}" not found in module "{1}": {2}'.format(attr_name, module_name, e))
+        raise AttributeNotFoundError('Attribute "{0}" not found in module "{1}": {2}'.format(attr_name, module_rel, e))
 
     return c
