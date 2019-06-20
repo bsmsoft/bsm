@@ -1,10 +1,9 @@
-from bsm.cmd import Base
 from bsm.cmd import CmdError
+from bsm.cmd.pkg_base import PkgBase
 
-class PkgLs(Base):
+class PkgLs(PkgBase):
     def execute(self, list_all, package):
-        if 'release_version' not in self._bsm.current():
-            raise CmdError('No release loaded currently')
+        self._check_release()
 
         if list_all:
             packages = self._bsm.ls_all_package()

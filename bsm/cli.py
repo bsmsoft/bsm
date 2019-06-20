@@ -117,6 +117,73 @@ def current(ctx):
 
 
 @cli.command()
+@click.option('--software-root', '-r', type=str, help='Local installed software root directory')
+@click.option('--release-repo', type=str, help='Repository for retrieving release information')
+@click.option('--release-source', type=str, help='Directory for retrieving release information. '
+        'This will take precedence over "release-repo". Use this option only for development')
+@click.option('--option', '-o', type=str, multiple=True, help='Options for release')
+@click.option('--reinstall', is_flag=True, help='Reinstall all packages')
+@click.option('--update', is_flag=True, help='Update version information before installation')
+@click.option('--without-package', is_flag=True, help='Do not install packages, only install the release')
+@click.option('--force', '-f', is_flag=True, help='Skip checking system requirements')
+@click.option('--yes', '-y', is_flag=True, help='Install without confirmation')
+@click.argument('version', type=str)
+@click.pass_context
+def install(ctx, software_root, release_repo, release_source, option, reinstall, update, without_package, force, yes, version):
+    '''Install specified release version'''
+    cmd = Cmd()
+    ctx.obj['config_entry']['software_root'] = software_root
+    ctx.obj['config_entry']['release_repo'] = release_repo
+    ctx.obj['config_entry']['release_source'] = release_source
+    ctx.obj['config_entry']['option'] = parse_lines(option)
+    ctx.obj['config_entry']['scenario'] = version
+    ctx.obj['config_entry']['reinstall'] = reinstall
+    cmd.execute('install', ctx.obj, update, without_package, force, yes)
+
+
+@cli.command()
+@click.option('--software-root', '-r', type=str, help='Local installed software root directory')
+@click.option('--default', '-d', is_flag=True, help='Also set the version as default')
+@click.option('--option', '-o', type=str, multiple=True, help='Options for the release')
+@click.option('--without-package', '-p', is_flag=True, help='Do not include packages environment')
+@click.argument('version', type=str)
+@click.pass_context
+def use(ctx, software_root, default, option, without_package, version):
+    '''Switch environment to given release version'''
+    cmd = Cmd()
+    ctx.obj['config_entry']['software_root'] = software_root
+    ctx.obj['config_entry']['option'] = parse_lines(option)
+    ctx.obj['config_entry']['scenario'] = version
+    cmd.execute('use', ctx.obj, default, without_package)
+
+
+@cli.command()
+@click.pass_context
+def refresh(ctx):
+    '''Refresh the current release version environment'''
+    cmd = Cmd()
+    cmd.execute('refresh', ctx.obj)
+
+
+@cli.command()
+@click.pass_context
+def clean(ctx):
+    '''Clean the current release version environment'''
+    cmd = Cmd()
+    cmd.execute('clean', ctx.obj)
+
+
+@cli.command()
+@click.option('--destination', '-d', type=str, help='Directory for packing output')
+@click.argument('version', type=str)
+@click.pass_context
+def pack(ctx, destination, version):
+    '''Create tar packages for the specified release version'''
+    cmd = Cmd('pack')
+    cmd.execute(ctx.obj, destination=destination, version_name=version)
+
+
+@cli.command()
 @click.option('--all', '-a', 'list_all', is_flag=True, help='List all available packages')
 @click.argument('package', type=str, required=False)
 @click.pass_context
@@ -124,6 +191,15 @@ def pkg_ls(ctx, list_all, package):
     '''List all packages of the current release versions'''
     cmd = Cmd()
     cmd.execute('pkg-ls', ctx.obj, list_all, package)
+
+
+@cli.command()
+@click.argument('package_path', type=str)
+@click.pass_context
+def pkg_init(ctx, package_path):
+    '''Initialize a new package'''
+    cmd = Cmd()
+    cmd.execute('pkg-init', ctx.obj, package_path)
 
 
 @cli.command()
@@ -210,81 +286,6 @@ def pkg_edit(ctx, category, subdir, version, option, package):
     cmd = Cmd()
     ctx.obj['config_entry']['option'] = parse_lines(option)
     cmd.execute('pkg-edit', ctx.obj, category, subdir, version, package)
-
-
-@cli.command()
-@click.pass_context
-def pkg_init(ctx):
-    '''Initialize a new package'''
-    cmd = Cmd()
-    cmd.execute('pkg-init', ctx.obj)
-
-
-@cli.command()
-@click.option('--software-root', '-r', type=str, help='Local installed software root directory')
-@click.option('--release-repo', type=str, help='Repository for retrieving release information')
-@click.option('--release-source', type=str, help='Directory for retrieving release information. '
-        'This will take precedence over "release-repo". Use this option only for development')
-@click.option('--option', '-o', type=str, multiple=True, help='Options for release')
-@click.option('--reinstall', is_flag=True, help='Reinstall all packages')
-@click.option('--update', is_flag=True, help='Update version information before installation')
-@click.option('--without-package', is_flag=True, help='Do not install packages, only install the release')
-@click.option('--force', '-f', is_flag=True, help='Skip checking system requirements')
-@click.option('--yes', '-y', is_flag=True, help='Install without confirmation')
-@click.argument('version', type=str)
-@click.pass_context
-def install(ctx, software_root, release_repo, release_source, option, reinstall, update, without_package, force, yes, version):
-    '''Install specified release version'''
-    cmd = Cmd()
-    ctx.obj['config_entry']['software_root'] = software_root
-    ctx.obj['config_entry']['release_repo'] = release_repo
-    ctx.obj['config_entry']['release_source'] = release_source
-    ctx.obj['config_entry']['option'] = parse_lines(option)
-    ctx.obj['config_entry']['scenario'] = version
-    ctx.obj['config_entry']['reinstall'] = reinstall
-    cmd.execute('install', ctx.obj, update, without_package, force, yes)
-
-
-@cli.command()
-@click.option('--software-root', '-r', type=str, help='Local installed software root directory')
-@click.option('--default', '-d', is_flag=True, help='Also set the version as default')
-@click.option('--option', '-o', type=str, multiple=True, help='Options for the release')
-@click.option('--without-package', '-p', is_flag=True, help='Do not include packages environment')
-@click.argument('version', type=str)
-@click.pass_context
-def use(ctx, software_root, default, option, without_package, version):
-    '''Switch environment to given release version'''
-    cmd = Cmd()
-    ctx.obj['config_entry']['software_root'] = software_root
-    ctx.obj['config_entry']['option'] = parse_lines(option)
-    ctx.obj['config_entry']['scenario'] = version
-    cmd.execute('use', ctx.obj, default, without_package)
-
-
-@cli.command()
-@click.pass_context
-def refresh(ctx):
-    '''Refresh the current release version environment'''
-    cmd = Cmd()
-    cmd.execute('refresh', ctx.obj)
-
-
-@cli.command()
-@click.pass_context
-def clean(ctx):
-    '''Clean the current release version environment'''
-    cmd = Cmd()
-    cmd.execute('clean', ctx.obj)
-
-
-@cli.command()
-@click.option('--destination', '-d', type=str, help='Directory for packing output')
-@click.argument('version', type=str)
-@click.pass_context
-def pack(ctx, destination, version):
-    '''Create tar packages for the specified release version'''
-    cmd = Cmd('pack')
-    cmd.execute(ctx.obj, destination=destination, version_name=version)
 
 
 def main(cmd_name=None, app_root=None, output_shell=None, check_cli=False):

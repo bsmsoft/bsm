@@ -1,10 +1,19 @@
-from bsm.cmd import Base
 from bsm.cmd import CmdError
+from bsm.cmd.pkg_base import PkgBase
 
-class PkgUse(Base):
+from bsm.logger import get_logger
+_logger = get_logger()
+
+class PkgUse(PkgBase):
     def execute(self, category, subdir, version, package):
-        if 'release_version' not in self._bsm.current():
-            raise CmdError('No release loaded currently')
+        self._check_release()
+
+        category = self._current_category(category)
 
         ctg, sd, ver = self._bsm.use_package(package, category, subdir, version)
-        return ctg, sd, ver
+        _logger.info('Load package "{0}" from category "{1}", subdir "{2}", version "{3}"'.format(package, ctg, sd, ver))
+
+        pkg_path = self._bsm.package_path(package, category, subdir, version)
+        _logger.info('Package directory: {0}'.format(pkg_path['main_dir']))
+
+        return ''

@@ -1,22 +1,16 @@
-import os
 import click
 
-from bsm.cmd import Base
 from bsm.cmd import CmdError
+from bsm.cmd.pkg_base import PkgBase
 
 from bsm.logger import get_logger
 _logger = get_logger()
 
-class PkgInstall(Base):
+class PkgInstall(PkgBase):
     def execute(self, category, subdir, version, category_origin, subdir_origin, version_origin, package, yes):
-        if 'release_version' not in self._bsm.current():
-            raise CmdError('No release loaded currently')
+        self._check_release()
 
-        if category is None:
-            ctg, _ = self._bsm.detect_category(os.getcwd())
-            if ctg:
-                category = ctg
-                _logger.info('Using current category: {0}'.format(category))
+        category = self._current_category(category)
 
         ctg, sd, ver, ctg_org, sd_org, ver_org, from_install = self._bsm.match_install_package(package, category, subdir, version, category_origin, subdir_origin, version_origin)
         _logger.debug('Matched install package: To category "{0}", subdir "{1}", version "{2}", from category "{3}", subdir "{4}", version "{5}", from_install "{6}"'.format(ctg, sd, ver, ctg_org, sd_org, ver_org, from_install))
