@@ -1,10 +1,7 @@
-from bsm.config.util import find_package
 from bsm.config.util import package_path
 
 from bsm.util import safe_mkdir
 from bsm.util.config import dump_config
-
-from bsm.handler import Handler
 
 from bsm.operation import Base
 
@@ -17,7 +14,7 @@ class InstallPackageConfigError(Exception):
 
 
 class InstallPackageConfig(Base):
-    def execute(self, package, category=None, subdir=None, version=None, category_origin=None, subdir_origin=None, version_origin=None, from_install=False):
+    def execute(self, package, category, subdir, version, category_origin, subdir_origin, version_origin, from_install=False):
         config_package_name = 'package_install' if from_install else 'package_runtime'
 
         category_priority = self._config['category']['priority']

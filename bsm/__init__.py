@@ -64,7 +64,7 @@ class Bsm(object):
 
 
     def ls_remote(self, list_all=False):
-        return self.__operation.execute('ls_remote', list_all)
+        return self.__operation.execute('ls-remote', list_all)
 
     def check_install(self):
         return self.__operation.execute('check', 'install')
@@ -78,13 +78,14 @@ class Bsm(object):
     def install_release_packages(self):
         return self.__operation.execute('install-release-packages')
 
-    def ls(self):
+    def ls_release_version(self):
         return self.__operation.execute('ls-release-version')
 
-    def use(self, without_package=False):
+    def load_release(self):
         self.__operation.execute('load-release')
-        if not without_package:
-            self.__operation.execute('load-release-packages')
+
+    def load_release_package(self):
+        self.__operation.execute('load-release-packages')
 
     def clean(self):
         self.__operation.execute('clean')
@@ -110,8 +111,11 @@ class Bsm(object):
     def find_package(self, package, category=None, subdir=None, version=None, from_install=False):
         return self.__operation.execute('find-package', package, category, subdir, version, from_install)
 
-    def package_path(self, package, category=None, subdir=None, version=None):
-        return self.__operation.execute('package-path', package, category, subdir, version)
+    def package_path(self, package, category=None, subdir=None, version=None, must_exist=False):
+        return self.__operation.execute('package-path', package, category, subdir, version, must_exist)
+
+    def package_exist(self, package, category, subdir, version):
+        return self.__operation.execute('package-exist', package, category, subdir, version)
 
     def match_install_package(self, package, category=None, subdir=None, version=None, category_origin=None, subdir_origin=None, version_origin=None):
         return self.__operation.execute('match-install-package', package, category, subdir, version, category_origin, subdir_origin, version_origin)
@@ -122,13 +126,19 @@ class Bsm(object):
     def install_package(self, package, category, subdir, version):
         return self.__operation.execute('install-package', package, category, subdir, version)
 
+    def detect_package(self, package_path):
+        return self.__operation.execute('detect-package', package_path)
+
+    def create_package_config(self, package, category, subdir, version):
+        return self.__operation.execute('create-package-config', package, category, subdir, version)
+
     def build_package(self, package, category=None, subdir=None, version=None):
         return self.__operation.execute('build-package')
 
     def clean_package(self, package):
         return self.__operation.execute('clean-package', package)
 
-    def use_package(self, package, category=None, subdir=None, version=None):
+    def load_package(self, package, category=None, subdir=None, version=None):
         return self.__operation.execute('load-package', package, category, subdir, version)
 
     def ls_all_package(self):

@@ -5,6 +5,7 @@ from bsm.handler import HandlerNotFoundError
 
 from bsm.config.package_base import ConfigPackageError
 
+from bsm.util import expand_path
 from bsm.util import ensure_list
 from bsm.util import is_str
 
@@ -225,3 +226,20 @@ def load_packages(handler, category_priority, config_package):
         result[package] = find_top_priority(handler, category_priority, value)
 
     return result
+
+def detect_category(config_category, directory):
+    dir_expand = expand_path(directory)
+
+    root_found = None
+    category_found = None
+    for ctg, cfg in config_category['content'].items():
+        if 'root' in cfg and dir_expand.startswith(cfg['root']):
+            root_found = cfg['root']
+            category_found = ctg
+            break
+
+    if category_found is None:
+        return None, None
+
+    rest_dir = dir_expand[len(root_found):].strip(os.sep)
+    return category_found, rest_dir

@@ -9,6 +9,7 @@ class Refresh(Base):
             _logger.warn('No release loaded currently')
             return ''
 
-        self._bsm.use()
+        self._bsm.load_release()
+        self._bsm.load_release_package()
 
         return self._bsm.config('scenario')['version']

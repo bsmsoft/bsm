@@ -19,12 +19,13 @@ def _detect_editor(editors):
     return None
 
 class PkgEdit(PkgBase):
-    def execute(self, category, subdir, version, package):
+    def execute(self, detect_category, category, subdir, version, package):
         self._check_release()
 
-        category = self._current_category(category)
+        if detect_category and category is None:
+            category = self._current_category()
 
-        pkg_path = self._bsm.package_path(package, category, subdir, version)
+        pkg_path = self._bsm.package_path(package, category, subdir, version, True)
 
         pkg_cfg_file = pkg_path['config_file']
 

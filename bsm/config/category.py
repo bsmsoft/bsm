@@ -10,6 +10,10 @@ from bsm.logger import get_logger
 _logger = get_logger()
 
 
+class ConfigCategoryError(Exception):
+    pass
+
+
 class Category(Common):
     def __init__(self, config_entry, config_app, config_env, config_user, config_scenario, config_attribute, config_release):
         super(Category, self).__init__()
@@ -24,8 +28,9 @@ class Category(Common):
         if config_scenario.get('scenario'):
             self.__update_content(config_user.get('scenario', {}).get(config_scenario['scenario'], {}), config_app, config_scenario, config_attribute)
 
-        # Remove duplicated
-        self['priority'] = list(OrderedDict.fromkeys(self['priority']))
+        self.__remove_duplicated_priority()
+
+        self.__check_nested_dir()
 
     def __update_content(self, config_container, config_app, config_scenario, config_attribute):
         self.__update_category(config_container, config_app, config_scenario, config_attribute)
@@ -74,3 +79,18 @@ class Category(Common):
         priority = [ctg for ctg in priority if ctg in self['content']]
         priority += [ctg for ctg in config_container.get('category', {}) if ctg not in priority]
         self['priority'] = priority + self['priority']
+
+    def __remove_duplicated_priority(self):
+        self['priority'] = list(OrderedDict.fromkeys(self['priority']))
+
+    def __check_nested_dir(self):
+        for ctg1, value1 in self['content'].items():
+            if 'root' not in value1:
+                continue
+            for ctg2, value2 in self['content'].items():
+                if ctg1 == ctg2:
+                    continue
+                if 'root' not in value2:
+                    continue
+                if value1['root'].startswith(value2['root']):
+                    raise ConfigCategoryError('Nested category "{0}" - "{1}": "{2}" - "{3}"'.format(ctg1, ctg2, value1['root'], value2['root']))

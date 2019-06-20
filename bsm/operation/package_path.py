@@ -14,11 +14,11 @@ class PackagePathError(Exception):
 
 
 class PackagePath(Base):
-    def execute(self, package, category=None, subdir=None, version=None):
+    def execute(self, package, category=None, subdir=None, version=None, must_exist=False):
         category_priority = self._config['category']['priority']
         _logger.debug('Package path category priority: {0}'.format(category_priority))
 
-        if category is None or subdir is None or version is None:
+        if must_exist or category is None or subdir is None or version is None:
             with Handler(self._config['release_path']['handler_python_dir']) as h:
                 ctg, sd, ver = find_package(h, category_priority, self._config['package_runtime'], package, category, subdir, version)
 

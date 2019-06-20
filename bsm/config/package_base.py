@@ -28,8 +28,11 @@ class PackageBase(Common):
         with Handler(config_release_path['handler_python_dir']) as h:
             self._init_package(h, config_entry, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category)
 
+    def package_exist(self, category, subdir, name, version):
+        return category in self and subdir in self[category] and name in self[category][subdir] and version in self[category][subdir][name]
+
     def package_config(self, category, subdir, name, version):
-        if category not in self or subdir not in self[category] or name not in self[category][subdir] or version not in self[category][subdir][name]:
+        if not self.package_exist(category, subdir, name, version):
             _logger.error('Package not found: {0}.{1}.{2}.{3}'.format(category, name, subdir, version))
             raise ConfigPackageError
         return self[category][subdir][name][version]

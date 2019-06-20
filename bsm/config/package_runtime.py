@@ -11,6 +11,16 @@ from bsm.logger import get_logger
 _logger = get_logger()
 
 
+def _config_from_file(config_file):
+    try:
+        loaded_data = load_config(config_file)
+        if isinstance(loaded_data, dict):
+            return loaded_data
+    except ConfigError as e:
+        _logger.debug('Load config file failed, use empty dict instead: {0}'.format(config_file))
+    return {}
+
+
 def _package_param(rel_dir, version_dir):
     frag = rel_dir.split(os.sep)
     if version_dir:
@@ -62,7 +72,7 @@ class PackageRuntime(PackageBase):
                     continue
 
                 try:
-                    pkg_cfg = load_config(full_path)
+                    pkg_cfg = _config_from_file(full_path)
                 except ConfigError as e:
                     _logger.warn('Fail to load package config file "{0}": {1}'.format(full_path, e))
                     continue

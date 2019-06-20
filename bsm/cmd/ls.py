@@ -5,7 +5,7 @@ _logger = get_logger()
 
 class Ls(Base):
     def execute(self):
-        return self._bsm.ls()
+        return self._bsm.ls_release_version()
 
 
 

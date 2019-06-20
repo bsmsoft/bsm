@@ -7,10 +7,11 @@ from bsm.logger import get_logger
 _logger = get_logger()
 
 class PkgInstall(PkgBase):
-    def execute(self, category, subdir, version, category_origin, subdir_origin, version_origin, package, yes):
+    def execute(self, detect_category, category, subdir, version, category_origin, subdir_origin, version_origin, package, yes):
         self._check_release()
 
-        category = self._current_category(category)
+        if detect_category and category is None:
+            category = self._current_category()
 
         ctg, sd, ver, ctg_org, sd_org, ver_org, from_install = self._bsm.match_install_package(package, category, subdir, version, category_origin, subdir_origin, version_origin)
         _logger.debug('Matched install package: To category "{0}", subdir "{1}", version "{2}", from category "{3}", subdir "{4}", version "{5}", from_install "{6}"'.format(ctg, sd, ver, ctg_org, sd_org, ver_org, from_install))
