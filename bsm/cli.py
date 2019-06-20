@@ -179,13 +179,14 @@ def pkg_remove(ctx, category, subdir, version, option, package):
 @click.option('--subdir', type=str, help='Sub directory for package')
 @click.option('--version', type=str, help='Package version')
 @click.option('--option', '-o', type=str, multiple=True, help='Options for release')
+@click.option('--all', '-a', 'list_all', is_flag=True, help='List all available packages')
 @click.argument('package', type=str)
 @click.pass_context
-def pkg_path(ctx, category, subdir, version, option, package):
+def pkg_path(ctx, category, subdir, version, option, list_all, package):
     '''Remove a package'''
     cmd = Cmd()
     ctx.obj['config_entry']['option'] = parse_lines(option)
-    cmd.execute('pkg-path', ctx.obj, category, subdir, version, package)
+    cmd.execute('pkg-path', ctx.obj, category, subdir, version, list_all, package)
 
 
 @cli.command()

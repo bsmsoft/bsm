@@ -21,8 +21,8 @@ class CmdError(Exception):
 
 class CmdResult(object):
     def __init__(self, output='', commands=[], script_types=[]):
-        self.__output = str(output)
-        self.__commands = commands if isinstance(commands[0], list) else [commands]
+        self.__output = output
+        self.__commands = commands if (not commands) or isinstance(commands[0], list) else [commands]
         self.__script_types = ensure_list(script_types)
 
     @property
