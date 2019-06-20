@@ -190,11 +190,12 @@ def pkg_path(ctx, category, subdir, version, option, list_all, package):
 
 
 @cli.command()
+@click.argument('package', type=str)
 @click.pass_context
-def pkg_clean(ctx):
-    '''Initialize a new package'''
+def pkg_clean(ctx, package):
+    '''Clean a package'''
     cmd = Cmd()
-    cmd.execute('pkg-clean', ctx.obj)
+    cmd.execute('pkg-clean', ctx.obj, package)
 
 
 @cli.command()

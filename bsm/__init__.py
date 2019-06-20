@@ -125,6 +125,9 @@ class Bsm(object):
     def build_package(self, package, category=None, subdir=None, version=None):
         return self.__operation.execute('build-package')
 
+    def clean_package(self, package):
+        return self.__operation.execute('clean-package', package)
+
     def use_package(self, package, category=None, subdir=None, version=None):
         return self.__operation.execute('load-package', package, category, subdir, version)
 
