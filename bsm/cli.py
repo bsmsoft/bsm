@@ -46,13 +46,14 @@ def home(ctx):
 
 
 @cli.command()
+@click.option('--no-default', is_flag=True, help='Do not load default release')
 @click.option('--show-script', is_flag=True, help='Display the shell script')
 @click.pass_context
-def init(ctx, show_script):
+def init(ctx, no_default, show_script):
     '''Initialize bsm environment'''
     cmd = Cmd()
-    ctx.obj['config_entry']['default_scenario'] = version
-    cmd.execute('init', ctx.obj, show_script=show_script, shell=ctx.obj['output']['shell'])
+    ctx.obj['config_entry']['default_scenario'] = not no_default
+    cmd.execute('init', ctx.obj, no_default, show_script, ctx.obj['output']['shell'])
 
 
 @cli.command()
@@ -61,7 +62,7 @@ def init(ctx, show_script):
 def exit(ctx, show_script):
     '''Exit bsm environment completely'''
     cmd = Cmd()
-    cmd.execute('exit', ctx.obj, show_script=show_script, shell=ctx.obj['output']['shell'])
+    cmd.execute('exit', ctx.obj, show_script, ctx.obj['output']['shell'])
 
 
 @cli.command()
@@ -106,6 +107,14 @@ def ls(ctx, software_root):
     cmd = Cmd()
     ctx.obj['software_root'] = software_root
     cmd.execute('ls', ctx.obj)
+
+
+@cli.command()
+@click.pass_context
+def default(ctx):
+    '''List default release'''
+    cmd = Cmd()
+    cmd.execute('default', ctx.obj)
 
 
 @cli.command()

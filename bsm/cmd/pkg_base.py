@@ -8,7 +8,7 @@ _logger = get_logger()
 
 class PkgBase(Base):
     def _check_release(self):
-        if 'release_version' not in self._bsm.current():
+        if 'version' not in self._bsm.config('scenario'):
             raise CmdError('No release loaded currently')
 
     def _current_category(self):

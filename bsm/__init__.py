@@ -63,6 +63,9 @@ class Bsm(object):
         return self.__env.env_final()
 
 
+    def default(self):
+        return self.__config['info'].get('default', {})
+
     def ls_remote(self, list_all=False):
         return self.__operation.execute('ls-remote', list_all)
 
