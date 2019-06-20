@@ -204,15 +204,15 @@ def pkg_ls(ctx, list_all, package):
 
 @cli.command()
 @click.option('--package-root', '-p', type=str, help='Package root directory for initialization, default to current directory')
+@click.option('--yes', '-y', is_flag=True, help='Install without confirmation')
 @click.pass_context
-def pkg_init(ctx, package_root):
-    '''Initialize a new package with directory'''
+def pkg_init(ctx, package_root, yes):
+    '''Initialize a new package from directory'''
     cmd = Cmd()
-    cmd.execute('pkg-init', ctx.obj, package_root)
+    cmd.execute('pkg-init', ctx.obj, package_root, yes)
 
 
 @cli.command()
-@click.option('--detect-category', '-d', is_flag=True, help='Automatically detect current category')
 @click.option('--category', type=str, help='Category to be installed')
 @click.option('--subdir', type=str, help='Sub directory for package')
 @click.option('--version', type=str, help='Package version')
@@ -224,38 +224,36 @@ def pkg_init(ctx, package_root):
 @click.option('--yes', '-y', is_flag=True, help='Install without confirmation')
 @click.argument('package', type=str)
 @click.pass_context
-def pkg_install(ctx, detect_category, category, subdir, version, category_origin, subdir_origin, version_origin, package, option, reinstall, yes):
+def pkg_install(ctx, category, subdir, version, category_origin, subdir_origin, version_origin, package, option, reinstall, yes):
     '''Install specified package'''
     cmd = Cmd()
     ctx.obj['config_entry']['option'] = parse_lines(option)
     ctx.obj['config_entry']['reinstall'] = reinstall
-    cmd.execute('pkg-install', ctx.obj, detect_category, category, subdir, version, category_origin, subdir_origin, version_origin, package, yes)
+    cmd.execute('pkg-install', ctx.obj, category, subdir, version, category_origin, subdir_origin, version_origin, package, yes)
 
 
 @cli.command()
-@click.option('--detect-category', '-d', is_flag=True, help='Automatically detect current category')
 @click.option('--category', type=str, help='Category to be installed')
 @click.option('--subdir', type=str, help='Sub directory for package')
 @click.option('--version', type=str, help='Package version')
 @click.option('--option', '-o', type=str, multiple=True, help='Options for release')
-@click.argument('package', type=str)
+@click.argument('package', type=str, required=False)
 @click.pass_context
-def pkg_use(ctx, detect_category, category, subdir, version, option, package):
+def pkg_use(ctx, category, subdir, version, option, package):
     '''Use a package'''
     cmd = Cmd()
     ctx.obj['config_entry']['option'] = parse_lines(option)
-    cmd.execute('pkg-use', ctx.obj, detect_category, category, subdir, version, package)
+    cmd.execute('pkg-use', ctx.obj, category, subdir, version, package)
 
 
 @cli.command()
-@click.option('--detect-category', '-d', is_flag=True, help='Automatically detect current category')
 @click.option('--category', type=str, help='Category to be installed')
 @click.option('--subdir', type=str, help='Sub directory for package')
 @click.option('--version', type=str, help='Package version')
 @click.option('--option', '-o', type=str, multiple=True, help='Options for release')
-@click.argument('package', type=str)
+@click.argument('package', type=str, required=False)
 @click.pass_context
-def pkg_remove(ctx, detect_category, category, subdir, version, option, package):
+def pkg_remove(ctx, category, subdir, version, option, package):
     '''Remove a package'''
     cmd = Cmd()
     ctx.obj['config_entry']['option'] = parse_lines(option)
@@ -263,19 +261,18 @@ def pkg_remove(ctx, detect_category, category, subdir, version, option, package)
 
 
 @cli.command()
-@click.option('--detect-category', '-d', is_flag=True, help='Automatically detect current category')
 @click.option('--category', type=str, help='Category to be installed')
 @click.option('--subdir', type=str, help='Sub directory for package')
 @click.option('--version', type=str, help='Package version')
 @click.option('--option', '-o', type=str, multiple=True, help='Options for release')
 @click.option('--all', '-a', 'list_all', is_flag=True, help='List all available packages')
-@click.argument('package', type=str)
+@click.argument('package', type=str, required=False)
 @click.pass_context
-def pkg_path(ctx, detect_category, category, subdir, version, option, list_all, package):
+def pkg_path(ctx, category, subdir, version, option, list_all, package):
     '''Remove a package'''
     cmd = Cmd()
     ctx.obj['config_entry']['option'] = parse_lines(option)
-    cmd.execute('pkg-path', ctx.obj, detect_category, category, subdir, version, list_all, package)
+    cmd.execute('pkg-path', ctx.obj, category, subdir, version, list_all, package)
 
 
 @cli.command()
@@ -288,18 +285,17 @@ def pkg_clean(ctx, package):
 
 
 @cli.command()
-@click.option('--detect-category', '-d', is_flag=True, help='Automatically detect current category')
 @click.option('--category', type=str, help='Category to be installed')
 @click.option('--subdir', type=str, help='Sub directory for package')
 @click.option('--version', type=str, help='Package version')
 @click.option('--option', '-o', type=str, multiple=True, help='Options for release')
-@click.argument('package', type=str)
+@click.argument('package', type=str, required=False)
 @click.pass_context
-def pkg_edit(ctx, detect_category, category, subdir, version, option, package):
+def pkg_edit(ctx, category, subdir, version, option, package):
     '''Edit package configuration'''
     cmd = Cmd()
     ctx.obj['config_entry']['option'] = parse_lines(option)
-    cmd.execute('pkg-edit', ctx.obj, detect_category, category, subdir, version, package)
+    cmd.execute('pkg-edit', ctx.obj, category, subdir, version, package)
 
 
 def main(cmd_name=None, app_root=None, output_shell=None, check_cli=False):

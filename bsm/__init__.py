@@ -129,8 +129,14 @@ class Bsm(object):
     def install_package(self, package, category, subdir, version):
         return self.__operation.execute('install-package', package, category, subdir, version)
 
-    def detect_package(self, package_path):
-        return self.__operation.execute('detect-package', package_path)
+    def detect_package_param(self, package_dir):
+        return self.__operation.execute('detect-package-param', package_dir)
+
+    def detect_package(self, directory):
+        return self.__operation.execute('detect-package', directory)
+
+    def check_conflict_package(self, directory):
+        return self.__operation.execute('check-conflict-package', directory)
 
     def create_package_config(self, package, category, subdir, version):
         return self.__operation.execute('create-package-config', package, category, subdir, version)

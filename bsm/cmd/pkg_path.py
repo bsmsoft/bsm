@@ -1,11 +1,11 @@
 from bsm.cmd.pkg_base import PkgBase
 
 class PkgPath(PkgBase):
-    def execute(self, detect_category, category, subdir, version, list_all, package):
+    def execute(self, category, subdir, version, list_all, package):
         self._check_release()
 
-        if detect_category and category is None:
-            category = self._current_category()
+        if package is None:
+            category, subdir, package, version = self._current_package()
 
         pkg_path = self._bsm.package_path(package, category, subdir, version)
 

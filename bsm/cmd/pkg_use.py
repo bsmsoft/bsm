@@ -4,11 +4,11 @@ from bsm.logger import get_logger
 _logger = get_logger()
 
 class PkgUse(PkgBase):
-    def execute(self, detect_category, category, subdir, version, package):
+    def execute(self, category, subdir, version, package):
         self._check_release()
 
-        if detect_category and category is None:
-            category = self._current_category()
+        if package is None:
+            category, subdir, package, version = self._current_package()
 
         ctg, sd, ver = self._bsm.load_package(package, category, subdir, version)
         _logger.info('Load package "{0}" successfully'.format(package))

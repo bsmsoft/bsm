@@ -243,3 +243,21 @@ def detect_category(config_category, directory):
 
     rest_dir = dir_expand[len(root_found):].strip(os.sep)
     return category_found, rest_dir
+
+def detect_package(directory, config_package):
+    for category in config_package:
+        for subdir in config_package[category]:
+            for package in config_package[category][subdir]:
+                for version, value in config_package[category][subdir][package].items():
+                    if directory.startswith(value['package_path']['main_dir']):
+                        return category, subdir, package, version
+    return None, None, None, None
+
+def check_conflict_package(directory, config_package):
+    for category in config_package:
+        for subdir in config_package[category]:
+            for package in config_package[category][subdir]:
+                for version, value in config_package[category][subdir][package].items():
+                    if directory.startswith(value['package_path']['main_dir']) or value['package_path']['main_dir'].startswith(directory):
+                        return category, subdir, package, version
+    return None, None, None, None

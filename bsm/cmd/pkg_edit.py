@@ -19,11 +19,11 @@ def _detect_editor(editors):
     return None
 
 class PkgEdit(PkgBase):
-    def execute(self, detect_category, category, subdir, version, package):
+    def execute(self, category, subdir, version, package):
         self._check_release()
 
-        if detect_category and category is None:
-            category = self._current_category()
+        if package is None:
+            category, subdir, package, version = self._current_package()
 
         pkg_path = self._bsm.package_path(package, category, subdir, version, True)
 

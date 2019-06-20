@@ -11,8 +11,9 @@ class PkgBase(Base):
         if 'version' not in self._bsm.config('scenario'):
             raise CmdError('No release loaded currently')
 
-    def _current_category(self):
-        ctg, _ = self._bsm.detect_category(os.getcwd())
-        if ctg:
-            _logger.info('Using current category: {0}'.format(ctg))
-        return ctg
+    def _current_package(self):
+        category, subdir, package, version = self._bsm.detect_package(os.getcwd())
+        if package is None:
+            raise CmdError('Can not tell which package to use')
+        _logger.info('Found current package "{0}": category "{1}", subdir "{2}", version "{3}"'.format(package, category, subdir, version))
+        return category, subdir, package, version
