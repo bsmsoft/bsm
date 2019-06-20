@@ -15,4 +15,4 @@ class Exit(Base):
 
         self._bsm.exit()
 
-        return CmdResult(output, 'exit')
+        return CmdResult(output=output, script_types='exit')

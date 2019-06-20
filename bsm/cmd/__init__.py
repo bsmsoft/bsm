@@ -1,4 +1,5 @@
 import sys
+import subprocess
 import traceback
 
 import click
@@ -19,13 +20,18 @@ class CmdError(Exception):
 
 
 class CmdResult(object):
-    def __init__(self, output='', script_types=[]):
-        self.__output = output
+    def __init__(self, output='', commands=[], script_types=[]):
+        self.__output = str(output)
+        self.__commands = commands if isinstance(commands[0], list) else [commands]
         self.__script_types = ensure_list(script_types)
 
     @property
     def output(self):
         return self.__output
+
+    @property
+    def commands(self):
+        return self.__commands
 
     @property
     def script_types(self):
@@ -35,10 +41,10 @@ class CmdResult(object):
 def _convert_cmd_result(result):
     if isinstance(result, CmdResult):
         return result
-    return CmdResult(result)
+    return CmdResult(output=result)
 
 
-def _generate_script(cmd_name, app_root, shell_name, output, env_changes, script_types):
+def _generate_script(cmd_name, app_root, shell_name, output, commands, env_changes, script_types):
     try:
         shell = Shell(shell_name, cmd_name, app_root)
     except Exception as e:
@@ -51,6 +57,11 @@ def _generate_script(cmd_name, app_root, shell_name, output, env_changes, script
     shell.comment('Add definition script')
     for st in script_types:
         shell.add_script(st)
+
+    shell.newline()
+    shell.comment('Run commands')
+    for cmd in commands:
+        shell.run(cmd)
 
     shell.newline()
     shell.comment('Final output')
@@ -100,7 +111,15 @@ class Cmd(object):
 
             if obj['output']['shell']:
                 final_output = _generate_script(bsm.config('app')['cmd_name'], bsm.config('app').get('app_root', ''),
-                        obj['output']['shell'], final_output, env_changes, cmd_result.script_types)
+                        obj['output']['shell'], final_output, cmd_result.commands, env_changes, cmd_result.script_types)
+
+            if final_output:
+                nl = not final_output.endswith('\n')
+                click.echo(final_output, nl=nl)
+
+            if not obj['output']['shell']:
+                for cmd in cmd_result.commands:
+                    subprocess.call(cmd)
         except ConfigReleaseError as e:
             _logger.error(str(e))
             _logger.critical('Can not load release version: {0}'.format(bsm.config('entry')['scenario']))
@@ -110,7 +129,3 @@ class Cmd(object):
             if bsm.config('output')['verbose']:
                 _logger.critical('\n{0}'.format(traceback.format_exc()))
             sys.exit(1)
-
-        if final_output:
-            nl = not final_output.endswith('\n')
-            click.echo(final_output, nl=nl)

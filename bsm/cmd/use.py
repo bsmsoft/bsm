@@ -15,5 +15,5 @@ class Use(Base):
 
         result = {}
         result['software_root'] = self._bsm.config('scenario').get('software_root', '')
-        result['release_version'] = self._bsm.config('scenario').get('version', '')
+        result['version'] = self._bsm.config('scenario').get('version', '')
         return result

@@ -15,4 +15,4 @@ class Init(Base):
 
         self._bsm.use()
 
-        return CmdResult(output, 'init')
+        return CmdResult(output=output, script_types='init')

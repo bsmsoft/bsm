@@ -197,11 +197,17 @@ def pkg_clean(ctx):
 
 
 @cli.command()
+@click.option('--category', type=str, help='Category to be installed')
+@click.option('--subdir', type=str, help='Sub directory for package')
+@click.option('--version', type=str, help='Package version')
+@click.option('--option', '-o', type=str, multiple=True, help='Options for release')
+@click.argument('package', type=str)
 @click.pass_context
-def pkg_edit(ctx):
+def pkg_edit(ctx, category, subdir, version, option, package):
     '''Edit package configuration'''
     cmd = Cmd()
-    cmd.execute('pkg-edit', ctx.obj)
+    ctx.obj['config_entry']['option'] = parse_lines(option)
+    cmd.execute('pkg-edit', ctx.obj, category, subdir, version, package)
 
 
 @cli.command()
