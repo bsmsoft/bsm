@@ -40,7 +40,7 @@ class PkgLs(PkgBase):
                 if max_subdir_length < subdir_length:
                     max_subdir_length = subdir_length
 
-                version_length = len(cfg['version'])
+                version_length = len(str(cfg['version']))
                 if max_version_length < version_length:
                     max_version_length = version_length
 
