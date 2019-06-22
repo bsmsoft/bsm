@@ -1,10 +1,9 @@
-from bsm.config.common import Common
-
 from bsm.handler import Handler
 
 from bsm.util import safe_mkdir
-
 from bsm.util.config import dump_config
+
+from bsm.config.common_dict import CommonDict
 
 from bsm.logger import get_logger
 _logger = get_logger()
@@ -17,8 +16,8 @@ class ConfigPackageParamError(Exception):
     pass
 
 
-class PackageBase(Common):
-    def __init__(self, config_entry, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category):
+class PackageBase(CommonDict):
+    def __init__(self, config_entry, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category, config_category_priority):
         super(PackageBase, self).__init__()
 
         if not ('version' in config_scenario and config_scenario['version']):
@@ -26,7 +25,7 @@ class PackageBase(Common):
             return
 
         with Handler(config_release_path['handler_python_dir']) as h:
-            self._init_package(h, config_entry, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category)
+            self._init_package(h, config_entry, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category, config_category_priority)
 
     def package_exist(self, category, subdir, name, version):
         return category in self and subdir in self[category] and name in self[category][subdir] and version in self[category][subdir][name]

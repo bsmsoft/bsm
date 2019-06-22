@@ -44,7 +44,7 @@ def _step_param(config_action):
 
 
 def transform_package(handler, operation, category, subdir, name, version, pkg_cfg,
-        config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_category):
+        config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_category, config_category_priority):
     param = {}
     param['operation'] = operation
 
@@ -62,6 +62,7 @@ def transform_package(handler, operation, category, subdir, name, version, pkg_c
     param['config_attribute'] = config_attribute.data_copy()
     param['config_release'] = config_release.data_copy()
     param['config_category'] = config_category.data_copy()
+    param['config_category_priority'] = config_category_priority.data_copy()
 
     try:
         result = handler.run('transform_package', param)
@@ -76,10 +77,10 @@ def transform_package(handler, operation, category, subdir, name, version, pkg_c
     return copy.deepcopy(pkg_cfg)
 
 def package_path(config_app, config_category, category, subdir, name, version):
-    if category not in config_category['content']:
+    if category not in config_category:
         raise ConfigPackageError('Category not found: {0}'.format(category))
 
-    ctg_cfg = config_category['content'][category]
+    ctg_cfg = config_category[category]
 
     if not ctg_cfg.get('root'):
         raise ConfigPackageError('Category root is not properly set for: {0}'.format(category))
@@ -180,6 +181,7 @@ def find_top_priority(handler, category_priority, packages):
             top_version = pkg[2]
     packages = [p for p in packages if p[2] == top_version]
 
+    # subdir is the least important
     top_subdir = None
     for pkg in packages:
         if top_subdir is None or pkg[1] < top_subdir:
@@ -232,7 +234,7 @@ def detect_category(config_category, directory):
 
     root_found = None
     category_found = None
-    for ctg, cfg in config_category['content'].items():
+    for ctg, cfg in config_category.items():
         if 'root' in cfg and dir_expand.startswith(cfg['root']):
             root_found = cfg['root']
             category_found = ctg

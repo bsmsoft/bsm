@@ -8,6 +8,12 @@ class Base(object):
         newlines = map(lambda x:'# '+x, lines)
         return '\n'.join(newlines) + '\n'
 
-    def run(self, command):
+    def run(self, command, cwd):
         args = ['\''+arg+'\'' for arg in command]
-        return ' '.join(args) + '\n'
+        run_line = ' '.join(args) + '\n'
+        if not cwd:
+            return run_line
+
+        cd_line = 'cd \'' + cwd + '\'\n'
+        cd_old_line = 'cd -'
+        return cd_line + run_line + cd_old_line

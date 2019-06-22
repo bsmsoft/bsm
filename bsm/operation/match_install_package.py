@@ -14,7 +14,7 @@ _logger = get_logger()
 
 class MatchInstallPackage(Base):
     def execute(self, package, category=None, subdir=None, version=None, category_origin=None, subdir_origin=None, version_origin=None):
-        category_priority = self._config['category']['priority']
+        category_priority = self._config['category_priority']
 
         from_install = False
 

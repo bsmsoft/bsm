@@ -1,12 +1,12 @@
 from packaging.specifiers import SpecifierSet
 from packaging.specifiers import InvalidSpecifier
 
-from bsm.config.common import Common
-
 from bsm.handler import Handler
 from bsm.handler import HandlerNotFoundError
 
 from bsm.util import ensure_list
+
+from bsm.config.common_dict import CommonDict
 
 from bsm.logger import get_logger
 _logger = get_logger()
@@ -18,7 +18,7 @@ class ConfigReleaseError(Exception):
     pass
 
 
-class Release(Common):
+class Release(CommonDict):
     def __init__(self, config_app, config_output, config_scenario, config_option, config_release_path, config_release_origin, config_attribute):
         super(Release, self).__init__()
 

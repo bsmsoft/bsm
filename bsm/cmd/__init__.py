@@ -22,7 +22,7 @@ class CmdError(Exception):
 class CmdResult(object):
     def __init__(self, output='', commands=[], script_types=[]):
         self.__output = output
-        self.__commands = commands if (not commands) or isinstance(commands[0], list) else [commands]
+        self.__commands = ensure_list(commands)
         self.__script_types = ensure_list(script_types)
 
     @property
@@ -60,8 +60,8 @@ def _generate_script(cmd_name, app_root, shell_name, output, commands, env_chang
 
     shell.newline()
     shell.comment('Run commands')
-    for cmd in commands:
-        shell.run(cmd)
+    for command in commands:
+        shell.run(command.get('cmd', []), command.get('cwd', None))
 
     shell.newline()
     shell.comment('Final output')
@@ -91,12 +91,12 @@ class Cmd(object):
         output_format = obj['output']['format']
 
         try:
-            cmd = load_common(subcmd_name, 'bsm.cmd')(bsm, output_format)
+            command = load_common(subcmd_name, 'bsm.cmd')(bsm, output_format)
         except Exception as e:
             raise CmdError('Can not load command "{0}": {1}'.format(subcmd_name, e))
 
         try:
-            cmd_result = _convert_cmd_result(cmd.execute(*args, **kwargs))
+            cmd_result = _convert_cmd_result(command.execute(*args, **kwargs))
 
             result_output = cmd_result.output
 
@@ -118,8 +118,8 @@ class Cmd(object):
                 click.echo(final_output, nl=nl)
 
             if not obj['output']['shell']:
-                for cmd in cmd_result.commands:
-                    subprocess.call(cmd)
+                for run_cmd in cmd_result.commands:
+                    subprocess.call(run_cmd.get('cmd', []), cwd=run_cmd.get('cwd', None))
         except ConfigReleaseError as e:
             _logger.error(str(e))
             _logger.critical('Can not load release version: {0}'.format(bsm.config('entry')['scenario']))

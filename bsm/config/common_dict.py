@@ -1,5 +1,9 @@
-import collections
 import copy
+
+try:
+    from collections.abc import MutableMapping
+except ImportError:
+    from collections import MutableMapping
 
 from bsm.util.config import load_config, dump_config, ConfigError
 
@@ -18,7 +22,7 @@ def _config_from_file(config_file):
     return {}
 
 
-class Common(collections.MutableMapping):
+class CommonDict(MutableMapping):
     def __init__(self, *args, **kwargs):
         self.__data = {}
         self.update(dict(*args, **kwargs))

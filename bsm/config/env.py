@@ -1,8 +1,8 @@
-from bsm.config.common import Common
-
 from bsm.env import Env as BsmEnv
 
-class Env(Common):
+from bsm.config.common_dict import CommonDict
+
+class Env(CommonDict):
     def __init__(self, initial_env, env_prefix):
         super(Env, self).__init__()
 

@@ -7,9 +7,12 @@ class Refresh(Base):
     def execute(self):
         if 'version' not in self._bsm.config('scenario'):
             _logger.warn('No release loaded currently')
-            return ''
+            return
 
         self._bsm.load_release()
         self._bsm.load_release_package()
 
-        return self._bsm.config('scenario')['version']
+        result = {}
+        result['software_root'] = self._bsm.config('scenario').get('software_root', '')
+        result['version'] = self._bsm.config('scenario').get('version', '')
+        return result

@@ -22,10 +22,9 @@ class PkgEdit(PkgBase):
     def execute(self, category, subdir, version, package):
         self._check_release()
 
-        if package is None:
-            category, subdir, package, version = self._current_package()
+        category, subdir, package, version = self._process_param(package, category, subdir, version)
 
-        pkg_path = self._bsm.package_path(package, category, subdir, version, True)
+        pkg_path = self._bsm.package_path(package, category, subdir, version)
 
         pkg_cfg_file = pkg_path['config_file']
 
@@ -39,11 +38,11 @@ class PkgEdit(PkgBase):
 
         if not editor:
             _logger.warn('Editor open failed. Please edit the package configuration file by yourself: {0}'.format(pkg_cfg_file))
-            return ''
+            return
 
         _logger.info('Edit package configuration file: {0}'.format(pkg_cfg_file))
         _logger.debug('Select editor: {0}'.format(editor))
 
         command = [editor, pkg_cfg_file]
 
-        return CmdResult(commands=command)
+        return CmdResult(commands={'cmd': command})

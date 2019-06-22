@@ -48,19 +48,19 @@ def _package_param(rel_dir, version_dir):
 
 
 class PackageRuntime(PackageBase):
-    def __init__(self, config_entry, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category):
-        super(PackageRuntime, self).__init__(config_entry, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category)
+    def __init__(self, config_entry, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category, config_category_priority):
+        super(PackageRuntime, self).__init__(config_entry, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category, config_category_priority)
 
-    def _init_package(self, handler, config_entry, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category):
+    def _init_package(self, handler, config_entry, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category, config_category_priority):
         reinstall = config_entry.get('reinstall', False)
 
-        category_runtime = [ctg for ctg, cfg in config_category['content'].items() if cfg.get('root')]
+        category_runtime = [ctg for ctg, cfg in config_category.items() if cfg.get('root')]
 
         _logger.debug('Category for runtime: {0}'.format(category_runtime))
 
         for category in category_runtime:
-            version_dir = config_category['content'][category]['version_dir']
-            config_package_dir = config_category['content'][category]['config_package_dir']
+            version_dir = config_category[category]['version_dir']
+            config_package_dir = config_category[category]['config_package_dir']
 
             for full_path, rel_dir, f in walk_rel_dir(config_package_dir):
                 if f != config_app['config_package_file']:
@@ -78,7 +78,7 @@ class PackageRuntime(PackageBase):
                     continue
 
                 final_pkg_cfg = transform_package(handler, 'runtime', category, subdir, package, version, pkg_cfg,
-                        config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_category)
+                        config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_category, config_category_priority)
 
                 if not version_dir:
                     if 'version' in final_pkg_cfg and final_pkg_cfg['version']:

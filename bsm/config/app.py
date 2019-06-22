@@ -1,10 +1,10 @@
 import os
 
 from bsm import BSM_HOME
-from bsm.config.common import Common
+from bsm.config.common_dict import CommonDict
 from bsm.util import expand_path
 
-class App(Common):
+class App(CommonDict):
     def __init__(self, app_root):
         super(App, self).__init__()
 

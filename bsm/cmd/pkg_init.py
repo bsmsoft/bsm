@@ -19,7 +19,7 @@ class PkgInit(PkgBase):
 
         _logger.info('Will create package "{0}" to category "{1}", subdir "{2}", version "{3}"'.format(package, ctg, sd, ver))
         if not yes and not click.confirm('Proceed with package initialization?', default=True, err=True):
-            return ''
+            return
 
         self._bsm.create_package_config(package, ctg, sd, ver)
         _logger.info('Package "{0}" initialized successfully'.format(package))

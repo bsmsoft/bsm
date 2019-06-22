@@ -240,7 +240,7 @@ def pkg_install(ctx, category, subdir, version, category_origin, subdir_origin, 
 @click.argument('package', type=str, required=False)
 @click.pass_context
 def pkg_use(ctx, category, subdir, version, option, package):
-    '''Use a package'''
+    '''Load a package'''
     cmd = Cmd()
     ctx.obj['config_entry']['option'] = parse_lines(option)
     cmd.execute('pkg-use', ctx.obj, category, subdir, version, package)
@@ -269,7 +269,7 @@ def pkg_remove(ctx, category, subdir, version, option, package):
 @click.argument('package', type=str, required=False)
 @click.pass_context
 def pkg_path(ctx, category, subdir, version, option, list_all, package):
-    '''Remove a package'''
+    '''List package path'''
     cmd = Cmd()
     ctx.obj['config_entry']['option'] = parse_lines(option)
     cmd.execute('pkg-path', ctx.obj, category, subdir, version, list_all, package)

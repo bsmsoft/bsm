@@ -47,13 +47,13 @@ def _package_param(identifier, pkg_cfg):
 
 
 class PackageInstall(PackageBase):
-    def __init__(self, config_entry, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category):
-        super(PackageInstall, self).__init__(config_entry, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category)
+    def __init__(self, config_entry, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category, config_category_priority):
+        super(PackageInstall, self).__init__(config_entry, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category, config_category_priority)
 
-    def _init_package(self, handler, config_entry, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category):
+    def _init_package(self, handler, config_entry, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category, config_category_priority):
         reinstall = config_entry.get('reinstall', False)
 
-        category_install = [ctg for ctg, ctg_cfg in config_category['content'].items() if ctg_cfg['install']]
+        category_install = [ctg for ctg, ctg_cfg in config_category.items() if ctg_cfg['install']]
 
         _logger.debug('Category for install: {0}'.format(category_install))
 
@@ -69,7 +69,7 @@ class PackageInstall(PackageBase):
 
             version = ensure_list(pkg_cfg.get('version', []))
 
-            version_dir = config_category['content'][category_name]['version_dir']
+            version_dir = config_category[category_name]['version_dir']
             if (not version_dir) and len(version) > 1:
                 _logger.warn('Only one version could be installed when category version_dir is false')
                 version = version[:1]
@@ -90,7 +90,7 @@ class PackageInstall(PackageBase):
                 final_config['config_origin']['version'] = ver
 
                 final_config['config'] = transform_package(handler, 'install', category_name, subdir, pkg_name, ver, pkg_cfg,
-                        config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_category)
+                        config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_category, config_category_priority)
                 final_config['config']['name'] = pkg_name
                 final_config['config']['category'] = category_name
                 final_config['config']['subdir'] = subdir

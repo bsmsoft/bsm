@@ -2,7 +2,7 @@ import os
 
 from bsm.const import HANDLER_MODULE_NAME
 
-from bsm.config.common import Common
+from bsm.config.common_dict import CommonDict
 
 from bsm.logger import get_logger
 _logger = get_logger()
@@ -12,7 +12,7 @@ class ReleasePathError(Exception):
     pass
 
 
-class ReleasePath(Common):
+class ReleasePath(CommonDict):
     def __init__(self, config_scenario, release_work_dir):
         super(ReleasePath, self).__init__()
 

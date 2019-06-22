@@ -1,9 +1,7 @@
 import os
-from collections import OrderedDict
 
-from bsm.config.common import Common
+from bsm.config.common_dict import CommonDict
 
-from bsm.util import ensure_list
 from bsm.util import expand_path
 
 from bsm.logger import get_logger
@@ -14,27 +12,18 @@ class ConfigCategoryError(Exception):
     pass
 
 
-class Category(Common):
-    def __init__(self, config_entry, config_app, config_env, config_user, config_scenario, config_attribute, config_release):
+class Category(CommonDict):
+    def __init__(self, config_app, config_user, config_scenario, config_attribute, config_release):
         super(Category, self).__init__()
 
-        self['content'] = {}
-        self['priority'] = []
+        self.__update_category(config_release.get('setting', {}), config_app, config_scenario, config_attribute)
 
-        self.__update_content(config_release.get('setting', {}), config_app, config_scenario, config_attribute)
-
-        self.__update_content(config_user, config_app, config_scenario, config_attribute)
+        self.__update_category(config_user, config_app, config_scenario, config_attribute)
 
         if config_scenario.get('scenario'):
-            self.__update_content(config_user.get('scenario', {}).get(config_scenario['scenario'], {}), config_app, config_scenario, config_attribute)
-
-        self.__remove_duplicated_priority()
+            self.__update_category(config_user.get('scenario', {}).get(config_scenario['scenario'], {}), config_app, config_scenario, config_attribute)
 
         self.__check_nested_dir()
-
-    def __update_content(self, config_container, config_app, config_scenario, config_attribute):
-        self.__update_category(config_container, config_app, config_scenario, config_attribute)
-        self.__update_priority(config_container)
 
     def __update_category(self, config_container, config_app, config_scenario, config_attribute):
         if 'category' not in config_container:
@@ -46,8 +35,8 @@ class Category(Common):
             self.__load_category(ctg, ctg_cfg, config_app, config_scenario, config_attribute)
 
     def __load_category(self, ctg, ctg_cfg, config_app, config_scenario, config_attribute):
-        self['content'][ctg] = {}
-        result = self['content'][ctg]
+        self[ctg] = {}
+        result = self[ctg]
 
         result['name'] = ctg
         result['pre_check'] = ctg_cfg.get('pre_check', False)
@@ -74,20 +63,11 @@ class Category(Common):
             result['config_package_dir'] = os.path.join(result['work_dir'], 'release', config_scenario['version'])
         result['install_dir'] = os.path.join(result['work_dir'], 'install')
 
-    def __update_priority(self, config_container):
-        priority = ensure_list(config_container.get('category_priority', []))
-        priority = [ctg for ctg in priority if ctg in self['content']]
-        priority += [ctg for ctg in config_container.get('category', {}) if ctg not in priority]
-        self['priority'] = priority + self['priority']
-
-    def __remove_duplicated_priority(self):
-        self['priority'] = list(OrderedDict.fromkeys(self['priority']))
-
     def __check_nested_dir(self):
-        for ctg1, value1 in self['content'].items():
+        for ctg1, value1 in self.items():
             if 'root' not in value1:
                 continue
-            for ctg2, value2 in self['content'].items():
+            for ctg2, value2 in self.items():
                 if ctg1 == ctg2:
                     continue
                 if 'root' not in value2:

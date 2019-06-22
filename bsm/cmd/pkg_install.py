@@ -21,7 +21,7 @@ class PkgInstall(PkgBase):
         _logger.info('The package directory will be: {0}"'.format(pkg_path['main_dir']))
 
         if not yes and not click.confirm('Proceed with installation?', default=True, err=True):
-            return ''
+            return
 
         # Install package config if not exist
         if ctg_org is not None:

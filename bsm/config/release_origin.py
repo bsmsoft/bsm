@@ -1,9 +1,9 @@
 import os
 
-from bsm.config.common import Common
-
 from bsm.util import walk_rel_dir
 from bsm.util.config import load_config, ConfigError
+
+from bsm.config.common_dict import CommonDict
 
 from bsm.logger import get_logger
 _logger = get_logger()
@@ -15,7 +15,7 @@ class ConfigReleaseOriginError(Exception):
     pass
 
 
-class ReleaseOrigin(Common):
+class ReleaseOrigin(CommonDict):
     def __init__(self, config_app, config_output, config_scenario, config_release_path):
         super(ReleaseOrigin, self).__init__()
 

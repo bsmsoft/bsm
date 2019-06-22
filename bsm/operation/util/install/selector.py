@@ -15,9 +15,12 @@ class Selector(object):
         param['config_app'] = self.__config['app'].data_copy()
         param['config_output'] = self.__config['output'].data_copy()
         param['config_scenario'] = self.__config['scenario'].data_copy()
+        param['config_option'] = self.__config['option'].data_copy()
         param['config_release_path'] = self.__config['release_path'].data_copy()
-        param['config_release'] = self.__config['release'].data_copy()
         param['config_attribute'] = self.__config['attribute'].data_copy()
+        param['config_release'] = self.__config['release'].data_copy()
+        param['config_category'] = self.__config['category'].data_copy()
+        param['config_category_priority'] = self.__config['category_priority'].data_copy()
 
         param['running'] = running
         param['idle'] = idle

@@ -9,7 +9,7 @@ from bsm.operation import Base
 from bsm.operation.util import list_versions
 
 
-class ReleaseVersionNotExistError(Exception):
+class ReleaseVersionError(Exception):
     pass
 
 
@@ -24,7 +24,7 @@ def _install_from_git_repo(src_repo, release_version, version_pattern, dst_dir, 
     versions = list_versions(src_repo, version_pattern, git)
 
     if release_version not in versions:
-        raise ReleaseVersionNotExistError('Release version "{0}" does not exist in repo {1}'.format(release_version, src_repo))
+        raise ReleaseVersionError('Release version "{0}" does not exist in repo {1}'.format(release_version, src_repo))
 
     release_tag = versions[release_version]
 
@@ -38,8 +38,7 @@ def _install_from_git_repo(src_repo, release_version, version_pattern, dst_dir, 
 class InstallRelease(Base):
     def execute(self):
         if 'version' not in self._config['scenario']:
-            _logger.warn('No release specified, nothing to do')
-            return ''
+            raise ReleaseVersionError('No release version specified')
 
         self.__install_definition()
         self.__install_handler()

@@ -20,7 +20,7 @@ class DetectPackageParam(Base):
 
         _logger.debug('Category found: {0}'.format(category))
 
-        version_dir = self._config['category']['content'][category]['version_dir']
+        version_dir = self._config['category'][category]['version_dir']
 
         frag = rest_dir.split(os.sep)
 

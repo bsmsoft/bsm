@@ -11,6 +11,8 @@ def _format_dict(d):
 
 class Plain(object):
     def dump(self, value):
+        if value is None:
+            return ''
         if isinstance(value, (list, tuple)):
             return '\n'.join([_pretty(v) for v in value])
         if isinstance(value, dict):

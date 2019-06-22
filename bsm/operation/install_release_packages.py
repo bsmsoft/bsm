@@ -10,6 +10,8 @@ from bsm.operation.util.install.executor import Executor as InstallExecutor
 
 from bsm.handler import Handler
 
+from bsm.env import Env
+
 from bsm.util import ensure_list
 from bsm.util import safe_mkdir
 
@@ -79,7 +81,7 @@ class InstallReleasePackages(Base):
         env.unload_packages()
         env.unload_release()
         env.unload_app()
-        env.load_app(self.__config['app'])
+        env.load_app(self._config['app'])
         env.load_release(self._config['scenario'], self._config['option'], self._config['release'])
 
         selector = InstallSelector(self._config)

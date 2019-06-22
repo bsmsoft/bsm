@@ -7,18 +7,17 @@ class PkgUse(PkgBase):
     def execute(self, category, subdir, version, package):
         self._check_release()
 
-        if package is None:
-            category, subdir, package, version = self._current_package()
+        category, subdir, package, version = self._process_param(package, category, subdir, version)
 
-        ctg, sd, ver = self._bsm.load_package(package, category, subdir, version)
+        self._bsm.load_package(package, category, subdir, version)
         _logger.info('Load package "{0}" successfully'.format(package))
 
-        pkg_path = self._bsm.package_path(package, ctg, sd, ver)
+        pkg_path = self._bsm.package_path(package, category, subdir, version)
 
         result = {}
-        result['category'] = ctg
-        result['subdir'] = sd
+        result['category'] = category
+        result['subdir'] = subdir
         result['name'] = package
-        result['version'] = ver
+        result['version'] = version
         result['main_dir'] = pkg_path['main_dir']
         return result

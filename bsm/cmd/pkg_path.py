@@ -4,8 +4,7 @@ class PkgPath(PkgBase):
     def execute(self, category, subdir, version, list_all, package):
         self._check_release()
 
-        if package is None:
-            category, subdir, package, version = self._current_package()
+        category, subdir, package, version = self._process_param(package, category, subdir, version)
 
         pkg_path = self._bsm.package_path(package, category, subdir, version)
 

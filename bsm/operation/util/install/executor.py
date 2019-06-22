@@ -63,6 +63,7 @@ class Executor(object):
         par['config_attribute'] = self.__config['attribute'].data_copy()
         par['config_release'] = self.__config['release'].data_copy()
         par['config_category'] = self.__config['category'].data_copy()
+        par['config_category_priority'] = self.__config['category_priority'].data_copy()
         par['config_package_all'] = self.__config[self.__config_package_name].data_copy()
         par['config_package_all_path'] = self.__config[self.__config_package_name+'_path'].data_copy()
 

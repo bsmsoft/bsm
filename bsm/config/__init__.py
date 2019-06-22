@@ -1,10 +1,15 @@
-import collections
 import copy
+
+try:
+    from collections.abc import Mapping
+except ImportError:
+    from collections import Mapping
 
 from bsm.util import expand_path
 
 
-from bsm.config.common import Common as ConfigCommon
+from bsm.config.common_dict import CommonDict as ConfigCommonDict
+from bsm.config.common_list import CommonList as ConfigCommonList
 from bsm.config.app import App as ConfigApp
 from bsm.config.env import Env as ConfigEnv
 from bsm.config.scenario import Scenario as ConfigScenario
@@ -13,6 +18,7 @@ from bsm.config.release_path import ReleasePath as ConfigReleasePath
 from bsm.config.release_origin import ReleaseOrigin as ConfigReleaseOrigin
 from bsm.config.release import Release as ConfigRelease
 from bsm.config.category import Category as ConfigCategory
+from bsm.config.category_priority import CategoryPriority as ConfigCategoryPriority
 from bsm.config.release_install import ReleaseInstall as ConfigReleaseInstall
 from bsm.config.package_runtime import PackageRuntime as ConfigPackageRuntime
 from bsm.config.package_install import PackageInstall as ConfigPackageInstall
@@ -32,7 +38,7 @@ class ConfigNoDirectModError(Exception):
     pass
 
 
-class Config(collections.MutableMapping):
+class Config(Mapping):
     def __init__(self, config_entry={}, initial_env=None):
         self.reset(config_entry, initial_env)
 
@@ -43,7 +49,7 @@ class Config(collections.MutableMapping):
             config_entry = self['entry'].data()
 
         self.__config = {}
-        self.__config['entry'] = ConfigCommon()
+        self.__config['entry'] = ConfigCommonDict()
         for k, v in config_entry.items():
             if v is not None:
                 self['entry'][k] = v
@@ -61,13 +67,6 @@ class Config(collections.MutableMapping):
 
         return self.__config[key]
 
-    def __setitem__(self, key, value):
-        raise ConfigNoDirectModError('Can not modify config value directly')
-        self.__config[key] = value
-
-    def __delitem__(self, key):
-        del self.__config[key]
-
     def __iter__(self):
         return iter(self.__config)
 
@@ -79,7 +78,7 @@ class Config(collections.MutableMapping):
         return ConfigApp(self['entry'].get('app_root', ''))
 
     def __load_example(self):
-        cfg = ConfigCommon()
+        cfg = ConfigCommonDict()
         cfg['path'] = self['app']['example_config_user']
         try:
             with open(self['app']['example_config_user']) as f:
@@ -90,7 +89,7 @@ class Config(collections.MutableMapping):
         return cfg
 
     def __load_user(self):
-        cfg = ConfigCommon()
+        cfg = ConfigCommonDict()
         config_user_file = self['app']['config_user_file']
         if 'config_user_file' in self['entry']:
             config_user_file = self['entry']['config_user_file']
@@ -98,7 +97,7 @@ class Config(collections.MutableMapping):
         return cfg
 
     def __load_output(self):
-        cfg = ConfigCommon()
+        cfg = ConfigCommonDict()
 
         # verbose
         cfg['verbose'] = False
@@ -120,7 +119,7 @@ class Config(collections.MutableMapping):
         return ConfigEnv(self.__initial_env, self['app']['env_prefix'])
 
     def __load_info(self):
-        cfg = ConfigCommon()
+        cfg = ConfigCommonDict()
         cfg.load_from_file(expand_path(self['app']['config_info_file']))
         return cfg
 
@@ -131,13 +130,13 @@ class Config(collections.MutableMapping):
         return ConfigReleasePath(self['scenario'], self['app']['release_work_dir'])
 
     def __load_release_status(self):
-        cfg = ConfigCommon()
+        cfg = ConfigCommonDict()
         cfg.load_from_file(self['release_path']['status_file'])
         return cfg
 
     # Release defined options, for display purpose only
     def __load_option_list(self):
-        cfg = ConfigCommon()
+        cfg = ConfigCommonDict()
 
         if 'handler_python_dir' not in self['release_path']:
             _logger.debug('handler_python_dir not in release_path')
@@ -161,7 +160,7 @@ class Config(collections.MutableMapping):
         return ConfigReleaseOrigin(self['app'], self['output'], self['scenario'], self['release_path'])
 
     def __load_attribute(self):
-        cfg = ConfigCommon()
+        cfg = ConfigCommonDict()
 
         if 'handler_python_dir' not in self['release_path']:
             _logger.debug('handler_python_dir not in release_path')
@@ -189,33 +188,36 @@ class Config(collections.MutableMapping):
         return ConfigRelease(self['app'], self['output'], self['scenario'], self['option'], self['release_path'], self['release_origin'], self['attribute'])
 
     def __load_category(self):
-        return ConfigCategory(self['entry'], self['app'], self['env'], self['user'], self['scenario'], self['attribute'], self['release'])
+        return ConfigCategory(self['app'], self['user'], self['scenario'], self['attribute'], self['release'])
+
+    def __load_category_priority(self):
+        return ConfigCategoryPriority(self['user'], self['scenario'], self['release'], self['category'])
 
     def __load_release_install(self):
         return ConfigReleaseInstall(self['release'])
 
     def __load_package_runtime(self):
         return ConfigPackageRuntime(self['entry'], self['app'], self['output'], self['scenario'], self['option'], self['release_path'],
-                self['attribute'], self['release'], self['release_install'], self['category'])
+                self['attribute'], self['release'], self['release_install'], self['category'], self['category_priority'])
 
     def __load_package_install(self):
         return ConfigPackageInstall(self['entry'], self['app'], self['output'], self['scenario'], self['option'], self['release_path'],
-                self['attribute'], self['release'], self['release_install'], self['category'])
+                self['attribute'], self['release'], self['release_install'], self['category'], self['category_priority'])
 
     def __load_package_runtime_path(self):
-        return ConfigPackagePath(self['release_path'], self['category'], self['package_runtime'])
+        return ConfigPackagePath(self['release_path'], self['category_priority'], self['package_runtime'])
 
     def __load_package_install_path(self):
-        return ConfigPackagePath(self['release_path'], self['category'], self['package_install'])
+        return ConfigPackagePath(self['release_path'], self['category_priority'], self['package_install'])
 
 
     def config(self, config_type):
-        if isinstance(self[config_type], ConfigCommon):
+        if isinstance(self[config_type], (ConfigCommonDict, ConfigCommonList)):
             return self[config_type].data()
         return self[config_type]
 
     def config_copy(self, config_type):
-        if isinstance(self[config_type], ConfigCommon):
+        if isinstance(self[config_type], (ConfigCommonDict, ConfigCommonList)):
             return self[config_type].data_copy()
         return copy.deepcopy(self[config_type])
 

@@ -1,10 +1,10 @@
-from bsm.config.common import Common
+from bsm.config.common_dict import CommonDict
 
 from bsm.logger import get_logger
 _logger = get_logger()
 
 
-class Option(Common):
+class Option(CommonDict):
     def __init__(self, config_entry, config_info, config_env, config_user, config_scenario, config_release_status, config_option_list):
         super(Option, self).__init__()
 

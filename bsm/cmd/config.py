@@ -1,4 +1,7 @@
-import collections
+try:
+    from collections.abc import Mapping
+except ImportError:
+    from collections import Mapping
 
 from bsm.cmd import Base
 from bsm.cmd import CmdError
@@ -14,7 +17,7 @@ class Config(Base):
         current_config = self._bsm.config(config_type)
         current_item = [config_type]
         for item in item_list:
-            if not isinstance(current_config, collections.MutableMapping):
+            if not isinstance(current_config, Mapping):
                 raise CmdError('Config "{0}" is not a map: {1}'.format(':'.join(current_item), type(current_config)))
             current_item.append(item)
             if item not in current_config:

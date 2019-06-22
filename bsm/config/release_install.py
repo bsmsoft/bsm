@@ -1,6 +1,6 @@
-from bsm.config.common import Common
-
 from bsm.util import ensure_list
+
+from bsm.config.common_dict import CommonDict
 
 from bsm.logger import get_logger
 _logger = get_logger()
@@ -10,7 +10,7 @@ class ConfigReleaseInstallError(Exception):
     pass
 
 
-class ReleaseInstall(Common):
+class ReleaseInstall(CommonDict):
     def __init__(self, config_release):
         super(ReleaseInstall, self).__init__()
 
