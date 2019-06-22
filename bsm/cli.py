@@ -251,6 +251,21 @@ def pkg_use(ctx, category, subdir, version, option, package):
 @click.option('--subdir', type=str, help='Sub directory for package')
 @click.option('--version', type=str, help='Package version')
 @click.option('--option', '-o', type=str, multiple=True, help='Options for release')
+@click.option('--rebuild', is_flag=True, help='Rebuild the package')
+@click.argument('package', type=str, required=False)
+@click.pass_context
+def pkg_build(ctx, category, subdir, version, option, rebuild, package):
+    '''Build a package'''
+    cmd = Cmd()
+    ctx.obj['config_entry']['option'] = parse_lines(option)
+    cmd.execute('pkg-build', ctx.obj, category, subdir, version, rebuild, package)
+
+
+@cli.command()
+@click.option('--category', type=str, help='Category to be installed')
+@click.option('--subdir', type=str, help='Sub directory for package')
+@click.option('--version', type=str, help='Package version')
+@click.option('--option', '-o', type=str, multiple=True, help='Options for release')
 @click.argument('package', type=str, required=False)
 @click.pass_context
 def pkg_remove(ctx, category, subdir, version, option, package):

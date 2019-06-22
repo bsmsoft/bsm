@@ -144,8 +144,8 @@ class Bsm(object):
     def create_package_config(self, package, category, subdir, version):
         return self.__operation.execute('create-package-config', package, category, subdir, version)
 
-    def build_package(self, package, category, subdir, version):
-        return self.__operation.execute('build-package', package, category, subdir, version)
+    def build_package(self, package, category, subdir, version, rebuild=False):
+        return self.__operation.execute('build-package', package, category, subdir, version, rebuild)
 
     def clean_package(self, package):
         return self.__operation.execute('clean-package', package)

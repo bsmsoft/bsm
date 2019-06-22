@@ -9,11 +9,11 @@ class Base(object):
         return '\n'.join(newlines) + '\n'
 
     def run(self, command, cwd):
-        args = ['\''+arg+'\'' for arg in command]
+        args = ['\''+str(arg)+'\'' for arg in command]
         run_line = ' '.join(args) + '\n'
         if not cwd:
             return run_line
 
         cd_line = 'cd \'' + cwd + '\'\n'
-        cd_old_line = 'cd -'
+        cd_old_line = 'cd -\n'
         return cd_line + run_line + cd_old_line
