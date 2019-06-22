@@ -33,7 +33,7 @@ def _package_param(rel_dir, version_dir):
         if len(frag) < 2 or frag[-1] != 'head':
             _logger.warn('Package config path is not valid: {0}'.format(rel_dir))
             raise ConfigPackageParamError
-        version = ''
+        version = None
         frag = frag[:-1]
 
     package = frag[-1]
@@ -77,7 +77,9 @@ class PackageRuntime(PackageBase):
                     _logger.warn('Fail to load package config file "{0}": {1}'.format(full_path, e))
                     continue
 
-                final_pkg_cfg = transform_package(handler, 'runtime', category, subdir, package, version, pkg_cfg,
+                pkg_path = package_path(config_app, config_category, category, subdir, package, version)
+
+                final_pkg_cfg = transform_package(handler, 'runtime', category, subdir, package, version, pkg_cfg, pkg_path,
                         config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_category, config_category_priority)
 
                 if not version_dir:
@@ -101,7 +103,7 @@ class PackageRuntime(PackageBase):
                 final_config['config']['subdir'] = subdir
                 final_config['config']['version'] = version
 
-                final_config['package_path'] = package_path(config_app, config_category, category, subdir, package, version)
+                final_config['package_path'] = package_path(config_app, config_category, category, subdir, package, final_config['config']['version'])
                 expand_package_path(final_config['package_path']['main_dir'], final_config['config'])
                 expand_package_env(final_config['config'])
 

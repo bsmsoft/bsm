@@ -265,6 +265,20 @@ def pkg_remove(ctx, category, subdir, version, option, package):
 @click.option('--subdir', type=str, help='Sub directory for package')
 @click.option('--version', type=str, help='Package version')
 @click.option('--option', '-o', type=str, multiple=True, help='Options for release')
+@click.argument('package', type=str, required=False)
+@click.pass_context
+def pkg_config(ctx, category, subdir, version, option, package):
+    '''List package config'''
+    cmd = Cmd()
+    ctx.obj['config_entry']['option'] = parse_lines(option)
+    cmd.execute('pkg-config', ctx.obj, category, subdir, version, package)
+
+
+@cli.command()
+@click.option('--category', type=str, help='Category to be installed')
+@click.option('--subdir', type=str, help='Sub directory for package')
+@click.option('--version', type=str, help='Package version')
+@click.option('--option', '-o', type=str, multiple=True, help='Options for release')
 @click.option('--all', '-a', 'list_all', is_flag=True, help='List all available packages')
 @click.argument('package', type=str, required=False)
 @click.pass_context

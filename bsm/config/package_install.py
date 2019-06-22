@@ -89,7 +89,9 @@ class PackageInstall(PackageBase):
                 final_config['config_origin'] = copy.deepcopy(pkg_cfg)
                 final_config['config_origin']['version'] = ver
 
-                final_config['config'] = transform_package(handler, 'install', category_name, subdir, pkg_name, ver, pkg_cfg,
+                pkg_path = package_path(config_app, config_category, category_name, subdir, pkg_name, ver)
+
+                final_config['config'] = transform_package(handler, 'install', category_name, subdir, pkg_name, ver, pkg_cfg, pkg_path,
                         config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_category, config_category_priority)
                 final_config['config']['name'] = pkg_name
                 final_config['config']['category'] = category_name

@@ -120,6 +120,9 @@ class Bsm(object):
     def package_path(self, package, category, subdir, version):
         return self.__operation.execute('package-path', package, category, subdir, version)
 
+    def package_config(self, package, category, subdir, version):
+        return self.__operation.execute('package-config', package, category, subdir, version)
+
     def package_exist(self, package, category, subdir, version):
         return self.__operation.execute('package-exist', package, category, subdir, version)
 
