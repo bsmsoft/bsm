@@ -61,7 +61,16 @@ def _generate_script(cmd_name, app_root, shell_name, output, commands, env_chang
     shell.newline()
     shell.comment('Run commands')
     for command in commands:
-        shell.run(command.get('cmd', []), command.get('cwd', None))
+        cmd = command.get('cmd', [])
+        cwd = command.get('cwd', None)
+        if cmd:
+            shell.echo('='*80)
+            shell.echo('= Start to run: {0}'.format(cmd))
+            if cwd is not None:
+                shell.echo('= Cwd: {0}'.format(cwd))
+            shell.run(cmd, cwd)
+            shell.echo('- End command')
+            shell.echo('-'*80)
 
     shell.newline()
     shell.comment('Final output')
@@ -72,6 +81,15 @@ def _generate_script(cmd_name, app_root, shell_name, output, commands, env_chang
     shell.comment('Shell script finished')
 
     return shell.script
+
+def _run_commands(commands):
+    for run_cmd in commands:
+        cmd = run_cmd.get('cmd', [])
+        cwd = run_cmd.get('cwd', None)
+        if cmd:
+            _logger.debug('Running command: {0}'.format(cmd))
+            _logger.debug('Command cwd: {0}'.format(cwd))
+            subprocess.call(cmd, cwd=run_cmd.get('cwd', None))
 
 
 class Base(object):
@@ -118,8 +136,7 @@ class Cmd(object):
                 click.echo(final_output, nl=nl)
 
             if not obj['output']['shell']:
-                for run_cmd in cmd_result.commands:
-                    subprocess.call(run_cmd.get('cmd', []), cwd=run_cmd.get('cwd', None))
+                _run_commands(cmd_result.commands)
         except ConfigReleaseError as e:
             _logger.error(str(e))
             _logger.critical('Can not load release version: {0}'.format(bsm.config('entry')['scenario']))
