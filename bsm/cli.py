@@ -167,11 +167,24 @@ def use(ctx, software_root, default, option, without_package, version):
 
 
 @cli.command()
+@click.option('--option', '-o', type=str, multiple=True, help='Options for the release')
 @click.pass_context
-def refresh(ctx):
+def refresh(ctx, option):
     '''Refresh the current release version environment'''
     cmd = Cmd()
+    ctx.obj['config_entry']['option'] = parse_lines(option)
     cmd.execute('refresh', ctx.obj)
+
+
+@cli.command()
+@click.option('--option', '-o', type=str, multiple=True, help='Options for release')
+@click.argument('command', nargs=-1, type=str, required=True)
+@click.pass_context
+def run(ctx, option, command):
+    '''Run release command'''
+    cmd = Cmd()
+    ctx.obj['config_entry']['option'] = parse_lines(option)
+    cmd.execute('run', ctx.obj, command)
 
 
 @cli.command()
@@ -194,21 +207,25 @@ def pack(ctx, destination, version):
 
 @cli.command()
 @click.option('--all', '-a', 'list_all', is_flag=True, help='List all available packages')
+@click.option('--option', '-o', type=str, multiple=True, help='Options for release')
 @click.argument('package', type=str, required=False)
 @click.pass_context
-def pkg_ls(ctx, list_all, package):
+def pkg_ls(ctx, list_all, option, package):
     '''List all packages of the current release versions'''
     cmd = Cmd()
+    ctx.obj['config_entry']['option'] = parse_lines(option)
     cmd.execute('pkg-ls', ctx.obj, list_all, package)
 
 
 @cli.command()
 @click.option('--package-root', '-p', type=str, help='Package root directory for initialization, default to current directory')
+@click.option('--option', '-o', type=str, multiple=True, help='Options for release')
 @click.option('--yes', '-y', is_flag=True, help='Install without confirmation')
 @click.pass_context
-def pkg_init(ctx, package_root, yes):
+def pkg_init(ctx, package_root, option, yes):
     '''Initialize a new package from directory'''
     cmd = Cmd()
+    ctx.obj['config_entry']['option'] = parse_lines(option)
     cmd.execute('pkg-init', ctx.obj, package_root, yes)
 
 

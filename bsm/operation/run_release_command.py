@@ -1,5 +1,3 @@
-import copy
-
 from bsm.handler import Handler
 from bsm.handler import HandlerNotFoundError
 
@@ -9,20 +7,11 @@ from bsm.logger import get_logger
 _logger = get_logger()
 
 
-class BuildPackage(Base):
-    def execute(self, package, category, subdir, version, rebuild=False):
-        pkg_cfg = self._config['package_runtime'].package_config(category, subdir, package, version)
-
+class RunReleaseCommand(Base):
+    def execute(self, command):
         param = {}
-        param['operation'] = 'rebuild' if rebuild else 'build'
 
-        param['name'] = package
-        param['category'] = category
-        param['subdir'] = subdir
-        param['version'] = version
-
-        param['config_package'] = copy.deepcopy(pkg_cfg['config'])
-        param['package_path'] = copy.deepcopy(pkg_cfg['package_path'])
+        param['command'] = command.copy()
 
         param['config_app'] = self._config['app'].data_copy()
         param['config_output'] = self._config['output'].data_copy()
@@ -38,7 +27,7 @@ class BuildPackage(Base):
 
         with Handler(self._config['release_path']['handler_python_dir']) as h:
             try:
-                return h.run('build_package', param)
+                return h.run('command', param)
             except HandlerNotFoundError as e:
-                _logger.error('Could not find out how to build package "{0}", category "{1}", subdir "{2}", version "{3}"'.format(package, category, subdir, version))
+                _logger.error('Could not find out how to run command: {0}'.format(command))
                 raise

@@ -85,19 +85,19 @@ class Bsm(object):
         return self.__operation.execute('ls-release-version')
 
     def load_release(self):
-        self.__operation.execute('load-release')
+        return self.__operation.execute('load-release')
 
     def load_release_package(self):
-        self.__operation.execute('load-release-packages')
+        return self.__operation.execute('load-release-packages')
 
     def clean(self):
-        self.__operation.execute('clean')
+        return self.__operation.execute('clean')
 
     def exit(self):
-        self.__operation.execute('exit')
+        return self.__operation.execute('exit')
 
     def save_as_default(self):
-        self.__operation.execute('save-as-default')
+        return self.__operation.execute('save-as-default')
 
     def current(self):
         return self.__env.current_release()
@@ -105,10 +105,8 @@ class Bsm(object):
     def detect_category(self, directory):
         return self.__operation.execute('detect-category', directory)
 
-    def run_release_command(self, command, args):
-        # run customized commands defined in release
-        # like bsm run pack (only in current version)
-        pass
+    def run_release_command(self, command):
+        return self.__operation.execute('run-release-command', command)
 
 
     def find_package(self, package, category=None, subdir=None, version=None, from_install=False):
