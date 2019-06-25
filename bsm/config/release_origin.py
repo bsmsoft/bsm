@@ -31,7 +31,10 @@ class ReleaseOrigin(CommonDict):
             raise ConfigReleaseOriginError('Release version "{0}" not found'.format(config_scenario['version']))
 
         for k in _AVAILABLE_RELEASE_CONFIG:
-            config_file = os.path.join(config_dir, k+'.yml')
+            config_file = os.path.join(config_dir, k+'.yaml')
+            if not os.path.isfile(config_file):
+                config_file = os.path.join(config_dir, k+'.yml')
+
             try:
                 self[k] = load_config(config_file)
             except ConfigError as e:
