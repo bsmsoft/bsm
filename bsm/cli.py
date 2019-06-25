@@ -196,16 +196,6 @@ def clean(ctx):
 
 
 @cli.command()
-@click.option('--destination', '-d', type=str, help='Directory for packing output')
-@click.argument('version', type=str)
-@click.pass_context
-def pack(ctx, destination, version):
-    '''Create tar packages for the specified release version'''
-    cmd = Cmd('pack')
-    cmd.execute(ctx.obj, destination=destination, version_name=version)
-
-
-@cli.command()
 @click.option('--all', '-a', 'list_all', is_flag=True, help='List all available packages')
 @click.option('--option', '-o', type=str, multiple=True, help='Options for release')
 @click.argument('package', type=str, required=False)
@@ -283,13 +273,14 @@ def pkg_build(ctx, category, subdir, version, option, rebuild, package):
 @click.option('--subdir', type=str, help='Sub directory for package')
 @click.option('--version', type=str, help='Package version')
 @click.option('--option', '-o', type=str, multiple=True, help='Options for release')
+@click.option('--force', '-f', is_flag=True, help='Do not prompt for confirmation')
 @click.argument('package', type=str, required=False)
 @click.pass_context
-def pkg_remove(ctx, category, subdir, version, option, package):
+def pkg_remove(ctx, category, subdir, version, option, force, package):
     '''Remove a package'''
     cmd = Cmd()
     ctx.obj['config_entry']['option'] = parse_lines(option)
-    cmd.execute('pkg-remove', ctx.obj)
+    cmd.execute('pkg-remove', ctx.obj, category, subdir, version, force, package)
 
 
 @cli.command()

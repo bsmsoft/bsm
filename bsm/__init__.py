@@ -130,6 +130,9 @@ class Bsm(object):
     def install_package(self, package, category, subdir, version):
         return self.__operation.execute('install-package', package, category, subdir, version)
 
+    def remove_package(self, package, category, subdir, version):
+        return self.__operation.execute('remove-package', package, category, subdir, version)
+
     def detect_package_param(self, package_dir):
         return self.__operation.execute('detect-package-param', package_dir)
 

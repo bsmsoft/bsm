@@ -1,3 +1,5 @@
+import copy
+
 from bsm.config.util import package_path
 from bsm.config.util import check_conflict_package
 
@@ -18,9 +20,8 @@ class InstallPackageConfig(Base):
     def execute(self, package, category, subdir, version, category_origin, subdir_origin, version_origin, from_install=False):
         config_package_name = 'package_install' if from_install else 'package_runtime'
 
-        category_priority = self._config['category']['priority']
-
-        pkg_cfg_origin = self._config[config_package_name].package_config(category_origin, subdir_origin, package, version_origin)['config_origin']
+        pkg_cfg_origin = copy.deepcopy(self._config[config_package_name].package_config(category_origin, subdir_origin, package, version_origin)['config_origin'])
+        pkg_cfg_origin['version'] = version
 
         pkg_path = package_path(self._config['app'], self._config['category'], category, subdir, package, version)
 

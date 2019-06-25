@@ -21,10 +21,10 @@ class PkgLs(PkgBase):
         if self._output_format != 'plain':
             return packages
 
-        max_package_length = 0
-        max_category_length = 0
-        max_subdir_length = 0
-        max_version_length = 0
+        max_package_length = 1
+        max_category_length = 1
+        max_subdir_length = 1
+        max_version_length = 1
 
         for pkg, cfgs in packages.items():
             for cfg in cfgs:

@@ -9,10 +9,10 @@ _logger = get_logger()
 
 
 def _output_preview_lines(config_package_install):
-    max_package_length = 0
-    max_category_length = 0
-    max_subdir_length = 0
-    max_version_length = 0
+    max_package_length = 1
+    max_category_length = 1
+    max_subdir_length = 1
+    max_version_length = 1
 
     packages = {}
 
