@@ -46,10 +46,6 @@ class CheckMissing(Base):
         param['config_release'] = self._config['release'].data_copy()
         param['config_category'] = self._config['category'].data_copy()
         param['config_category_priority'] = self._config['category_priority'].data_copy()
-        param['config_package_install'] = self._config['package_install'].data_copy()
-        param['config_package_install_path'] = self._config['package_install_path'].data_copy()
-        param['config_package_runtime'] = self._config['package_runtime'].data_copy()
-        param['config_package_runtime_path'] = self._config['package_runtime_path'].data_copy()
         param['config_package_check'] = self._config['package_check'].data_copy()
 
         try:
@@ -74,10 +70,6 @@ class CheckMissing(Base):
         param['config_release'] = self._config['release'].data_copy()
         param['config_category'] = self._config['category'].data_copy()
         param['config_category_priority'] = self._config['category_priority'].data_copy()
-        param['config_package_install'] = self._config['package_install'].data_copy()
-        param['config_package_install_path'] = self._config['package_install_path'].data_copy()
-        param['config_package_runtime'] = self._config['package_runtime'].data_copy()
-        param['config_package_runtime_path'] = self._config['package_runtime_path'].data_copy()
         param['config_package_check'] = self._config['package_check'].data_copy()
 
         try:

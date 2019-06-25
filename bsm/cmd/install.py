@@ -62,7 +62,7 @@ class Install(Base):
         if not force:
             missing_pkg = self._bsm.check_missing_install()
             if missing_pkg:
-                _logger.warn('Missing package found: {0}'.format(', '.join(missing_pkg.keys())))
+                _logger.warn('Missing package found for installation: {0}'.format(', '.join(missing_pkg.keys())))
 
         _logger.info('The following packages will be installed:\n')
         _output_preview_lines(self._bsm.config('package_install'))

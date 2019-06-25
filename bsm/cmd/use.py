@@ -8,6 +8,10 @@ class Use(Base):
         if not self._bsm.config('release_status').get('install', {}).get('finished'):
             _logger.warn('Release version {0} is not fully installed'.format(self._bsm.config('scenario')['version']))
 
+        missing_pkg = self._bsm.check_missing_runtime()
+        if missing_pkg:
+            _logger.warn('Missing package found for runtime: {0}'.format(', '.join(missing_pkg.keys())))
+
         self._bsm.load_release()
         if not without_package:
             self._bsm.load_release_package()
