@@ -66,7 +66,7 @@ class InstallReleasePackages(Base):
                         pkg_deps = ensure_list(value['config'].get('dep', []))
                         for pkg_dep in pkg_deps:
                             if pkg_dep not in package_steps:
-                                _logger.warn('Dependency for package "{0}" not available: {1}'.format(package, pkg_dep))
+                                _logger.debug('Dependency for package "{0}" not available: {1}'.format(package, pkg_dep))
                                 continue
                             for dep in package_steps[pkg_dep]:
                                 dep_end_index = len(self._config['package_install'][dep[0]][dep[1]][dep[2]][dep[3]]['step'][atomic_end]) - 1

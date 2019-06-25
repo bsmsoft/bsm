@@ -69,11 +69,11 @@ class Bsm(object):
     def ls_remote(self, list_all=False):
         return self.__operation.execute('ls-remote', list_all)
 
-    def check_install(self):
-        return self.__operation.execute('check', 'install')
+    def check_missing_install(self):
+        return self.__operation.execute('check-missing', 'install')
 
-    def check_runtime(self):
-        return self.__operation.execute('check', 'runtime')
+    def check_missing_runtime(self):
+        return self.__operation.execute('check-missing', 'runtime')
 
     def install_release(self):
         return self.__operation.execute('install-release')

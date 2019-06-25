@@ -28,8 +28,8 @@ class Release(CommonDict):
 
         self.__transform(config_app, config_output, config_scenario, config_option, config_release_path, config_release_origin, config_attribute)
         self.__expand_env(config_scenario, config_attribute)
-        self.__check_bsm_version()
         self.__check_version_consistency(config_scenario)
+        self.__check_bsm_version()
 
     def __transform(self, config_app, config_output, config_scenario, config_option, config_release_path, config_release_origin, config_attribute):
         param = {}
@@ -43,7 +43,7 @@ class Release(CommonDict):
 
         try:
             with Handler(config_release_path['handler_python_dir']) as h:
-                result = h.run('transform_release', param)
+                result = h.run('transform.release', param)
                 if isinstance(result, dict):
                     self.update(result)
         except HandlerNotFoundError as e:
@@ -81,6 +81,15 @@ class Release(CommonDict):
         for k, v in env_alias.items():
             env_alias[k] = v.format(**format_dict)
 
+    def __check_version_consistency(self, config_scenario):
+        if 'version' not in self:
+            raise ConfigReleaseError('"version" is not found in config release')
+
+        version = config_scenario.get('version')
+        version_in_release = self.get('version')
+        if version != version_in_release:
+            _logger.warn('Version inconsistency found. Request {0} but receive {1}'.format(version, version_in_release))
+
     def __check_bsm_version(self):
         version_require = self.get('setting', {}).get('bsm', {}).get('require', '')
         _logger.debug('Version require: "{0}"'.format(version_require))
@@ -94,9 +103,3 @@ class Release(CommonDict):
 
         if BSM_VERSION not in spec:
             raise ConfigReleaseError('BSM version "{0}" does not follow: {1}'.format(BSM_VERSION, version_require))
-
-    def __check_version_consistency(self, config_scenario):
-        version = config_scenario.get('version')
-        version_in_release = self.get('version')
-        if version != version_in_release:
-            _logger.warn('Version inconsistency found. Request {0} but receive {1}'.format(version, version_in_release))

@@ -3,8 +3,6 @@ import copy
 
 from bsm.handler import HandlerNotFoundError
 
-from bsm.config.package_base import ConfigPackageError
-
 from bsm.util import expand_path
 from bsm.util import ensure_list
 from bsm.util import is_str
@@ -13,18 +11,6 @@ from bsm.util.config import load_config, ConfigError
 
 from bsm.logger import get_logger
 _logger = get_logger()
-
-
-def _config_from_file(config_file):
-    try:
-        loaded_data = load_config(config_file)
-        if isinstance(loaded_data, dict):
-            return loaded_data
-        else:
-            _logger.warn('Config file is not a dict: {0}'.format(config_file))
-            _logger.warn('Use empty dict instead')
-    except ConfigError as e:
-        return dict()
 
 def _step_param(config_action):
     if not config_action:
@@ -43,10 +29,95 @@ def _step_param(config_action):
     return None, {}
 
 
-def transform_package(handler, operation, category, subdir, name, version, pkg_cfg, pkg_path,
-        config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_category, config_category_priority):
+class ConfigPackageError(Exception):
+    pass
+
+class ConfigPackageParamError(Exception):
+    pass
+
+
+def config_from_file(config_file):
+    if not os.path.isfile(config_file):
+        return {}
+
+    try:
+        loaded_data = load_config(config_file)
+        if isinstance(loaded_data, dict):
+            return loaded_data
+        if loaded_data is not None:
+            _logger.warn('Config file is not a dict, use empty dict instead: {0}'.format(config_file))
+    except ConfigError as e:
+        _logger.warn('Load config file failed, use empty dict instead: {0}'.format(config_file))
+
+    return {}
+
+
+def package_param_from_rel_dir(rel_dir, version_dir):
+    frag = rel_dir.split(os.sep)
+    if version_dir:
+        if len(frag) < 3 or frag[-2] != 'versions':
+            _logger.warn('Package config path is not valid: {0}'.format(rel_dir))
+            raise ConfigPackageParamError
+        version = frag[-1]
+        frag = frag[:-2]
+    else:
+        if len(frag) < 2 or frag[-1] != 'head':
+            _logger.warn('Package config path is not valid: {0}'.format(rel_dir))
+            raise ConfigPackageParamError
+        version = None
+        frag = frag[:-1]
+
+    package = frag[-1]
+
+    frag = frag[:-1]
+    if frag:
+        subdir = os.path.join(*frag)
+    else:
+        subdir = ''
+
+    return (subdir, package, version)
+
+
+def package_param_from_identifier(identifier, pkg_cfg):
+    frag = identifier.split(os.sep)
+
+    # Use the last part as default package name
+    if 'name' in pkg_cfg:
+        pkg_name = pkg_cfg['name']
+    elif frag[-1]:
+        pkg_name = frag[-1]
+    else:
+        _logger.error('Package name not found for {0}'.format(identifier))
+        raise ConfigPackageParamError
+
+    frag = frag[:-1]
+
+    # Use the first part as default category name
+    if 'category' in pkg_cfg:
+        category_name = pkg_cfg['category']
+    elif len(frag) > 0:
+        category_name = frag[0]
+    else:
+        _logger.warn('Category not specified for {0}'.format(identifier))
+        raise ConfigPackageParamError
+
+    frag = frag[1:]
+
+    # Use the middle part as default subdir
+    if 'subdir' in pkg_cfg:
+        subdir = pkg_cfg['subdir']
+    elif frag:
+        subdir = os.path.join(*frag)
+    else:
+        subdir = ''
+
+    return (category_name, subdir, pkg_name)
+
+
+def transform_package(handler, trans_type, category, subdir, name, version, pkg_cfg, pkg_path,
+        config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category, config_category_priority):
     param = {}
-    param['operation'] = operation
+    param['type'] = trans_type
 
     param['category'] = category
     param['subdir'] = subdir
@@ -63,11 +134,12 @@ def transform_package(handler, operation, category, subdir, name, version, pkg_c
     param['config_release_path'] = config_release_path.data_copy()
     param['config_attribute'] = config_attribute.data_copy()
     param['config_release'] = config_release.data_copy()
+    param['config_release_install'] = config_release_install.data_copy()
     param['config_category'] = config_category.data_copy()
     param['config_category_priority'] = config_category_priority.data_copy()
 
     try:
-        result = handler.run('transform_package', param)
+        result = handler.run('transform.package', param)
         if isinstance(result, dict):
             return result
     except HandlerNotFoundError:
@@ -139,7 +211,7 @@ def expand_package_env(pkg_cfg):
         env_alias[k] = v.format(**format_dict)
 
 def install_status(status_install_file):
-    return _config_from_file(status_install_file)
+    return config_from_file(status_install_file)
 
 def install_step(config_release_install, pkg_cfg, install_status, reinstall):
     result = {}

@@ -12,7 +12,7 @@ class LsAllPackage(Base):
         for category in self._config['package_runtime']:
             for subdir in self._config['package_runtime'][category]:
                 for package in self._config['package_runtime'][category][subdir]:
-                    for version, value in self._config['package_runtime'][category][subdir][package].items():
+                    for version in self._config['package_runtime'][category][subdir][package]:
                         active = (package in cur_pkgs and category == cur_pkgs[package]['category'] and \
                                 subdir == cur_pkgs[package]['subdir'] and version == cur_pkgs[package]['version'])
                         packages.setdefault(package, [])

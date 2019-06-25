@@ -1,49 +1,14 @@
 import os
 import copy
 
-from bsm.config.package_base import PackageBase, ConfigPackageParamError
-from bsm.config.util import transform_package, package_path, expand_package_path, expand_package_env, install_status, install_step
+from bsm.config.package_base import PackageBase
+from bsm.config.util import ConfigPackageParamError
+from bsm.config.util import package_param_from_identifier, transform_package, package_path, expand_package_path, expand_package_env, install_status, install_step
 
 from bsm.util import ensure_list
 
 from bsm.logger import get_logger
 _logger = get_logger()
-
-
-def _package_param(identifier, pkg_cfg):
-    frag = identifier.split(os.sep)
-
-    # Use the last part as default package name
-    if 'name' in pkg_cfg:
-        pkg_name = pkg_cfg['name']
-    elif frag[-1]:
-        pkg_name = frag[-1]
-    else:
-        _logger.error('Package name not found for {0}'.format(identifier))
-        raise ConfigPackageParamError
-
-    frag = frag[:-1]
-
-    # Use the first part as default category name
-    if 'category' in pkg_cfg:
-        category_name = pkg_cfg['category']
-    elif len(frag) > 0:
-        category_name = frag[0]
-    else:
-        _logger.warn('Category not specified for {0}'.format(identifier))
-        raise ConfigPackageParamError
-
-    frag = frag[1:]
-
-    # Use the middle part as default subdir
-    if 'subdir' in pkg_cfg:
-        subdir = pkg_cfg['subdir']
-    elif frag:
-        subdir = os.path.join(*frag)
-    else:
-        subdir = ''
-
-    return (category_name, subdir, pkg_name)
 
 
 class PackageInstall(PackageBase):
@@ -59,7 +24,7 @@ class PackageInstall(PackageBase):
 
         for identifier, pkg_cfg in config_release.get('package', {}).items():
             try:
-                category_name, subdir, pkg_name = _package_param(identifier, pkg_cfg)
+                category_name, subdir, pkg_name = package_param_from_identifier(identifier, pkg_cfg)
             except ConfigPackageParamError:
                 continue
 
@@ -92,7 +57,7 @@ class PackageInstall(PackageBase):
                 pkg_path = package_path(config_app, config_category, category_name, subdir, pkg_name, ver)
 
                 final_config['config'] = transform_package(handler, 'install', category_name, subdir, pkg_name, ver, pkg_cfg, pkg_path,
-                        config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_category, config_category_priority)
+                        config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category, config_category_priority)
                 final_config['config']['name'] = pkg_name
                 final_config['config']['category'] = category_name
                 final_config['config']['subdir'] = subdir

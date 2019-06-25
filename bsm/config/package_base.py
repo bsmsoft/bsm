@@ -3,17 +3,12 @@ from bsm.handler import Handler
 from bsm.util import safe_mkdir
 from bsm.util.config import dump_config
 
+from bsm.config.util import ConfigPackageError
+
 from bsm.config.common_dict import CommonDict
 
 from bsm.logger import get_logger
 _logger = get_logger()
-
-
-class ConfigPackageError(Exception):
-    pass
-
-class ConfigPackageParamError(Exception):
-    pass
 
 
 class PackageBase(CommonDict):

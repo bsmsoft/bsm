@@ -22,6 +22,7 @@ from bsm.config.category_priority import CategoryPriority as ConfigCategoryPrior
 from bsm.config.release_install import ReleaseInstall as ConfigReleaseInstall
 from bsm.config.package_runtime import PackageRuntime as ConfigPackageRuntime
 from bsm.config.package_install import PackageInstall as ConfigPackageInstall
+from bsm.config.package_check import PackageCheck as ConfigPackageCheck
 from bsm.config.package_path import PackagePath as ConfigPackagePath
 
 from bsm.handler import Handler
@@ -202,6 +203,10 @@ class Config(Mapping):
 
     def __load_package_install(self):
         return ConfigPackageInstall(self['entry'], self['app'], self['output'], self['scenario'], self['option'], self['release_path'],
+                self['attribute'], self['release'], self['release_install'], self['category'], self['category_priority'])
+
+    def __load_package_check(self):
+        return ConfigPackageCheck(self['app'], self['output'], self['scenario'], self['option'], self['release_path'],
                 self['attribute'], self['release'], self['release_install'], self['category'], self['category_priority'])
 
     def __load_package_runtime_path(self):

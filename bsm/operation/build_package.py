@@ -14,7 +14,7 @@ class BuildPackage(Base):
         pkg_cfg = self._config['package_runtime'].package_config(category, subdir, package, version)
 
         param = {}
-        param['operation'] = 'rebuild' if rebuild else 'build'
+        param['type'] = 'rebuild' if rebuild else 'build'
 
         param['name'] = package
         param['category'] = category

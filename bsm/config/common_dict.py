@@ -7,19 +7,10 @@ except ImportError:
 
 from bsm.util.config import load_config, dump_config, ConfigError
 
+from bsm.config.util import config_from_file
+
 from bsm.logger import get_logger
 _logger = get_logger()
-
-
-def _config_from_file(config_file):
-    try:
-        loaded_data = load_config(config_file)
-        if isinstance(loaded_data, dict):
-            return loaded_data
-        _logger.warn('Config file is not a dict, use empty dict instead: {0}'.format(config_file))
-    except ConfigError as e:
-        _logger.debug('Load config file failed, use empty dict instead: {0}'.format(config_file))
-    return {}
 
 
 class CommonDict(MutableMapping):
@@ -55,10 +46,10 @@ class CommonDict(MutableMapping):
 
 
     def load_from_file(self, config_file):
-        self.__data = _config_from_file(config_file)
+        self.__data = config_from_file(config_file)
 
     def update_from_file(self, config_file):
-        self.__data.update(_config_from_file(config_file))
+        self.__data.update(config_from_file(config_file))
 
     def save_to_file(self, config_file):
         dump_config(self.__data, config_file)
