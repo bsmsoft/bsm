@@ -3,11 +3,6 @@ class Base(object):
         self._cmd_name = cmd_name
         self._app_root = app_root
 
-    def comment(self, content):
-        lines = content.rstrip().split('\n')
-        newlines = map(lambda x:'# '+x, lines)
-        return '\n'.join(newlines) + '\n'
-
     def run(self, command, cwd):
         args = ['\''+str(arg)+'\'' for arg in command]
         run_line = ' '.join(args) + '\n'

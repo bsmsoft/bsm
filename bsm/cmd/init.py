@@ -2,6 +2,9 @@ from bsm.cmd import Base
 from bsm.cmd import CmdResult
 from bsm.shell import Shell
 
+from bsm.logger import get_logger
+_logger = get_logger()
+
 class Init(Base):
     def execute(self, no_default, show_script, shell):
         output = ''
@@ -16,5 +19,7 @@ class Init(Base):
         if not no_default and 'version' in self._bsm.config('scenario'):
             self._bsm.load_release()
             self._bsm.load_release_package()
+            _logger.info('software_root : {0}'.format(self._bsm.config('scenario').get('software_root', '')))
+            _logger.info('version       : {0}'.format(self._bsm.config('scenario').get('version', '')))
 
         return CmdResult(output=output, script_types='init')

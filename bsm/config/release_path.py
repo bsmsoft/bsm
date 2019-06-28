@@ -22,7 +22,8 @@ class ReleasePath(CommonDict):
         self['release_dir'] = os.path.join(config_scenario['software_root'], release_work_dir)
 
         if not ('version' in config_scenario and config_scenario['version']):
-            raise ReleasePathError('"version" not specified in config scenario')
+            _logger.debug('"version" not specified in config scenario')
+            return
 
         self['main_dir'] = os.path.join(self['release_dir'], config_scenario['version'])
         self['content_dir'] = os.path.join(self['main_dir'], 'content')

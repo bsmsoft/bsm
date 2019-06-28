@@ -5,9 +5,11 @@ from bsm.shell.base import Base
 
 CUR_DIR = os.path.dirname(os.path.realpath(__file__))
 CSH_INIT = os.path.join(CUR_DIR, 'bsm.csh')
-CSH_SCRIPT_INIT = os.path.join(CUR_DIR, 'bsm_script.csh')
 
 class Csh(Base):
+    def comment(self, content):
+        return '\n'
+
     def echo(self, content):
         lines = content.rstrip().split('\n')
 
@@ -18,36 +20,42 @@ class Csh(Base):
         return ';\n'.join(newlines) + ';\n'
 
     def set_env(self, env_name, env_value):
-        return 'setenv {0} "{1}";\n'.format(env_name, env_value)
+        return 'setenv {0} \'{1}\';\n'.format(env_name, env_value)
 
     def unset_env(self, env_name):
         return 'unsetenv {0};\n'.format(env_name)
 
+    def alias(self, alias_name, alias_value):
+        return 'alias {0} \'{1}\';\n'.format(alias_name, alias_value)
+
+    def unalias(self, alias_name):
+        return 'unalias {0};\n'.format(alias_name)
+
     def source(self, script_path):
         return 'source {0};\n'.format(script_path)
 
-    def define_command(self):
+    def script_init(self):
         python_exe = sys.executable or 'python'
 
-        common_alias = '''\
-alias {0} '\
-set _bsm_python_exe="{1}"; \
+        bsm_alias = '''\
+alias {cmd_name} '\
+set _bsm_python_exe="{python_exe}"; \
 set _bsm_argv="\!*"; \
-source "{2}"; \
+set _bsm_cmd_name="{cmd_name}"; \
+set _bsm_app_root="{app_root}"; \
+source "{csh_init}"; \
+unset _bsm_app_root; \
+unset _bsm_cmd_name; \
 unset _bsm_argv; \
 unset _bsm_python_exe; \
 eval "exit $_bsm_exit"\
 ';
-'''
+'''.format(cmd_name=self._cmd_name, python_exe=python_exe, app_root=self._app_root, csh_init=CSH_INIT)
 
-        bsm_alias = common_alias.format('bsm', python_exe, CSH_INIT)
-        bsm_script_alias = common_alias.format('bsm_script', python_exe, CSH_SCRIPT_INIT)
+        return bsm_alias
 
-        return bsm_alias + bsm_script_alias
-
-    def undefine_command(self):
+    def script_exit(self):
         bsm_exit = '''\
-unalias bsm_script;
-unalias bsm;
-'''
+unalias {cmd_name};
+'''.format(cmd_name=self._cmd_name)
         return bsm_exit

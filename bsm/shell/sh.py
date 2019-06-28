@@ -3,6 +3,11 @@ import sys
 from bsm.shell.base import Base
 
 class Sh(Base):
+    def comment(self, content):
+        lines = content.rstrip().split('\n')
+        newlines = map(lambda x:'# '+x, lines)
+        return '\n'.join(newlines) + '\n'
+
     def echo(self, content):
         lines = content.rstrip().split('\n')
 
