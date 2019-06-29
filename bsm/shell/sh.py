@@ -2,29 +2,42 @@ import sys
 
 from bsm.shell.base import Base
 
+def _convert_sh_string(s):
+    res = '\''
+    for i in s:
+        # "\" will be converted into four chars "'\\'"
+        if i == '\\':
+            res += '\'\\\\\''
+        # "'" will be converted into four chars "'\''"
+        elif i == '\'':
+            res += '\'\\\'\''
+        else:
+            res += i
+    res += '\''
+    return res
+
 class Sh(Base):
     def comment(self, content):
-        lines = content.rstrip().split('\n')
+        lines = content.split('\n')
         newlines = map(lambda x:'# '+x, lines)
         return '\n'.join(newlines) + '\n'
 
-    def echo(self, content):
-        lines = content.rstrip().split('\n')
-
-        # "\" should be escaped
-        # "'" will be converted into four chars "'\''"
-        newlines = map(lambda x:'echo \'' + x.replace('\\', '\\\\').replace('\'', '\'\\\'\'') + '\'', lines)
-
+    def print(self, content):
+        lines = content.split('\n')
+        newlines = ['echo ' + _convert_sh_string(l) for l in lines]
         return '\n'.join(newlines) + '\n'
 
+    def print_env(self, env_name):
+        return 'echo "${0}"'.format(env_name)
+
     def set_env(self, env_name, env_value):
-        return 'export {0}=\'{1}\'\n'.format(env_name, env_value)
+        return 'export {0}={1}\n'.format(env_name, _convert_sh_string(env_value))
 
     def unset_env(self, env_name):
         return 'unset {0}\n'.format(env_name)
 
     def alias(self, alias_name, alias_value):
-        return 'alias {0}=\'{1}\'\n'.format(alias_name, alias_value)
+        return 'alias {0}={1}\n'.format(alias_name, _convert_sh_string(alias_value))
 
     def unalias(self, alias_name):
         return 'unalias {0} 2>/dev/null\n'.format(alias_name)
@@ -60,6 +73,6 @@ class Sh(Base):
 
     def script_exit(self):
         bsm_exit = '''\
-unset -f {cmd_name}
+unset -f {cmd_name} 2>/dev/null
 '''.format(cmd_name=self._cmd_name)
         return bsm_exit

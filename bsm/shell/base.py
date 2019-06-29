@@ -3,7 +3,7 @@ class Base(object):
         self._cmd_name = cmd_name
         self._app_root = app_root
 
-    def run(self, command, cwd):
+    def run(self, command, cwd=None):
         args = ['\''+str(arg)+'\'' for arg in command]
         run_line = ' '.join(args) + '\n'
         if not cwd:
