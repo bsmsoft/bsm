@@ -2,7 +2,8 @@ import subprocess
 
 import pytest
 
-from bsm.util import call
+from bsm.util import call, which
+
 from bsm.shell import Shell
 
 
@@ -47,13 +48,28 @@ def test_add_script(shell):
     assert shell.script
 
 
-@pytest.fixture(params=[
-    ('sh', ['sh', '-s']),
-    ('sh', ['bash', '-s', '-O', 'expand_aliases']),
-    ('sh', ['bash', '--posix', '-s']),
-    ('sh', ['zsh', '-s']),
-    ('csh', ['csh', '-s']),
-])
+def _get_available_shell_cmd():
+    all_shell_cmd = []
+
+    if which('sh'):
+        all_shell_cmd.append(('sh', ['sh', '-s']))
+    if which('dash'):
+        all_shell_cmd.append(('sh', ['dash', '-s']))
+    if which('bash'):
+        all_shell_cmd.append(('sh', ['bash', '-s', '-O', 'expand_aliases']))
+        all_shell_cmd.append(('sh', ['bash', '--posix', '-s']))
+    if which('zsh'):
+        all_shell_cmd.append(('sh', ['zsh', '-s']))
+
+    if which('csh'):
+        all_shell_cmd.append(('csh', ['csh', '-s']))
+    if which('tcsh'):
+        all_shell_cmd.append(('csh', ['tcsh', '-s']))
+
+    return all_shell_cmd
+
+
+@pytest.fixture(params=_get_available_shell_cmd())
 def shell_with_cmd(request):
     return Shell(request.param[0], 'test_bsm', '/fake_app_root'), request.param[1]
 
