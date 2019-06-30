@@ -14,6 +14,7 @@ with open(os.path.join(here, 'bsm', 'BSMCLI_CMD')) as bsmcli_cmd_file:
 with open(os.path.join(here, 'README.rst')) as f:
     long_description = f.read()
 
+
 setup(
     name = 'bsm',
     version = version,
@@ -21,7 +22,7 @@ setup(
     long_description = long_description,
     url = 'https://github.com/bsmhep/bsm',
     author = 'Xianghu Zhao',
-    author_email = 'zhaoxh@ihep.ac.cn',
+    author_email = 'xianghuzhao@gmail.com',
     license = 'MIT',
 
     classifiers = [
@@ -34,13 +35,13 @@ setup(
         'License :: OSI Approved :: MIT License',
 
         'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
