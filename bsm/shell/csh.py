@@ -1,6 +1,8 @@
 import sys
 import os
 
+from bsm.const import BSMCLI_BIN
+
 from bsm.shell.base import Base
 
 CUR_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -25,9 +27,9 @@ def _convert_csh_string(s):
 
 class Csh(Base):
     def comment(self, content):
-        ''' csh does not support comment when interactive
-        '''
-        return '\n'
+        lines = content.split('\n')
+        newlines = ['# ' + l for l in lines]
+        return '\n'.join(newlines) + '\n'
 
     def print(self, content):
         lines = content.split('\n')
@@ -57,16 +59,10 @@ class Csh(Base):
 
         bsm_alias = '''\
 alias {cmd_name} '\
-set _bsm_python_exe="{python_exe}"; \
-set _bsm_argv="\!*"; \
-set _bsm_cmd_name="{cmd_name}"; \
-set _bsm_app_root="{app_root}"; \
-source "{csh_init}"; \
-unset _bsm_app_root; \
-unset _bsm_cmd_name; \
-unset _bsm_argv; \
-unset _bsm_python_exe; \
-eval "exit $_bsm_exit"\
+set _bsm_var_python_exe="{python_exe}"; \
+set _bsm_var_cmd_name="{cmd_name}"; \
+set _bsm_var_app_root="{app_root}"; \
+source "{csh_init}" \
 ';
 '''.format(cmd_name=self._cmd_name, python_exe=python_exe, app_root=self._app_root, csh_init=CSH_INIT)
 
@@ -77,3 +73,17 @@ eval "exit $_bsm_exit"\
 unalias {cmd_name};
 '''.format(cmd_name=self._cmd_name)
         return bsm_exit
+
+    def setup_script(self):
+        script = '''\
+set _bsm_var_tmpfile=`mktemp`
+'{bsmcli_bin}' --app-root '{app_root}' --shell csh init > $_bsm_var_tmpfile
+if ($status == 0) then
+    source $_bsm_var_tmpfile
+else
+    echo 'BSM initialization error'
+endif
+rm -f $_bsm_var_tmpfile
+unset _bsm_var_tmpfile
+'''.format(bsmcli_bin=BSMCLI_BIN, app_root=self._app_root)
+        return script

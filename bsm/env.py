@@ -2,7 +2,7 @@ import os
 import sys
 import json
 
-from bsm.const import BSMCLI_CMD
+from bsm.const import BSMCLI_BIN
 
 from bsm.util import ensure_list
 
@@ -35,8 +35,6 @@ class Env(object):
 
         self.__init_env_name(env_prefix)
 
-        self.__init_bsmcli_bin()
-
     def __init_env_name(self, env_prefix):
         self.__env_name = {}
 
@@ -50,14 +48,6 @@ class Env(object):
         self.__env_name['option']          = env_prefix + '_OPTION'
         self.__env_name['release_info']    = env_prefix + '_RELEASE_INFO'
         self.__env_name['packages_info']   = env_prefix + '_PACKAGES_INFO'
-
-    def __init_bsmcli_bin(self):
-        if not sys.executable:
-            self.__bsmcli_bin = BSMCLI_CMD
-            return
-
-        python_bin_dir = os.path.dirname(sys.executable)
-        self.__bsmcli_bin = os.path.join(python_bin_dir, BSMCLI_CMD)
 
 
     def __merge_path(self, env_name, path_list, append=False):
@@ -152,7 +142,7 @@ class Env(object):
     def load_app(self, config_app):
         self.unload_app()
 
-        self.__env[self.__env_name['bsmcli_bin']] = self.__bsmcli_bin
+        self.__env[self.__env_name['bsmcli_bin']] = BSMCLI_BIN
 
         info = {}
         info['env'] = self.__load_env(config_app.get('env', {}))

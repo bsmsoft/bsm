@@ -10,7 +10,7 @@ class Refresh(Base):
             return
 
         self._bsm.load_release()
-        self._bsm.load_release_package()
+        self._bsm.load_release_packages()
 
         result = {}
         result['software_root'] = self._bsm.config('scenario').get('software_root', '')

@@ -1,5 +1,7 @@
 import sys
 
+from bsm.const import BSMCLI_BIN
+
 from bsm.shell.base import Base
 
 def _convert_sh_string(s):
@@ -19,7 +21,7 @@ def _convert_sh_string(s):
 class Sh(Base):
     def comment(self, content):
         lines = content.split('\n')
-        newlines = map(lambda x:'# '+x, lines)
+        newlines = ['# ' + l for l in lines]
         return '\n'.join(newlines) + '\n'
 
     def print(self, content):
@@ -76,3 +78,9 @@ class Sh(Base):
 unset -f {cmd_name} 2>/dev/null
 '''.format(cmd_name=self._cmd_name)
         return bsm_exit
+
+    def setup_script(self):
+        script = '''\
+eval "$('{bsmcli_bin}' --app-root '{app_root}' --shell sh init)"
+'''.format(bsmcli_bin=BSMCLI_BIN, app_root=self._app_root)
+        return script

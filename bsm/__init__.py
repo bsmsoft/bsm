@@ -87,7 +87,7 @@ class Bsm(object):
     def load_release(self):
         return self.__operation.execute('load-release')
 
-    def load_release_package(self):
+    def load_release_packages(self):
         return self.__operation.execute('load-release-packages')
 
     def clean(self):

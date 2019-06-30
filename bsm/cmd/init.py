@@ -1,6 +1,7 @@
+from bsm.shell import Shell
+
 from bsm.cmd import Base
 from bsm.cmd import CmdResult
-from bsm.shell import Shell
 
 from bsm.logger import get_logger
 _logger = get_logger()
@@ -16,9 +17,11 @@ class Init(Base):
             shell.add_script('init')
             output = shell.script
 
+        self._bsm.clean()
+
         if not no_default and 'version' in self._bsm.config('scenario'):
             self._bsm.load_release()
-            self._bsm.load_release_package()
+            self._bsm.load_release_packages()
             _logger.info('software_root : {0}'.format(self._bsm.config('scenario').get('software_root', '')))
             _logger.info('version       : {0}'.format(self._bsm.config('scenario').get('version', '')))
 

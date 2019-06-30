@@ -46,6 +46,15 @@ def home(ctx):
 
 
 @cli.command()
+@click.argument('shell', type=str)
+@click.pass_context
+def setup(ctx, shell):
+    '''Get the setup script'''
+    cmd = Cmd()
+    cmd.execute('setup', ctx.obj, shell)
+
+
+@cli.command()
 @click.option('--no-default', is_flag=True, help='Do not load default release')
 @click.option('--show-script', is_flag=True, help='Display the shell script')
 @click.pass_context

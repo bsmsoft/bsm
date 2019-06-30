@@ -1,6 +1,7 @@
+from bsm.shell import Shell
+
 from bsm.cmd import Base
 from bsm.cmd import CmdResult
-from bsm.shell import Shell
 
 class Exit(Base):
     def execute(self, show_script, shell):

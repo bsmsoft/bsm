@@ -35,6 +35,9 @@ class Shell(object):
             self.__script += getattr(self.__shell, name)(*args, **kargs)
         return method
 
+    def setup_script(self):
+        return self.__shell.setup_script()
+
     @property
     def script(self):
         return self.__script

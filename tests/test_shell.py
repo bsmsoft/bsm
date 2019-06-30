@@ -7,21 +7,23 @@ from bsm.util import call, which
 from bsm.shell import Shell
 
 
-SPECIAL_STRINGS = [
-        'simple',
+INPUT_STRINGS = [
+    'simple',
 
-        '',
-        ' ',
-        '\\',
-        '\'',
-        '\t',
-        '!',
+    '',
+    ' ',
+    '\\',
+    '\'',
+    '\t',
+    '!',
 
-        'String with  space   ',
-        '\nString with \nline break\n',
-        'String with  empty \t  \n ',
+    'String with  space   ',
+    '\nString with \nline break\n',
+    'String with  empty \t  \n ',
 
-        'String with special `~!@#$%^&*()-_=+[{]};:\'"\\|,<.>/?\n\t abc ABC 0123',
+    'String with special `~!@#$%^&*()-_=+[{]};:\'"\\|,<.>/?\n\t abc ABC 0123',
+
+    '{"make_jobs" : 16, "work_root" : "~/mywork_test", "work_ver_root" : "~/mywork_ver_test"}'
 ]
 
 
@@ -88,7 +90,7 @@ def test_comment(shell_with_cmd):
 def test_print(shell_with_cmd):
     shell, cmd = shell_with_cmd
 
-    for s in SPECIAL_STRINGS:
+    for s in INPUT_STRINGS:
         shell.clear_script()
         shell.print(s)
         assert (s + '\n') == _execute_shell(cmd, shell.script)
@@ -98,7 +100,7 @@ def test_env(shell_with_cmd):
 
     env_name = '_BSM_TEST_ENV'
 
-    for s in SPECIAL_STRINGS:
+    for s in INPUT_STRINGS:
         # Just do not test variables with newline
         new_s = s.replace('\n', '')
 

@@ -14,7 +14,7 @@ class Use(Base):
 
         self._bsm.load_release()
         if not without_package:
-            self._bsm.load_release_package()
+            self._bsm.load_release_packages()
 
         if default:
             self._bsm.save_as_default()
