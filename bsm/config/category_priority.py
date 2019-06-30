@@ -33,5 +33,5 @@ class CategoryPriority(CommonList):
 
     def __remove_duplicated_priority(self):
         new_list = OrderedDict.fromkeys(self)
-        self.clear()
+        del self[:]
         self.extend(new_list)

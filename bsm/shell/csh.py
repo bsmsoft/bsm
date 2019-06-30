@@ -31,12 +31,12 @@ class Csh(Base):
         newlines = ['# ' + l for l in lines]
         return '\n'.join(newlines) + '\n'
 
-    def print(self, content):
+    def output(self, content):
         lines = content.split('\n')
         newlines = ['echo ' + _convert_csh_string(l) for l in lines]
         return ';\n'.join(newlines) + ';\n'
 
-    def print_env(self, env_name):
+    def output_env(self, env_name):
         return 'sh -c \'echo "${0}"\';\n'.format(env_name)
 
     def set_env(self, env_name, env_value):

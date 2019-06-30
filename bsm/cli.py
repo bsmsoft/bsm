@@ -15,10 +15,14 @@ from bsm.util.option import parse_lines
 @click.option('--output-env', is_flag=True, help='Also output environment')
 @click.pass_context
 def cli(ctx, verbose, quiet, app_root, shell, config_user, output_format, output_env):
-    ctx.obj['config_entry']['verbose'] = verbose
-    ctx.obj['config_entry']['quiet'] = quiet
+    if verbose:
+        ctx.obj['config_entry']['verbose'] = verbose
+    if quiet:
+        ctx.obj['config_entry']['quiet'] = quiet
+
     if config_user is not None:
         ctx.obj['config_entry']['config_user_file'] = config_user
+
     ctx.obj['output']['format'] = output_format
     ctx.obj['output']['env'] = output_env
 
