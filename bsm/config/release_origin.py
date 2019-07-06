@@ -38,7 +38,7 @@ class ReleaseOrigin(CommonDict):
             try:
                 self[k] = load_config(config_file)
             except ConfigError as e:
-                _logger.warn('Fail to load config file "{0}": {1}'.format(config_file, e))
+                _logger.warning('Fail to load config file "{0}": {1}'.format(config_file, e))
 
         package_dir = os.path.join(config_dir, 'package')
         self.__load_package_config(package_dir)
@@ -52,4 +52,4 @@ class ReleaseOrigin(CommonDict):
             try:
                 self['package'][os.path.join(rel_dir, pkg_name)] = load_config(full_path)
             except ConfigError as e:
-                _logger.warn('Fail to load package config file "{0}": {1}'.format(full_path, e))
+                _logger.warning('Fail to load package config file "{0}": {1}'.format(full_path, e))

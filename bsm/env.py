@@ -1,5 +1,4 @@
 import os
-import sys
 import json
 
 from bsm.const import BSMCLI_BIN
@@ -20,7 +19,7 @@ def _parse_info(info_str):
         return {}
 
 def _emit_info(info):
-    return json.dumps(info, separators=(',',':'))
+    return json.dumps(info, separators=(',', ':'))
 
 
 class Env(object):
@@ -38,16 +37,16 @@ class Env(object):
     def __init_env_name(self, env_prefix):
         self.__env_name = {}
 
-        self.__env_name['bsmcli_bin']      = env_prefix + '_BSMCLI_BIN'
+        self.__env_name['bsmcli_bin'] = env_prefix + '_BSMCLI_BIN'
 
-        self.__env_name['app_info']        = env_prefix + '_APP_INFO'
+        self.__env_name['app_info'] = env_prefix + '_APP_INFO'
 
-        self.__env_name['software_root']   = env_prefix + '_SOFTWARE_ROOT'
+        self.__env_name['software_root'] = env_prefix + '_SOFTWARE_ROOT'
         self.__env_name['release_version'] = env_prefix + '_RELEASE_VERSION'
-        self.__env_name['scenario']        = env_prefix + '_SCENARIO'
-        self.__env_name['option']          = env_prefix + '_OPTION'
-        self.__env_name['release_info']    = env_prefix + '_RELEASE_INFO'
-        self.__env_name['packages_info']   = env_prefix + '_PACKAGES_INFO'
+        self.__env_name['scenario'] = env_prefix + '_SCENARIO'
+        self.__env_name['option'] = env_prefix + '_OPTION'
+        self.__env_name['release_info'] = env_prefix + '_RELEASE_INFO'
+        self.__env_name['packages_info'] = env_prefix + '_PACKAGES_INFO'
 
 
     def __merge_path(self, env_name, path_list, append=False):
@@ -222,7 +221,7 @@ class Env(object):
     def unload_packages(self):
         if self.__env_name['packages_info'] in self.__env:
             packages_info = _parse_info(self.__env[self.__env_name['packages_info']])
-            for package, info in packages_info.items():
+            for _, info in packages_info.items():
                 self.__unload_env(info.get('env', {}))
             del self.__env[self.__env_name['packages_info']]
 

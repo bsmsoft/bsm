@@ -6,11 +6,11 @@ _logger = get_logger()
 class Use(Base):
     def execute(self, default=False, without_package=False):
         if not self._bsm.config('release_status').get('install', {}).get('finished'):
-            _logger.warn('Release version {0} is not fully installed'.format(self._bsm.config('scenario')['version']))
+            _logger.warning('Release version {0} is not fully installed'.format(self._bsm.config('scenario')['version']))
 
         missing_pkg = self._bsm.check_missing_runtime()
         if missing_pkg:
-            _logger.warn('Missing package found for runtime: {0}'.format(', '.join(missing_pkg.keys())))
+            _logger.warning('Missing package found for runtime: {0}'.format(', '.join(missing_pkg.keys())))
 
         self._bsm.load_release()
         if not without_package:

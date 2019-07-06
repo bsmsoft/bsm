@@ -31,7 +31,7 @@ class Category(CommonDict):
 
         for ctg, ctg_cfg in config_container['category'].items():
             if ctg in self:
-                _logger.warn('Conflicting category: {0}'.format(ctg))
+                _logger.warning('Conflicting category: {0}'.format(ctg))
             self.__load_category(ctg, ctg_cfg, config_app, config_scenario, config_attribute)
 
     def __load_category(self, ctg, ctg_cfg, config_app, config_scenario, config_attribute):

@@ -82,8 +82,8 @@ def exit(ctx, show_script):
 @click.pass_context
 def upgrade(ctx):
     '''Upgrade bsm to the latest version'''
-    cmd = Cmd('upgrade')
-    cmd.execute(ctx.obj)
+    cmd = Cmd()
+    cmd.execute('upgrade', ctx.obj)
 
 
 @cli.command()

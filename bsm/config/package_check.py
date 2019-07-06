@@ -3,7 +3,7 @@ import copy
 from bsm.handler import Handler, HandlerNotFoundError
 
 from bsm.config.util import ConfigPackageParamError
-from bsm.config.util import package_param_from_identifier, transform_package
+from bsm.config.util import package_param_from_identifier
 
 from bsm.config.common_dict import CommonDict
 
@@ -22,7 +22,7 @@ class PackageCheck(CommonDict):
         with Handler(config_release_path['handler_python_dir']) as h:
             for identifier, pkg_cfg in config_release.get('package', {}).items():
                 try:
-                    category_name, subdir, pkg_name = package_param_from_identifier(identifier, pkg_cfg)
+                    category_name, _, pkg_name = package_param_from_identifier(identifier, pkg_cfg)
                 except ConfigPackageParamError:
                     continue
 
@@ -32,7 +32,7 @@ class PackageCheck(CommonDict):
 
                 self.setdefault(category_name, {})
                 if pkg_name in self[category_name]:
-                    _logger.warn('Duplicated package found: category({0}), package({1})'.format(category_name, pkg_name))
+                    _logger.warning('Duplicated package found: category({0}), package({1})'.format(category_name, pkg_name))
                 self[category_name].setdefault(pkg_name, {})
                 final_config = self[category_name][pkg_name]
 

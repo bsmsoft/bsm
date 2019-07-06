@@ -36,18 +36,18 @@ class PackageInstall(PackageBase):
 
             version_dir = config_category[category_name]['version_dir']
             if (not version_dir) and len(version) > 1:
-                _logger.warn('Only one version could be installed when category version_dir is false')
+                _logger.warning('Only one version could be installed when category version_dir is false')
                 version = version[:1]
 
             if not version:
-                _logger.warn('No version is specified for category({0}), package({1})'.format(category_name, pkg_name))
+                _logger.warning('No version is specified for category({0}), package({1})'.format(category_name, pkg_name))
 
             for ver in version:
                 self.setdefault(category_name, {})
                 self[category_name].setdefault(subdir, {})
                 self[category_name][subdir].setdefault(pkg_name, {})
                 if ver in self[category_name][subdir][pkg_name]:
-                    _logger.warn('Duplicated package found: category({0}), subdir({1}), package({2}), version({3})'.format(category_name, subdir, pkg_name, ver))
+                    _logger.warning('Duplicated package found: category({0}), subdir({1}), package({2}), version({3})'.format(category_name, subdir, pkg_name, ver))
                 self[category_name][subdir][pkg_name].setdefault(ver, {})
                 final_config = self[category_name][subdir][pkg_name][ver]
 

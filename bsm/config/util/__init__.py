@@ -21,7 +21,7 @@ def _step_param(config_action):
 
     if isinstance(config_action, dict):
         if len(config_action) > 1:
-            _logger.warn('More than one actions found in the install action dictionary. Will only randomly choose one!')
+            _logger.warning('More than one actions found in the install action dictionary. Will only randomly choose one!')
             _logger.debug('config_action: {0}'.format(config_action))
         handler = next(iter(config_action))
         return handler, config_action[handler]
@@ -45,9 +45,9 @@ def config_from_file(config_file):
         if isinstance(loaded_data, dict):
             return loaded_data
         if loaded_data is not None:
-            _logger.warn('Config file is not a dict, use empty dict instead: {0}'.format(config_file))
+            _logger.warning('Config file is not a dict, use empty dict instead: {0}'.format(config_file))
     except ConfigError as e:
-        _logger.warn('Load config file failed, use empty dict instead: {0}'.format(config_file))
+        _logger.warning('Load config file failed, use empty dict instead: {0}'.format(config_file))
 
     return {}
 
@@ -56,13 +56,13 @@ def package_param_from_rel_dir(rel_dir, version_dir):
     frag = rel_dir.split(os.sep)
     if version_dir:
         if len(frag) < 3 or frag[-2] != 'versions':
-            _logger.warn('Package config path is not valid: {0}'.format(rel_dir))
+            _logger.warning('Package config path is not valid: {0}'.format(rel_dir))
             raise ConfigPackageParamError
         version = frag[-1]
         frag = frag[:-2]
     else:
         if len(frag) < 2 or frag[-1] != 'head':
-            _logger.warn('Package config path is not valid: {0}'.format(rel_dir))
+            _logger.warning('Package config path is not valid: {0}'.format(rel_dir))
             raise ConfigPackageParamError
         version = None
         frag = frag[:-1]
@@ -95,10 +95,10 @@ def package_param_from_identifier(identifier, pkg_cfg):
     # Use the first part as default category name
     if 'category' in pkg_cfg:
         category_name = pkg_cfg['category']
-    elif len(frag) > 0:
+    elif frag:
         category_name = frag[0]
     else:
-        _logger.warn('Category not specified for {0}'.format(identifier))
+        _logger.warning('Category not specified for {0}'.format(identifier))
         raise ConfigPackageParamError
 
     frag = frag[1:]

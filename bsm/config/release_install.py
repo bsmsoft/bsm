@@ -20,8 +20,8 @@ class ReleaseInstall(CommonDict):
 
         if len(self['steps']) != len(set(self['steps'])):
             raise ConfigReleaseInstallError('Duplicated steps found in: {0}'.format(self['steps']))
-        if len(self['steps']) == 0:
-            _logger.warn('No install steps specified')
+        if not self['steps']:
+            _logger.warning('No install steps specified')
 
         self['atomic_start'] = install_cfg.get('atomic_start')
         self['atomic_end'] = install_cfg.get('atomic_end')

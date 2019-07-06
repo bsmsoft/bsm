@@ -15,11 +15,11 @@ def list_versions(release_repo, version_pattern, git):
         if not m:
             continue
         groups = m.groups()
-        if len(groups) == 0:
+        if not groups:
             continue
         version = groups[0]
         if version in versions:
-            _logger.warn('Duplicated version "{0}" found for tag "{1}", please check the version pattern "{2}"'.format(version, tag, version_pattern))
+            _logger.warning('Duplicated version "{0}" found for tag "{1}", please check the version pattern "{2}"'.format(version, tag, version_pattern))
             continue
         versions[version] = tag
 

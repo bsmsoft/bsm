@@ -6,7 +6,7 @@ _logger = get_logger()
 class Refresh(Base):
     def execute(self):
         if 'version' not in self._bsm.config('scenario'):
-            _logger.warn('No release loaded currently')
+            _logger.warning('No release loaded currently')
             return
 
         self._bsm.load_release()

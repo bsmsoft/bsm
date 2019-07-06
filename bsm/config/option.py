@@ -35,4 +35,4 @@ class Option(CommonDict):
     def __check_option(self, config_option_list):
         for k, v in self.items():
             if k not in config_option_list:
-                _logger.warn('Option "{0}" is not in the option list'.format(k))
+                _logger.warning('Option "{0}" is not in the option list'.format(k))

@@ -8,6 +8,9 @@ from bsm.util import safe_rmdir
 from bsm.operation import Base
 from bsm.operation.util import list_versions
 
+from bsm.logger import get_logger
+_logger = get_logger()
+
 
 class ReleaseVersionError(Exception):
     pass
@@ -58,7 +61,7 @@ class InstallRelease(Base):
         elif 'version' in conf and conf['version']:
             _install_from_git_repo(conf['release_repo'], conf['version'], version_pattern, content_dir, git_temp)
         else:
-            _logger.warn('No release specified, nothing to do')
+            _logger.warning('No release specified, nothing to do')
 
     def __install_handler(self):
         conf = self._config['release_path']

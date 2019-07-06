@@ -37,7 +37,7 @@ class PkgEdit(PkgBase):
             editor = _detect_editor(DEFAULT_EDITOR)
 
         if not editor:
-            _logger.warn('Editor open failed. Please edit the package configuration file by yourself: {0}'.format(pkg_cfg_file))
+            _logger.warning('Editor open failed. Please edit the package configuration file by yourself: {0}'.format(pkg_cfg_file))
             return
 
         _logger.info('Edit package configuration file: {0}'.format(pkg_cfg_file))

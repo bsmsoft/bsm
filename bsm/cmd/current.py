@@ -10,7 +10,7 @@ class Current(Base):
         result = {}
 
         if 'release_version' not in current_release:
-            _logger.warn('No release loaded currently')
+            _logger.warning('No release loaded currently')
             return result
 
         result['software_root'] = current_release.get('software_root', '')

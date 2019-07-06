@@ -88,10 +88,10 @@ class Git(object):
         return _git_cmd(cwd, self.__git_exec, *git_args)
 
     def clone(self, url):
-        out = self.__run_cmd('clone', url=url)
+        self.__run_cmd('clone', url=url)
 
     def checkout(self, branch):
-        out = self.__run_cmd('checkout', branch=branch)
+        self.__run_cmd('checkout', branch=branch)
 
     def clear_git_info(self):
         if self.__path is not None:

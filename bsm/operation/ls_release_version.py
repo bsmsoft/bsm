@@ -30,7 +30,7 @@ class LsReleaseVersion(Base):
                 local_versions.append(version_dir)
 
                 if version_in_file != version_dir:
-                    _logger.warn('Version inconsistent for "{0}": Defined as "{1}"'.format(version_dir, version_in_file))
+                    _logger.warning('Version inconsistent for "{0}": Defined as "{1}"'.format(version_dir, version_in_file))
             except:
                 continue
 

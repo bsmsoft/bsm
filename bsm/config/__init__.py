@@ -85,7 +85,7 @@ class Config(Mapping):
             with open(self['app']['example_config_user']) as f:
                 cfg['content'] = f.read()
         except Exception as e:
-            _logger.warn('Open user config example failed: {0}'.format(e))
+            _logger.warning('Open user config example failed: {0}'.format(e))
             cfg['content'] = ''
         return cfg
 

@@ -88,7 +88,7 @@ class Release(CommonDict):
         version = config_scenario.get('version')
         version_in_release = self.get('version')
         if version != version_in_release:
-            _logger.warn('Version inconsistency found. Request {0} but receive {1}'.format(version, version_in_release))
+            _logger.warning('Version inconsistency found. Request {0} but receive {1}'.format(version, version_in_release))
 
     def __check_bsm_version(self):
         version_require = self.get('setting', {}).get('bsm', {}).get('require', '')
