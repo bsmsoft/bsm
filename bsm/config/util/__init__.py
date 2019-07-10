@@ -21,8 +21,10 @@ def _step_param(config_action):
 
     if isinstance(config_action, dict):
         if len(config_action) > 1:
-            _logger.warning('More than one actions found in the install action dictionary. Will only randomly choose one!')
-            _logger.debug('config_action: {0}'.format(config_action))
+            _logger.warning(
+                'More than one actions found in the install action dictionary. '
+                'Will only randomly choose one!')
+            _logger.debug('config_action: %s', config_action)
         handler = next(iter(config_action))
         return handler, config_action[handler]
 
@@ -114,12 +116,12 @@ def package_param_from_identifier(identifier, pkg_cfg):
     return (category_name, subdir, pkg_name)
 
 
-def transform_package(handler, trans_type, category, subdir, name, version, pkg_cfg, pkg_path,
-        config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category, config_category_priority):
+def transform_package(handler, trans_type,
+                      ctg, subdir, name, version, pkg_cfg, pkg_path, **config):
     param = {}
     param['type'] = trans_type
 
-    param['category'] = category
+    param['category'] = ctg
     param['subdir'] = subdir
     param['name'] = name
     param['version'] = version
@@ -127,16 +129,10 @@ def transform_package(handler, trans_type, category, subdir, name, version, pkg_
     param['config_package'] = copy.deepcopy(pkg_cfg)
     param['package_path'] = copy.deepcopy(pkg_path)
 
-    param['config_app'] = config_app.data_copy()
-    param['config_output'] = config_output.data_copy()
-    param['config_scenario'] = config_scenario.data_copy()
-    param['config_option'] = config_option.data_copy()
-    param['config_release_path'] = config_release_path.data_copy()
-    param['config_attribute'] = config_attribute.data_copy()
-    param['config_release'] = config_release.data_copy()
-    param['config_release_install'] = config_release_install.data_copy()
-    param['config_category'] = config_category.data_copy()
-    param['config_category_priority'] = config_category_priority.data_copy()
+    for n in [
+            'app', 'output', 'scenario', 'option', 'release_path', 'attribute',
+            'release', 'release_package', 'release_install', 'category', 'category_priority']:
+        param['config_'+n] = config[n].data_copy()
 
     try:
         result = handler.run('transform.package', param)
@@ -213,11 +209,11 @@ def expand_package_env(pkg_cfg):
 def install_status(status_install_file):
     return config_from_file(status_install_file)
 
-def install_step(config_release_install, pkg_cfg, install_status, reinstall):
+def install_step(config_release_install, pkg_cfg, inst_status, reinstall):
     result = {}
 
     for step in config_release_install['steps']:
-        finished = install_status.get('steps', {}).get(step, {}).get('finished', False)
+        finished = inst_status.get('steps', {}).get(step, {}).get('finished', False)
         install = reinstall or not finished
 
         config_action = ensure_list(pkg_cfg.get('install', {}).get(step, []))

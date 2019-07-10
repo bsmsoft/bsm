@@ -35,30 +35,33 @@ def load_module(module_name):
 
 
 def load_func(module_name, func_name):
-    m = load_module(module_name)
+    mod = load_module(module_name)
 
     try:
-        f = getattr(m, func_name)
+        f = getattr(mod, func_name)
     except AttributeError as e:
-        raise FunctionNotFoundError('Function "{0}" not found in module "{1}": {2}'.format(func_name, module_name, e))
+        raise FunctionNotFoundError(
+            'Function "{0}" not found in module "{1}": {2}'.format(func_name, module_name, e))
 
     if not callable(f):
-        raise NotCallableError('"{0}" in module "{1}" is not callable'.format(func_name, module_name))
+        raise NotCallableError(
+            '"{0}" in module "{1}" is not callable'.format(func_name, module_name))
 
     return f
 
 def load_class(module_name, class_name):
-    m = load_module(module_name)
+    mod = load_module(module_name)
 
     try:
-        c = getattr(m, class_name)
+        cls = getattr(mod, class_name)
     except AttributeError as e:
-        raise ClassNotFoundError('Class "{0}" not found in module "{1}": {2}'.format(class_name, module_name, e))
+        raise ClassNotFoundError(
+            'Class "{0}" not found in module "{1}": {2}'.format(class_name, module_name, e))
 
-    if not inspect.isclass(c):
+    if not inspect.isclass(cls):
         raise NotAClassError('"{0}" in module "{1}" is not a class'.format(class_name, module_name))
 
-    return c
+    return cls
 
 def load_common(name, module_prefix):
     name_underscore = name.replace('-', '_')
@@ -66,21 +69,22 @@ def load_common(name, module_prefix):
     class_name = snake_to_camel(name_underscore)
 
     try:
-        c = load_class(module_name, class_name)
+        cls = load_class(module_name, class_name)
     except LoadError as e:
         raise LoadError('Load "{0}:{1}" error: {2}'.format(module_prefix, name, e))
 
-    return c
+    return cls
 
 def load_relative(module_cur, module_rel, attr_name):
     parent_module_seq = module_cur.split('.')[:-1]
     full_module_name = '.'.join(parent_module_seq + [module_rel])
 
-    m = load_module(full_module_name)
+    mod = load_module(full_module_name)
 
     try:
-        c = getattr(m, attr_name)
+        cls = getattr(mod, attr_name)
     except AttributeError as e:
-        raise AttributeNotFoundError('Attribute "{0}" not found in module "{1}": {2}'.format(attr_name, module_rel, e))
+        raise AttributeNotFoundError(
+            'Attribute "{0}" not found in module "{1}": {2}'.format(attr_name, module_rel, e))
 
-    return c
+    return cls

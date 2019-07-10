@@ -9,7 +9,7 @@ class LsReleaseVersion(Base):
     def execute(self):
         local_versions = []
 
-        release_dir = self._config['release_path']['release_dir']
+        release_dir = self._config['release_dir']
         _logger.debug('Search local versions under release directory: {0}'.format(release_dir))
 
         if not os.path.isdir(release_dir):
@@ -31,7 +31,7 @@ class LsReleaseVersion(Base):
 
                 if version_in_file != version_dir:
                     _logger.warning('Version inconsistent for "{0}": Defined as "{1}"'.format(version_dir, version_in_file))
-            except:
+            except IOError:
                 continue
 
         local_versions.sort()

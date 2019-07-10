@@ -11,15 +11,15 @@ _logger = get_logger()
 
 
 class CategoryPriority(CommonList):
-    def __init__(self, config_user, config_scenario, config_release, config_category):
+    def __init__(self, **config):
         super(CategoryPriority, self).__init__()
 
-        self.__update_priority(config_release.get('setting', {}), config_category)
+        self.__update_priority(config['release'].get('setting', {}), config['category'])
 
-        self.__update_priority(config_user, config_category)
+        self.__update_priority(config['user'], config['category'])
 
-        if config_scenario.get('scenario'):
-            self.__update_priority(config_user.get('scenario', {}).get(config_scenario['scenario'], {}), config_category)
+        if config['scenario'].get('scenario'):
+            self.__update_priority(config['user'].get('scenario', {}).get(config['scenario']['scenario'], {}), config['category'])
 
         self.__remove_duplicated_priority()
 

@@ -7,6 +7,9 @@ from bsm.handler import HandlerNotFoundError
 
 from bsm.operation import Base
 
+from bsm.logger import get_logger
+_logger = get_logger()
+
 class CheckMissing(Base):
     def execute(self, check_type):
         env = Env(initial_env=self._env.env_final(), env_prefix=self._config['app']['env_prefix'])

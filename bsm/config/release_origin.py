@@ -1,6 +1,5 @@
 import os
 
-from bsm.util import walk_rel_dir
 from bsm.util.config import load_config, ConfigError
 
 from bsm.config.common_dict import CommonDict
@@ -16,17 +15,16 @@ class ConfigReleaseOriginError(Exception):
 
 
 class ReleaseOrigin(CommonDict):
-    def __init__(self, config_app, config_output, config_scenario, config_release_path):
+    def __init__(self, **config):
         super(ReleaseOrigin, self).__init__()
 
-        if not ('version' in config_scenario and config_scenario['version']):
-            _logger.debug('"version" not specified in config release origin')
-            return
+        if not ('version' in config['scenario'] and config['scenario']['version']):
+            raise ConfigReleaseOriginError('"version" not specified in config')
 
-        self.__load_config(config_scenario, config_release_path)
+        self.__load_config(config['scenario'], config['release_path'])
 
     def __load_config(self, config_scenario, config_release_path):
-        config_dir = os.path.join(config_release_path['config_dir'])
+        config_dir = config_release_path['config_dir']
         if not os.path.isdir(config_dir):
             raise ConfigReleaseOriginError('Release version "{0}" not found'.format(config_scenario['version']))
 
@@ -39,17 +37,3 @@ class ReleaseOrigin(CommonDict):
                 self[k] = load_config(config_file)
             except ConfigError as e:
                 _logger.warning('Fail to load config file "{0}": {1}'.format(config_file, e))
-
-        package_dir = os.path.join(config_dir, 'package')
-        self.__load_package_config(package_dir)
-
-    def __load_package_config(self, package_dir):
-        self['package'] = {}
-        for full_path, rel_dir, f in walk_rel_dir(package_dir):
-            if not f.endswith('.yml') and not f.endswith('.yaml'):
-                continue
-            pkg_name = os.path.splitext(f)[0]
-            try:
-                self['package'][os.path.join(rel_dir, pkg_name)] = load_config(full_path)
-            except ConfigError as e:
-                _logger.warning('Fail to load package config file "{0}": {1}'.format(full_path, e))

@@ -1,4 +1,5 @@
-import os
+# pylint: disable=no-value-for-parameter,unexpected-keyword-arg
+
 import click
 
 from bsm.cmd import Cmd
@@ -11,7 +12,8 @@ from bsm.util.option import parse_lines
 @click.option('--app-root', type=str, hidden=True, help='Application configuration directory')
 @click.option('--shell', type=str, hidden=True, help='Type of shell script')
 @click.option('--config-user', type=str, help='User configuration file path')
-@click.option('--output-format', type=str, default='plain', help='Output format (json, yaml, python, plain)')
+@click.option('--output-format', type=str, default='plain',
+              help='Output format (json, yaml, python, plain)')
 @click.option('--output-env', is_flag=True, help='Also output environment')
 @click.pass_context
 def cli(ctx, verbose, quiet, app_root, shell, config_user, output_format, output_env):
@@ -33,20 +35,25 @@ def cli(ctx, verbose, quiet, app_root, shell, config_user, output_format, output
         ctx.obj['output']['shell'] = shell
 
 
-@cli.command()
+@cli.command(name='version')
 @click.pass_context
-def version(ctx):
+def version_cmd(ctx):
     '''Display version information'''
-    cmd = Cmd()
-    cmd.execute('version', ctx.obj)
+    Cmd.execute('version', ctx.obj)
 
 
 @cli.command()
 @click.pass_context
 def home(ctx):
     '''Display home directory of bsm'''
-    cmd = Cmd()
-    cmd.execute('home', ctx.obj)
+    Cmd.execute('home', ctx.obj)
+
+
+@cli.command()
+@click.pass_context
+def bsmcli(ctx):
+    '''Display bsmcli path'''
+    Cmd.execute('bsmcli', ctx.obj)
 
 
 @cli.command()
@@ -54,8 +61,7 @@ def home(ctx):
 @click.pass_context
 def setup(ctx, shell):
     '''Get the setup script'''
-    cmd = Cmd()
-    cmd.execute('setup', ctx.obj, shell)
+    Cmd.execute('setup', ctx.obj, shell)
 
 
 @cli.command()
@@ -64,40 +70,36 @@ def setup(ctx, shell):
 @click.pass_context
 def init(ctx, no_default, show_script):
     '''Initialize bsm environment'''
-    cmd = Cmd()
     ctx.obj['config_entry']['default_scenario'] = not no_default
-    cmd.execute('init', ctx.obj, no_default, show_script, ctx.obj['output']['shell'])
+    Cmd.execute('init', ctx.obj, no_default, show_script, ctx.obj['output']['shell'])
 
 
-@cli.command()
+@cli.command(name='exit')
 @click.option('--show-script', is_flag=True, help='Display the shell script')
 @click.pass_context
-def exit(ctx, show_script):
+def exit_cmd(ctx, show_script):
     '''Exit bsm environment completely'''
-    cmd = Cmd()
-    cmd.execute('exit', ctx.obj, show_script, ctx.obj['output']['shell'])
+    Cmd.execute('exit', ctx.obj, show_script, ctx.obj['output']['shell'])
 
 
 @cli.command()
 @click.pass_context
 def upgrade(ctx):
     '''Upgrade bsm to the latest version'''
-    cmd = Cmd()
-    cmd.execute('upgrade', ctx.obj)
+    Cmd.execute('upgrade', ctx.obj)
 
 
 @cli.command()
-@click.option('--version', '-n', type=str, help='Release version')
+@click.option('--version', '-n', 'scenario', type=str, help='Release version')
 @click.option('--option', '-o', type=str, multiple=True, help='Options for release')
 @click.argument('config-type', type=str, required=False)
 @click.argument('item-list', nargs=-1, type=str, required=False)
 @click.pass_context
-def config(ctx, version, option, config_type, item_list):
+def config(ctx, scenario, option, config_type, item_list):
     '''Display configuration, mostly for debug purpose'''
-    cmd = Cmd()
-    ctx.obj['config_entry']['scenario'] = version
+    ctx.obj['config_entry']['scenario'] = scenario
     ctx.obj['config_entry']['option'] = parse_lines(option)
-    cmd.execute('config', ctx.obj, config_type, item_list)
+    Cmd.execute('config', ctx.obj, config_type, item_list)
 
 
 @cli.command()
@@ -107,9 +109,8 @@ def config(ctx, version, option, config_type, item_list):
 @click.pass_context
 def ls_remote(ctx, release_repo, list_all, tag):
     '''List all available release versions'''
-    cmd = Cmd()
     ctx.obj['release_repo'] = release_repo
-    cmd.execute('ls-remote', ctx.obj, list_all, tag)
+    Cmd.execute('ls-remote', ctx.obj, list_all, tag)
 
 
 @cli.command()
@@ -117,50 +118,49 @@ def ls_remote(ctx, release_repo, list_all, tag):
 @click.pass_context
 def ls(ctx, software_root):
     '''List installed release versions'''
-    cmd = Cmd()
     ctx.obj['software_root'] = software_root
-    cmd.execute('ls', ctx.obj)
+    Cmd.execute('ls', ctx.obj)
 
 
-@cli.command()
+@cli.command(name='default')
 @click.pass_context
-def default(ctx):
+def default_cmd(ctx):
     '''List default release'''
-    cmd = Cmd()
-    cmd.execute('default', ctx.obj)
+    Cmd.execute('default', ctx.obj)
 
 
 @cli.command()
 @click.pass_context
 def current(ctx):
     '''List current release'''
-    cmd = Cmd()
-    cmd.execute('current', ctx.obj)
+    Cmd.execute('current', ctx.obj)
 
 
 @cli.command()
 @click.option('--software-root', '-r', type=str, help='Local installed software root directory')
 @click.option('--release-repo', type=str, help='Repository for retrieving release information')
-@click.option('--release-source', type=str, help='Directory for retrieving release information. '
-        'This will take precedence over "release-repo". Use this option only for development')
+@click.option('--release-source', type=str,
+              help='Directory for retrieving release information. '
+              'This will take precedence over "release-repo". Use this option only for development')
 @click.option('--option', '-o', type=str, multiple=True, help='Options for release')
 @click.option('--reinstall', is_flag=True, help='Reinstall all packages')
 @click.option('--update', is_flag=True, help='Update version information before installation')
-@click.option('--without-package', is_flag=True, help='Do not install packages, only install the release')
+@click.option('--without-package', is_flag=True,
+              help='Do not install packages, only install the release')
 @click.option('--force', '-f', is_flag=True, help='Skip checking system requirements')
 @click.option('--yes', '-y', is_flag=True, help='Install without confirmation')
 @click.argument('version', type=str)
 @click.pass_context
-def install(ctx, software_root, release_repo, release_source, option, reinstall, update, without_package, force, yes, version):
+def install(ctx, software_root, release_repo, release_source,
+            option, reinstall, update, without_package, force, yes, version):
     '''Install specified release version'''
-    cmd = Cmd()
     ctx.obj['config_entry']['software_root'] = software_root
     ctx.obj['config_entry']['release_repo'] = release_repo
     ctx.obj['config_entry']['release_source'] = release_source
     ctx.obj['config_entry']['option'] = parse_lines(option)
     ctx.obj['config_entry']['scenario'] = version
     ctx.obj['config_entry']['reinstall'] = reinstall
-    cmd.execute('install', ctx.obj, update, without_package, force, yes)
+    Cmd.execute('install', ctx.obj, update, without_package, force, yes)
 
 
 @cli.command()
@@ -172,11 +172,10 @@ def install(ctx, software_root, release_repo, release_source, option, reinstall,
 @click.pass_context
 def use(ctx, software_root, default, option, without_package, version):
     '''Switch environment to given release version'''
-    cmd = Cmd()
     ctx.obj['config_entry']['software_root'] = software_root
     ctx.obj['config_entry']['option'] = parse_lines(option)
     ctx.obj['config_entry']['scenario'] = version
-    cmd.execute('use', ctx.obj, default, without_package)
+    Cmd.execute('use', ctx.obj, default, without_package)
 
 
 @cli.command()
@@ -184,9 +183,8 @@ def use(ctx, software_root, default, option, without_package, version):
 @click.pass_context
 def refresh(ctx, option):
     '''Refresh the current release version environment'''
-    cmd = Cmd()
     ctx.obj['config_entry']['option'] = parse_lines(option)
-    cmd.execute('refresh', ctx.obj)
+    Cmd.execute('refresh', ctx.obj)
 
 
 @cli.command()
@@ -195,17 +193,15 @@ def refresh(ctx, option):
 @click.pass_context
 def run(ctx, option, command):
     '''Run release command'''
-    cmd = Cmd()
     ctx.obj['config_entry']['option'] = parse_lines(option)
-    cmd.execute('run', ctx.obj, command)
+    Cmd.execute('run', ctx.obj, command)
 
 
 @cli.command()
 @click.pass_context
 def clean(ctx):
     '''Clean the current release version environment'''
-    cmd = Cmd()
-    cmd.execute('clean', ctx.obj)
+    Cmd.execute('clean', ctx.obj)
 
 
 @cli.command()
@@ -215,21 +211,20 @@ def clean(ctx):
 @click.pass_context
 def pkg_ls(ctx, list_all, option, package):
     '''List all packages of the current release versions'''
-    cmd = Cmd()
     ctx.obj['config_entry']['option'] = parse_lines(option)
-    cmd.execute('pkg-ls', ctx.obj, list_all, package)
+    Cmd.execute('pkg-ls', ctx.obj, list_all, package)
 
 
 @cli.command()
-@click.option('--package-root', '-p', type=str, help='Package root directory for initialization, default to current directory')
+@click.option('--package-root', '-p', type=str,
+              help='Package root directory for initialization, default to current directory')
 @click.option('--option', '-o', type=str, multiple=True, help='Options for release')
 @click.option('--yes', '-y', is_flag=True, help='Install without confirmation')
 @click.pass_context
 def pkg_init(ctx, package_root, option, yes):
     '''Initialize a new package from directory'''
-    cmd = Cmd()
     ctx.obj['config_entry']['option'] = parse_lines(option)
-    cmd.execute('pkg-init', ctx.obj, package_root, yes)
+    Cmd.execute('pkg-init', ctx.obj, package_root, yes)
 
 
 @cli.command()
@@ -244,12 +239,16 @@ def pkg_init(ctx, package_root, option, yes):
 @click.option('--yes', '-y', is_flag=True, help='Install without confirmation')
 @click.argument('package', type=str)
 @click.pass_context
-def pkg_install(ctx, category, subdir, version, category_origin, subdir_origin, version_origin, package, option, reinstall, yes):
+def pkg_install(ctx, category, subdir, version,
+                category_origin, subdir_origin, version_origin,
+                option, reinstall, yes, package):
     '''Install specified package'''
-    cmd = Cmd()
     ctx.obj['config_entry']['option'] = parse_lines(option)
     ctx.obj['config_entry']['reinstall'] = reinstall
-    cmd.execute('pkg-install', ctx.obj, category, subdir, version, category_origin, subdir_origin, version_origin, package, yes)
+    Cmd.execute('pkg-install', ctx.obj,
+                category, subdir, version,
+                category_origin, subdir_origin, version_origin,
+                package, yes)
 
 
 @cli.command()
@@ -261,9 +260,8 @@ def pkg_install(ctx, category, subdir, version, category_origin, subdir_origin, 
 @click.pass_context
 def pkg_use(ctx, category, subdir, version, option, package):
     '''Load a package'''
-    cmd = Cmd()
     ctx.obj['config_entry']['option'] = parse_lines(option)
-    cmd.execute('pkg-use', ctx.obj, category, subdir, version, package)
+    Cmd.execute('pkg-use', ctx.obj, category, subdir, version, package)
 
 
 @cli.command()
@@ -276,9 +274,8 @@ def pkg_use(ctx, category, subdir, version, option, package):
 @click.pass_context
 def pkg_build(ctx, category, subdir, version, option, rebuild, package):
     '''Build a package'''
-    cmd = Cmd()
     ctx.obj['config_entry']['option'] = parse_lines(option)
-    cmd.execute('pkg-build', ctx.obj, category, subdir, version, rebuild, package)
+    Cmd.execute('pkg-build', ctx.obj, category, subdir, version, rebuild, package)
 
 
 @cli.command()
@@ -291,9 +288,8 @@ def pkg_build(ctx, category, subdir, version, option, rebuild, package):
 @click.pass_context
 def pkg_remove(ctx, category, subdir, version, option, force, package):
     '''Remove a package'''
-    cmd = Cmd()
     ctx.obj['config_entry']['option'] = parse_lines(option)
-    cmd.execute('pkg-remove', ctx.obj, category, subdir, version, force, package)
+    Cmd.execute('pkg-remove', ctx.obj, category, subdir, version, force, package)
 
 
 @cli.command()
@@ -305,9 +301,8 @@ def pkg_remove(ctx, category, subdir, version, option, force, package):
 @click.pass_context
 def pkg_config(ctx, category, subdir, version, option, package):
     '''List package config'''
-    cmd = Cmd()
     ctx.obj['config_entry']['option'] = parse_lines(option)
-    cmd.execute('pkg-config', ctx.obj, category, subdir, version, package)
+    Cmd.execute('pkg-config', ctx.obj, category, subdir, version, package)
 
 
 @cli.command()
@@ -320,9 +315,8 @@ def pkg_config(ctx, category, subdir, version, option, package):
 @click.pass_context
 def pkg_path(ctx, category, subdir, version, option, list_all, package):
     '''List package path'''
-    cmd = Cmd()
     ctx.obj['config_entry']['option'] = parse_lines(option)
-    cmd.execute('pkg-path', ctx.obj, category, subdir, version, list_all, package)
+    Cmd.execute('pkg-path', ctx.obj, category, subdir, version, list_all, package)
 
 
 @cli.command()
@@ -330,8 +324,7 @@ def pkg_path(ctx, category, subdir, version, option, list_all, package):
 @click.pass_context
 def pkg_clean(ctx, package):
     '''Clean a package'''
-    cmd = Cmd()
-    cmd.execute('pkg-clean', ctx.obj, package)
+    Cmd.execute('pkg-clean', ctx.obj, package)
 
 
 @cli.command()
@@ -343,11 +336,15 @@ def pkg_clean(ctx, package):
 @click.pass_context
 def pkg_edit(ctx, category, subdir, version, option, package):
     '''Edit package configuration'''
-    cmd = Cmd()
     ctx.obj['config_entry']['option'] = parse_lines(option)
-    cmd.execute('pkg-edit', ctx.obj, category, subdir, version, package)
+    Cmd.execute('pkg-edit', ctx.obj, category, subdir, version, package)
 
 
 def main(cmd_name=None, app_root=None, output_shell=None, check_cli=False):
     '''The app_root and output_shell here take precedence over cli arguments'''
-    cli(prog_name=cmd_name, obj={'config_entry': {'app_root': app_root}, 'output': {'shell': output_shell}, 'check_cli': check_cli})
+    args = {}
+    args['config_entry'] = {'app_root': app_root}
+    args['output'] = {'shell': output_shell}
+    args['check_cli'] = check_cli
+
+    cli(prog_name=cmd_name, obj=args)

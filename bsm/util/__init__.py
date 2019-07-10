@@ -8,16 +8,18 @@ import pprint
 
 
 def camel_to_snake(name, delim='_'):
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1{0}\2'.format(delim), name)
-    return re.sub('([a-z0-9])([A-Z])', r'\1{0}\2'.format(delim), s1).lower()
+    mid = re.sub('(.)([A-Z][a-z]+)', r'\1{0}\2'.format(delim), name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1{0}\2'.format(delim), mid).lower()
 
 def snake_to_camel(name, delim='_'):
     return name.title().replace(delim, '')
 
 
 def is_str(var):
-    if sys.version_info[0] >= 3:
-        return isinstance(var, str)
+    try:
+        basestring
+    except NameError:
+        basestring = str
     return isinstance(var, basestring)
 
 
@@ -66,15 +68,15 @@ def expand_path(path):
 
 def walk_rel_dir(directory, rel_dir=''):
     if not os.path.isdir(directory):
-        raise StopIteration
+        return
     res = os.listdir(directory)
-    for r in res:
-        full_path = os.path.join(directory, r)
+    for item in res:
+        full_path = os.path.join(directory, item)
         if os.path.isfile(full_path):
-            yield (full_path, rel_dir, r)
+            yield (full_path, rel_dir, item)
             continue
         if os.path.isdir(full_path):
-            new_rel_dir = os.path.join(rel_dir, r)
+            new_rel_dir = os.path.join(rel_dir, item)
             for next_full_path, next_rel_dir, next_f in walk_rel_dir(full_path, new_rel_dir):
                 yield (next_full_path, next_rel_dir, next_f)
 
@@ -83,15 +85,16 @@ def check_output(args):
     p = subprocess.Popen(args, stdout=subprocess.PIPE)
     return p.communicate()[0].decode()
 
-def call(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=None, env=None, input=None):
+def call(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+         cwd=None, env=None, input_str=None):
     p = subprocess.Popen(args,
-            stdout=stdout, stderr=stderr, stdin=subprocess.PIPE,
-            cwd=cwd, env=env)
-    out, err = p.communicate(input=input)
+                         stdout=stdout, stderr=stderr, stdin=subprocess.PIPE,
+                         cwd=cwd, env=env)
+    out, err = p.communicate(input=input_str)
     ret = p.returncode
     return (ret, out, err)
 
-def call_and_log(cmd, log, cwd=None, env=None, input=None):
+def call_and_log(cmd, log, cwd=None, env=None, input_str=None):
     log.write('='*80 + '\n')
     log.write(' - Start time: {0}\n'.format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
     log.write(' - Command: {0}\n'.format(cmd))
@@ -101,7 +104,7 @@ def call_and_log(cmd, log, cwd=None, env=None, input=None):
     log.flush()
 
     try:
-        ret, out, err = call(cmd, stdout=log, cwd=cwd, env=env, input=input)
+        ret, _, _ = call(cmd, stdout=log, cwd=cwd, env=env, input_str=input_str)
     except OSError as e:
         log.write('OSError: {0}\n'.format(e))
         log.write('Command not found: {0}\n'.format(cmd[0]))
@@ -116,7 +119,7 @@ def which(program):
     def is_exe(fpath):
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
-    fpath, fname = os.path.split(program)
+    fpath, _ = os.path.split(program)
     if fpath:
         if is_exe(program):
             return program

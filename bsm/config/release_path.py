@@ -13,21 +13,16 @@ class ReleasePathError(Exception):
 
 
 class ReleasePath(CommonDict):
-    def __init__(self, config_scenario, release_work_dir):
+    def __init__(self, **config):
         super(ReleasePath, self).__init__()
 
-        if 'software_root' not in config_scenario:
-            raise ReleasePathError('"software_root" not specified in config scenario')
+        if not ('version' in config['scenario'] and config['scenario']['version']):
+            raise ReleasePathError('"version" not specified in config scenario')
 
-        self['release_dir'] = os.path.join(config_scenario['software_root'], release_work_dir)
-
-        if not ('version' in config_scenario and config_scenario['version']):
-            _logger.debug('"version" not specified in config scenario')
-            return
-
-        self['main_dir'] = os.path.join(self['release_dir'], config_scenario['version'])
+        self['main_dir'] = os.path.join(config['release_dir'], config['scenario']['version'])
         self['content_dir'] = os.path.join(self['main_dir'], 'content')
         self['config_dir'] = os.path.join(self['content_dir'], 'config')
+        self['config_package_dir'] = os.path.join(self['config_dir'], 'package')
         self['handler_dir'] = os.path.join(self['content_dir'], 'handler')
         self['handler_python_dir'] = os.path.join(self['main_dir'], 'handler')
         self['handler_module_dir'] = os.path.join(self['main_dir'], 'handler', HANDLER_MODULE_NAME)

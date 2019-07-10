@@ -20,10 +20,11 @@ class CmdError(Exception):
 
 
 class CmdResult(object):
-    def __init__(self, output='', commands=[], script_types=[]):
+    def __init__(self, output='', commands=None, script_types=None):
         self.__output = output
-        self.__commands = ensure_list(commands)
-        self.__script_types = ensure_list(script_types)
+
+        self.__commands = ensure_list(commands) if commands else []
+        self.__script_types = ensure_list(script_types) if script_types else []
 
     @property
     def output(self):
@@ -55,8 +56,8 @@ def _generate_script(cmd_name, app_root, shell_name, output, commands, env_chang
 
     shell.newline()
     shell.comment('Add definition script')
-    for st in script_types:
-        shell.add_script(st)
+    for script_type in script_types:
+        shell.add_script(script_type)
 
     shell.newline()
     shell.comment('Run commands')
@@ -87,8 +88,8 @@ def _run_commands(commands):
         cmd = run_cmd.get('cmd', [])
         cwd = run_cmd.get('cwd', None)
         if cmd:
-            _logger.debug('Running command: {0}'.format(cmd))
-            _logger.debug('Command cwd: {0}'.format(cwd))
+            _logger.debug('Running command: %s', cmd)
+            _logger.debug('Command cwd: %s', cwd)
             subprocess.call(cmd, cwd=run_cmd.get('cwd', None))
 
 
@@ -99,7 +100,8 @@ class Base(object):
 
 
 class Cmd(object):
-    def execute(self, subcmd_name, obj, *args, **kwargs):
+    @staticmethod
+    def execute(subcmd_name, obj, *args, **kwargs):
         if 'check_cli' in obj and obj['check_cli']:
             click.echo('BSM:COMMAND_LINE_INTERFACE_OK')
             return
@@ -122,14 +124,20 @@ class Cmd(object):
             env_changes = bsm.apply_env_changes()
 
             if obj['output']['env']:
-                result_output = {'output': result_output, 'env_final': env_final, 'env_changes': env_changes}
+                result_output = {
+                    'output': result_output,
+                    'env_final': env_final,
+                    'env_changes': env_changes,
+                }
 
             output = Output(output_format)
             final_output = output.dump(result_output)
 
             if obj['output']['shell']:
-                final_output = _generate_script(bsm.config('app')['cmd_name'], bsm.config('app').get('app_root', ''),
-                        obj['output']['shell'], final_output, cmd_result.commands, env_changes, cmd_result.script_types)
+                final_output = _generate_script(
+                    bsm.config('app')['cmd_name'], bsm.config('app').get('app_root', ''),
+                    obj['output']['shell'], final_output,
+                    cmd_result.commands, env_changes, cmd_result.script_types)
 
             if final_output:
                 nl = not final_output.endswith('\n')
@@ -137,12 +145,8 @@ class Cmd(object):
 
             if not obj['output']['shell']:
                 _run_commands(cmd_result.commands)
-        except ConfigReleaseError as e:
-            _logger.error(str(e))
-            _logger.critical('Can not load release version: {0}'.format(bsm.config('entry')['scenario']))
-            sys.exit(2)
         except Exception as e:
-            _logger.critical('Fatal error ({0}): {1}'.format(type(e).__name__, e))
+            _logger.critical('Fatal error (%s): %s', type(e).__name__, e)
             if bsm.config('output')['verbose']:
-                _logger.critical('\n{0}'.format(traceback.format_exc()))
+                _logger.critical('\n%s', traceback.format_exc())
             sys.exit(1)

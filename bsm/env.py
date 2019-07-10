@@ -15,7 +15,7 @@ def _emit_path(path_list):
 def _parse_info(info_str):
     try:
         return json.loads(info_str)
-    except:
+    except ValueError:
         return {}
 
 def _emit_info(info):

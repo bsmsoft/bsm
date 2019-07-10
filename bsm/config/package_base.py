@@ -12,18 +12,15 @@ _logger = get_logger()
 
 
 class PackageBase(CommonDict):
-    def __init__(self, config_entry, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category, config_category_priority):
+    def __init__(self, **config):
         super(PackageBase, self).__init__()
 
-        if not ('version' in config_scenario and config_scenario['version']):
-            _logger.debug('"version" not specified in config package')
-            return
-
-        with Handler(config_release_path['handler_python_dir']) as h:
-            self._init_package(h, config_entry, config_app, config_output, config_scenario, config_option, config_release_path, config_attribute, config_release, config_release_install, config_category, config_category_priority)
+        with Handler(config['release_path']['handler_python_dir']) as h:
+            self._init_package(h, **config)
 
     def package_exist(self, category, subdir, name, version):
-        return category in self and subdir in self[category] and name in self[category][subdir] and version in self[category][subdir][name]
+        return category in self and subdir in self[category] and \
+                name in self[category][subdir] and version in self[category][subdir][name]
 
     def package_config(self, category, subdir, name, version):
         if not self.package_exist(category, subdir, name, version):

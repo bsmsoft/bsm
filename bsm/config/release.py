@@ -1,6 +1,8 @@
 from packaging.specifiers import SpecifierSet
 from packaging.specifiers import InvalidSpecifier
 
+from bsm import BSM_VERSION
+
 from bsm.handler import Handler
 from bsm.handler import HandlerNotFoundError
 
@@ -11,44 +13,33 @@ from bsm.config.common_dict import CommonDict
 from bsm.logger import get_logger
 _logger = get_logger()
 
-from bsm import BSM_VERSION
-
 
 class ConfigReleaseError(Exception):
     pass
 
 
 class Release(CommonDict):
-    def __init__(self, config_app, config_output, config_scenario, config_option, config_release_path, config_release_origin, config_attribute):
+    def __init__(self, **config):
         super(Release, self).__init__()
 
-        if not ('version' in config_scenario and config_scenario['version']):
-            _logger.debug('"version" not specified in config release')
-            return
-
-        self.__transform(config_app, config_output, config_scenario, config_option, config_release_path, config_release_origin, config_attribute)
-        self.__expand_env(config_scenario, config_attribute)
-        self.__check_version_consistency(config_scenario)
+        self.__transform(**config)
+        self.__expand_env(config['scenario'], config['attribute'])
+        self.__check_version_consistency(config['scenario'])
         self.__check_bsm_version()
 
-    def __transform(self, config_app, config_output, config_scenario, config_option, config_release_path, config_release_origin, config_attribute):
+    def __transform(self, **config):
         param = {}
-        param['config_app'] = config_app.data_copy()
-        param['config_output'] = config_output.data_copy()
-        param['config_scenario'] = config_scenario.data_copy()
-        param['config_option'] = config_option.data_copy()
-        param['config_release_path'] = config_release_path.data_copy()
-        param['config_release_origin'] = config_release_origin.data_copy()
-        param['config_attribute'] = config_attribute.data_copy()
+        for name in ['app', 'output', 'scenario', 'option', 'release_path', 'release_origin', 'attribute']:
+            param['config_'+name] = config[name].data_copy()
 
         try:
-            with Handler(config_release_path['handler_python_dir']) as h:
+            with Handler(config['release_path']['handler_python_dir']) as h:
                 result = h.run('transform.release', param)
                 if isinstance(result, dict):
                     self.update(result)
         except HandlerNotFoundError as e:
             _logger.debug('Transformer for release not found: {0}'.format(e))
-            self.update(config_release_origin)
+            self.update(config['release_origin'])
         except Exception as e:
             _logger.error('Transformer for release run error: {0}'.format(e))
             raise
@@ -99,7 +90,7 @@ class Release(CommonDict):
         try:
             spec = SpecifierSet(version_require, prereleases=True)
         except InvalidSpecifier as e:
-            raise ConfigReleaseError('Require statement not correct: {0}'.format(e))
+            raise ConfigReleaseError('Require statement not valid: {0}'.format(e))
 
         if BSM_VERSION not in spec:
             raise ConfigReleaseError('BSM version "{0}" does not follow: {1}'.format(BSM_VERSION, version_require))

@@ -1,7 +1,9 @@
+# pylint: disable=too-many-public-methods
+
 import os
 import copy
 
-from bsm.const import BSM_HOME, BSM_VERSION
+from bsm.const import BSM_HOME, BSM_VERSION, BSMCLI_BIN
 
 from bsm.config import Config
 from bsm.env import Env
@@ -13,7 +15,13 @@ _logger = get_logger()
 
 
 class Bsm(object):
-    def __init__(self, config_entry={}, initial_env=None):
+    def __init__(self, config_entry=None, initial_env=None):
+        self.__bsm_version = BSM_VERSION
+        self.__bsm_home = BSM_HOME
+        self.__bsm_cli_bin = BSMCLI_BIN
+
+        self.__env = None
+
         self.reload(config_entry=config_entry, initial_env=initial_env)
 
 
@@ -40,10 +48,13 @@ class Bsm(object):
 
 
     def version(self):
-        return BSM_VERSION
+        return self.__bsm_version
 
     def home(self):
-        return BSM_HOME
+        return self.__bsm_home
+
+    def cli(self):
+        return self.__bsm_cli_bin
 
 
     def app(self):
@@ -110,10 +121,16 @@ class Bsm(object):
 
 
     def find_package(self, package, category=None, subdir=None, version=None, from_install=False):
-        return self.__operation.execute('find-package', package, category, subdir, version, from_install)
+        return self.__operation.execute(
+            'find-package', package, category, subdir, version, from_install)
 
-    def match_install_package(self, package, category=None, subdir=None, version=None, category_origin=None, subdir_origin=None, version_origin=None):
-        return self.__operation.execute('match-install-package', package, category, subdir, version, category_origin, subdir_origin, version_origin)
+    def match_install_package(self, package,
+                              category=None, subdir=None, version=None,
+                              category_origin=None, subdir_origin=None, version_origin=None):
+        return self.__operation.execute(
+            'match-install-package', package,
+            category, subdir, version,
+            category_origin, subdir_origin, version_origin)
 
     def package_path(self, package, category, subdir, version):
         return self.__operation.execute('package-path', package, category, subdir, version)
@@ -124,8 +141,15 @@ class Bsm(object):
     def package_exist(self, package, category, subdir, version):
         return self.__operation.execute('package-exist', package, category, subdir, version)
 
-    def install_package_config(self, package, category, subdir, version, category_origin, subdir_origin, version_origin, from_install=False):
-        return self.__operation.execute('install-package-config', package, category, subdir, version, category_origin, subdir_origin, version_origin, from_install)
+    def install_package_config(self, package,
+                               category, subdir, version,
+                               category_origin, subdir_origin, version_origin,
+                               from_install=False):
+        return self.__operation.execute(
+            'install-package-config', package,
+            category, subdir, version,
+            category_origin, subdir_origin, version_origin,
+            from_install)
 
     def install_package(self, package, category, subdir, version):
         return self.__operation.execute('install-package', package, category, subdir, version)
@@ -146,7 +170,8 @@ class Bsm(object):
         return self.__operation.execute('create-package-config', package, category, subdir, version)
 
     def build_package(self, package, category, subdir, version, rebuild=False):
-        return self.__operation.execute('build-package', package, category, subdir, version, rebuild)
+        return self.__operation.execute(
+            'build-package', package, category, subdir, version, rebuild)
 
     def clean_package(self, package):
         return self.__operation.execute('clean-package', package)

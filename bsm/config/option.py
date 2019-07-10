@@ -5,24 +5,24 @@ _logger = get_logger()
 
 
 class Option(CommonDict):
-    def __init__(self, config_entry, config_info, config_env, config_user, config_scenario, config_release_status, config_option_list):
+    def __init__(self, **config):
         super(Option, self).__init__()
 
-        self.__update_option(config_release_status)
+        self.__update_option(config['release_status'])
 
-        self.__update_option(config_user)
+        self.__update_option(config['user'])
 
-        if config_scenario.get('scenario'):
-            self.__update_option(config_user.get('scenario', {}).get(config_scenario['scenario'], {}))
+        if config['scenario'].get('scenario'):
+            self.__update_option(config['user'].get('scenario', {}).get(config['scenario']['scenario'], {}))
 
-        if config_entry.get('default_scenario') and config_info.get('default', {}).get('scenario'):
-            self.__update_option(config_info.get('default', {}))
+        if config['entry'].get('default_scenario') and config['info'].get('default', {}).get('scenario'):
+            self.__update_option(config['info'].get('default', {}))
         else:
-            self.__update_option(config_env)
+            self.__update_option(config['env'])
 
-        self.__update_option(config_entry)
+        self.__update_option(config['entry'])
 
-        self.__check_option(config_option_list)
+        self.__check_option(config['option_list'])
 
     def __update_option(self, config_container):
         if 'option' not in config_container:

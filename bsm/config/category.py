@@ -13,15 +13,15 @@ class ConfigCategoryError(Exception):
 
 
 class Category(CommonDict):
-    def __init__(self, config_app, config_user, config_scenario, config_attribute, config_release):
+    def __init__(self, **config):
         super(Category, self).__init__()
 
-        self.__update_category(config_release.get('setting', {}), config_app, config_scenario, config_attribute)
+        self.__update_category(config['release'].get('setting', {}), config['app'], config['scenario'], config['attribute'])
 
-        self.__update_category(config_user, config_app, config_scenario, config_attribute)
+        self.__update_category(config['user'], config['app'], config['scenario'], config['attribute'])
 
-        if config_scenario.get('scenario'):
-            self.__update_category(config_user.get('scenario', {}).get(config_scenario['scenario'], {}), config_app, config_scenario, config_attribute)
+        if config['scenario'].get('scenario'):
+            self.__update_category(config['user'].get('scenario', {}).get(config['scenario']['scenario'], {}), config['app'], config['scenario'], config['attribute'])
 
         self.__check_nested_dir()
 

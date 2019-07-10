@@ -99,10 +99,18 @@ class InstallReleasePackages(Base):
         self._config['release_status']['install']['start'] = start_time
         self._config['release_status']['install']['end'] = end_time
         self._config['release_status']['install']['finished'] = True
+
         self._config['release_status']['option'] = {}
-        for opt in self._config['release_install']['options_to_save']:
+        option_from_install = ensure_list(self._config['release'].get('setting', {}).get('option_from_install', []))
+        for opt in option_from_install:
             if opt in self._config['option']:
                 self._config['release_status']['option'][opt] = self._config['option'][opt]
+
+        self._config['release_status']['attribute'] = {}
+        essential_attribute = ensure_list(self._config['release'].get('setting', {}).get('essential_attribute', []))
+        for att in essential_attribute:
+            if att in self._config['attribute']:
+                self._config['release_status']['attribute'][att] = self._config['attribute'][att]
 
         safe_mkdir(self._config['release_path']['status_dir'])
         self._config['release_status'].save_to_file(self._config['release_path']['status_file'])

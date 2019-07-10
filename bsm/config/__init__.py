@@ -1,3 +1,4 @@
+import os
 import copy
 
 try:
@@ -16,7 +17,9 @@ from bsm.config.scenario import Scenario as ConfigScenario
 from bsm.config.option import Option as ConfigOption
 from bsm.config.release_path import ReleasePath as ConfigReleasePath
 from bsm.config.release_origin import ReleaseOrigin as ConfigReleaseOrigin
+from bsm.config.release_package_origin import ReleasePackageOrigin as ConfigReleasePackageOrigin
 from bsm.config.release import Release as ConfigRelease
+from bsm.config.release_package import ReleasePackage as ConfigReleasePackage
 from bsm.config.category import Category as ConfigCategory
 from bsm.config.category_priority import CategoryPriority as ConfigCategoryPriority
 from bsm.config.release_install import ReleaseInstall as ConfigReleaseInstall
@@ -35,12 +38,9 @@ _logger = get_logger()
 class ConfigNotValidError(Exception):
     pass
 
-class ConfigNoDirectModError(Exception):
-    pass
-
 
 class Config(Mapping):
-    def __init__(self, config_entry={}, initial_env=None):
+    def __init__(self, config_entry=None, initial_env=None):
         self.reset(config_entry, initial_env)
 
     def reset(self, config_entry=None, initial_env=None):
@@ -75,6 +75,10 @@ class Config(Mapping):
         return len(self.__config)
 
 
+    def __config_kwargs(self, *args):
+        return {name:self[name] for name in args}
+
+
     def __load_app(self):
         return ConfigApp(self['entry'].get('app_root', ''))
 
@@ -84,8 +88,8 @@ class Config(Mapping):
         try:
             with open(self['app']['example_config_user']) as f:
                 cfg['content'] = f.read()
-        except Exception as e:
-            _logger.warning('Open user config example failed: {0}'.format(e))
+        except IOError as e:
+            _logger.warning('Open user config example failed: %s', e)
             cfg['content'] = ''
         return cfg
 
@@ -125,17 +129,22 @@ class Config(Mapping):
         return cfg
 
     def __load_scenario(self):
-        return ConfigScenario(self['entry'], self['app'], self['info'], self['env'], self['user'])
+        return ConfigScenario(**self.__config_kwargs('entry', 'app', 'info', 'env', 'user'))
+
+    def __load_release_dir(self):
+        if 'software_root' not in self['scenario']:
+            raise ConfigNotValidError('"software_root" not specified')
+        return os.path.join(self['scenario']['software_root'], self['app']['release_work_dir'])
 
     def __load_release_path(self):
-        return ConfigReleasePath(self['scenario'], self['app']['release_work_dir'])
+        return ConfigReleasePath(**self.__config_kwargs('scenario', 'release_dir'))
 
     def __load_release_status(self):
         cfg = ConfigCommonDict()
         cfg.load_from_file(self['release_path']['status_file'])
         return cfg
 
-    # Release defined options, for display purpose only
+    # Release defined options, for display purpose
     def __load_option_list(self):
         cfg = ConfigCommonDict()
 
@@ -149,16 +158,20 @@ class Config(Mapping):
         except HandlerNotFoundError:
             _logger.debug('Handler for option list not found')
         except Exception as e:
-            _logger.error('Handler for option list run error: {0}'.format(e))
+            _logger.error('Handler for option list run error: %s', e)
             raise
 
         return cfg
 
     def __load_option(self):
-        return ConfigOption(self['entry'], self['info'], self['env'], self['user'], self['scenario'], self['release_status'], self['option_list'])
+        return ConfigOption(**self.__config_kwargs(
+            'entry', 'info', 'env', 'user', 'scenario', 'release_status', 'option_list'))
 
     def __load_release_origin(self):
-        return ConfigReleaseOrigin(self['app'], self['output'], self['scenario'], self['release_path'])
+        return ConfigReleaseOrigin(**self.__config_kwargs('scenario', 'release_path'))
+
+    def __load_release_package_origin(self):
+        return ConfigReleasePackageOrigin(self['release_path'])
 
     def __load_attribute(self):
         cfg = ConfigCommonDict()
@@ -168,52 +181,63 @@ class Config(Mapping):
             return cfg
 
         param = {}
-        param['config_app'] = self['app'].data_copy()
-        param['config_output'] = self['output'].data_copy()
-        param['config_scenario'] = self['scenario'].data_copy()
-        param['config_option'] = self['option'].data_copy()
-        param['config_release_path'] = self['release_path'].data_copy()
-        param['config_release_origin'] = self['release_origin'].data_copy()
+        for name in [
+                'app', 'output', 'scenario', 'option',
+                'release_path', 'release_origin', 'release_package_origin']:
+            param['config_'+name] = self[name].data_copy()
         try:
             with Handler(self['release_path']['handler_python_dir']) as h:
                 cfg.update(h.run('attribute', param))
         except HandlerNotFoundError:
             _logger.debug('Handler for attribute not found')
         except Exception as e:
-            _logger.error('Handler for attribute run error: {0}'.format(e))
+            _logger.error('Handler for attribute run error: %s', e)
             raise
 
         return cfg
 
     def __load_release(self):
-        return ConfigRelease(self['app'], self['output'], self['scenario'], self['option'], self['release_path'], self['release_origin'], self['attribute'])
+        return ConfigRelease(**self.__config_kwargs(
+            'app', 'output', 'scenario', 'option', 'release_path', 'release_origin', 'attribute'))
+
+    def __load_release_package(self):
+        return ConfigReleasePackage(**self.__config_kwargs(
+            'app', 'output', 'scenario', 'option', 'release_path',
+            'release_origin', 'release_package_origin', 'attribute'))
 
     def __load_category(self):
-        return ConfigCategory(self['app'], self['user'], self['scenario'], self['attribute'], self['release'])
+        return ConfigCategory(**self.__config_kwargs(
+            'app', 'user', 'scenario', 'attribute', 'release'))
 
     def __load_category_priority(self):
-        return ConfigCategoryPriority(self['user'], self['scenario'], self['release'], self['category'])
+        return ConfigCategoryPriority(**self.__config_kwargs(
+            'user', 'scenario', 'release', 'category'))
 
     def __load_release_install(self):
         return ConfigReleaseInstall(self['release'])
 
     def __load_package_runtime(self):
-        return ConfigPackageRuntime(self['entry'], self['app'], self['output'], self['scenario'], self['option'], self['release_path'],
-                self['attribute'], self['release'], self['release_install'], self['category'], self['category_priority'])
+        return ConfigPackageRuntime(**self.__config_kwargs(
+            'entry', 'app', 'output', 'scenario', 'option', 'release_path', 'attribute',
+            'release', 'release_package', 'release_install', 'category', 'category_priority'))
 
     def __load_package_install(self):
-        return ConfigPackageInstall(self['entry'], self['app'], self['output'], self['scenario'], self['option'], self['release_path'],
-                self['attribute'], self['release'], self['release_install'], self['category'], self['category_priority'])
+        return ConfigPackageInstall(**self.__config_kwargs(
+            'entry', 'app', 'output', 'scenario', 'option', 'release_path', 'attribute',
+            'release', 'release_package', 'release_install', 'category', 'category_priority'))
 
     def __load_package_check(self):
-        return ConfigPackageCheck(self['app'], self['output'], self['scenario'], self['option'], self['release_path'],
-                self['attribute'], self['release'], self['release_install'], self['category'], self['category_priority'])
+        return ConfigPackageCheck(**self.__config_kwargs(
+            'app', 'output', 'scenario', 'option', 'release_path', 'attribute',
+            'release', 'release_package', 'release_install', 'category', 'category_priority'))
 
     def __load_package_runtime_path(self):
-        return ConfigPackagePath(self['release_path'], self['category_priority'], self['package_runtime'])
+        return ConfigPackagePath(**self.__config_kwargs(
+            'release_path', 'category_priority', 'package_runtime'))
 
     def __load_package_install_path(self):
-        return ConfigPackagePath(self['release_path'], self['category_priority'], self['package_install'])
+        return ConfigPackagePath(**self.__config_kwargs(
+            'release_path', 'category_priority', 'package_install'))
 
 
     def config(self, config_type):

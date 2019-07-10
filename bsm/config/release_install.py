@@ -30,5 +30,3 @@ class ReleaseInstall(CommonDict):
             raise ConfigReleaseInstallError('Can not find atomic start/end: {0} ... {1}'.format(self['atomic_start'], self['atomic_end']))
         if self['steps'].index(self['atomic_start']) > self['steps'].index(self['atomic_end']):
             raise ConfigReleaseInstallError('atomic_start should not be after atomic_end')
-
-        self['options_to_save'] = ensure_list(install_cfg.get('options_to_save', []))
