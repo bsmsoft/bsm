@@ -27,11 +27,11 @@ class InstallPackageError(Exception):
 
 class InstallReleasePackages(Base):
     def execute(self):
-        self.__build_dag()
-        self.__dag_run()
+        dag = self.__build_dag()
+        self.__dag_run(dag)
 
     def __build_dag(self):
-        self.__dag = Dag()
+        dag = Dag()
 
         steps = self._config['release_install']['steps']
         atomic_start = self._config['release_install']['atomic_start']
@@ -48,10 +48,10 @@ class InstallReleasePackages(Base):
                         for step in steps:
                             for sub_step in range(len(value['step'][step])):
                                 vertex_pkg = (category, subdir, package, version, step, sub_step)
-                                self.__dag.add_vertex(vertex_pkg)
+                                dag.add_vertex(vertex_pkg)
                                 if previous_vertex is not None:
                                     _logger.debug('DAG add edge for single package: {0} -> {1}'.format(previous_vertex, vertex_pkg))
-                                    self.__dag.add_edge(previous_vertex, vertex_pkg)
+                                    dag.add_edge(previous_vertex, vertex_pkg)
                                 previous_vertex = vertex_pkg
                         package_steps.setdefault(package, [])
                         package_steps[package].append((category, subdir, package, version))
@@ -73,9 +73,11 @@ class InstallReleasePackages(Base):
                                 end_vertex = (dep[0], dep[1], dep[2], dep[3], atomic_end, dep_end_index)
 
                                 _logger.debug('DAG add edge for package dependency: {0} -> {1}'.format(end_vertex, start_vertex))
-                                self.__dag.add_edge(end_vertex, start_vertex)
+                                dag.add_edge(end_vertex, start_vertex)
 
-    def __dag_run(self):
+        return dag
+
+    def __dag_run(self, dag):
         # Get clean environment
         env = Env(initial_env=self._env.env_final(), env_prefix=self._config['app']['env_prefix'])
         env.unload_packages()
@@ -91,7 +93,7 @@ class InstallReleasePackages(Base):
         start_time = datetime.datetime.utcnow()
 
         with Handler(self._config['release_path']['handler_python_dir']):
-            dag_run(self.__dag, selector=selector, processor=processor, executor=executor)
+            dag_run(dag, selector=selector, processor=processor, executor=executor)
 
         end_time = datetime.datetime.utcnow()
 
