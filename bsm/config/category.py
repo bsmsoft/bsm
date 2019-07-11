@@ -13,7 +13,7 @@ class ConfigCategoryError(Exception):
 
 
 class Category(CommonDict):
-    def __init__(self, **config):
+    def __init__(self, config):
         super(Category, self).__init__()
 
         self.__update_category(config['release'].get('setting', {}), config['app'], config['scenario'], config['attribute'])

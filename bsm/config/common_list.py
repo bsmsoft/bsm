@@ -5,6 +5,10 @@ try:
 except ImportError:
     from collections import MutableSequence
 
+from bsm.util.config import dump_config
+
+from bsm.config.util import config_from_file
+
 
 class CommonList(MutableSequence):
     def __init__(self, *args, **kwargs):
@@ -36,3 +40,10 @@ class CommonList(MutableSequence):
 
     def data_copy(self):
         return copy.deepcopy(self.__data)
+
+
+    def load_from_file(self, config_file):
+        self.__data = config_from_file(config_file, list)
+
+    def save_to_file(self, config_file):
+        dump_config(self.__data, config_file)

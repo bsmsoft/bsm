@@ -13,7 +13,7 @@ class ReleasePathError(Exception):
 
 
 class ReleasePath(CommonDict):
-    def __init__(self, **config):
+    def __init__(self, config):
         super(ReleasePath, self).__init__()
 
         if not ('version' in config['scenario'] and config['scenario']['version']):

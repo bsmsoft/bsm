@@ -5,7 +5,7 @@ _logger = get_logger()
 
 
 class Option(CommonDict):
-    def __init__(self, **config):
+    def __init__(self, config):
         super(Option, self).__init__()
 
         self.__update_option(config['release_status'])

@@ -8,7 +8,7 @@ from bsm.logger import get_logger
 _logger = get_logger()
 
 class PackagePath(CommonDict):
-    def __init__(self, **config):
+    def __init__(self, config):
         super(PackagePath, self).__init__()
 
         with Handler(config['release_path']['handler_python_dir']) as h:

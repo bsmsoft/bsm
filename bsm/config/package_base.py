@@ -12,11 +12,11 @@ _logger = get_logger()
 
 
 class PackageBase(CommonDict):
-    def __init__(self, **config):
+    def __init__(self, config):
         super(PackageBase, self).__init__()
 
         with Handler(config['release_path']['handler_python_dir']) as h:
-            self._init_package(h, **config)
+            self._init_package(h, config)
 
     def package_exist(self, category, subdir, name, version):
         return category in self and subdir in self[category] and \

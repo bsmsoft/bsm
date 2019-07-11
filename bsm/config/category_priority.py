@@ -11,7 +11,7 @@ _logger = get_logger()
 
 
 class CategoryPriority(CommonList):
-    def __init__(self, **config):
+    def __init__(self, config):
         super(CategoryPriority, self).__init__()
 
         self.__update_priority(config['release'].get('setting', {}), config['category'])

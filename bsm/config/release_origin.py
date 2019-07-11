@@ -15,7 +15,7 @@ class ConfigReleaseOriginError(Exception):
 
 
 class ReleaseOrigin(CommonDict):
-    def __init__(self, **config):
+    def __init__(self, config):
         super(ReleaseOrigin, self).__init__()
 
         if not ('version' in config['scenario'] and config['scenario']['version']):

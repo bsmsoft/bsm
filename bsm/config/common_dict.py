@@ -5,12 +5,9 @@ try:
 except ImportError:
     from collections import MutableMapping
 
-from bsm.util.config import load_config, dump_config, ConfigError
+from bsm.util.config import dump_config
 
 from bsm.config.util import config_from_file
-
-from bsm.logger import get_logger
-_logger = get_logger()
 
 
 class CommonDict(MutableMapping):
@@ -46,10 +43,10 @@ class CommonDict(MutableMapping):
 
 
     def load_from_file(self, config_file):
-        self.__data = config_from_file(config_file)
+        self.__data = config_from_file(config_file, dict)
 
     def update_from_file(self, config_file):
-        self.__data.update(config_from_file(config_file))
+        self.__data.update(config_from_file(config_file, dict))
 
     def save_to_file(self, config_file):
         dump_config(self.__data, config_file)

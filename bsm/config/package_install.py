@@ -13,7 +13,7 @@ _logger = get_logger()
 
 
 class PackageInstall(PackageBase):
-    def _init_package(self, handler, **config):
+    def _init_package(self, handler, config):
         reinstall = config['entry'].get('reinstall', False)
 
         category_install = [
@@ -66,7 +66,7 @@ class PackageInstall(PackageBase):
 
                 final_config['config'] = transform_package(
                     handler, 'install',
-                    category_name, subdir, pkg_name, ver, pkg_cfg, pkg_path, **config)
+                    category_name, subdir, pkg_name, ver, pkg_cfg, pkg_path, config)
                 final_config['config']['name'] = pkg_name
                 final_config['config']['category'] = category_name
                 final_config['config']['subdir'] = subdir

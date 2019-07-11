@@ -27,7 +27,7 @@ def _filter_scenario_config(config, items, veto=False):
 
 
 class Scenario(CommonDict):
-    def __init__(self, **config):
+    def __init__(self, config):
         super(Scenario, self).__init__()
 
         self.update(_filter_scenario_config(config['app'], _SCENARIO_GLOBAL_ITEMS))

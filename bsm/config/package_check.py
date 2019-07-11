@@ -11,7 +11,7 @@ from bsm.logger import get_logger
 _logger = get_logger()
 
 
-def _transform_package(handler, ctg, name, pkg_cfg, **config):
+def _transform_package(handler, ctg, name, pkg_cfg, config):
     param = {}
     param['type'] = 'check'
 
@@ -39,7 +39,7 @@ def _transform_package(handler, ctg, name, pkg_cfg, **config):
 
 
 class PackageCheck(CommonDict):
-    def __init__(self, **config):
+    def __init__(self, config):
         super(PackageCheck, self).__init__()
 
         category_check = [
@@ -69,6 +69,6 @@ class PackageCheck(CommonDict):
                 final_config['config_origin'] = copy.deepcopy(pkg_cfg)
 
                 final_config['config'] = _transform_package(
-                    h, category_name, pkg_name, pkg_cfg, **config)
+                    h, category_name, pkg_name, pkg_cfg, config)
                 final_config['config']['name'] = pkg_name
                 final_config['config']['category'] = category_name

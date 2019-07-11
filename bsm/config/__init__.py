@@ -75,7 +75,7 @@ class Config(Mapping):
         return len(self.__config)
 
 
-    def __config_kwargs(self, *args):
+    def __config_arg(self, *args):
         return {name:self[name] for name in args}
 
 
@@ -129,7 +129,7 @@ class Config(Mapping):
         return cfg
 
     def __load_scenario(self):
-        return ConfigScenario(**self.__config_kwargs('entry', 'app', 'info', 'env', 'user'))
+        return ConfigScenario(self.__config_arg('entry', 'app', 'info', 'env', 'user'))
 
     def __load_release_dir(self):
         if 'software_root' not in self['scenario']:
@@ -137,7 +137,7 @@ class Config(Mapping):
         return os.path.join(self['scenario']['software_root'], self['app']['release_work_dir'])
 
     def __load_release_path(self):
-        return ConfigReleasePath(**self.__config_kwargs('scenario', 'release_dir'))
+        return ConfigReleasePath(self.__config_arg('scenario', 'release_dir'))
 
     def __load_release_status(self):
         cfg = ConfigCommonDict()
@@ -164,11 +164,11 @@ class Config(Mapping):
         return cfg
 
     def __load_option(self):
-        return ConfigOption(**self.__config_kwargs(
+        return ConfigOption(self.__config_arg(
             'entry', 'info', 'env', 'user', 'scenario', 'release_status', 'option_list'))
 
     def __load_release_origin(self):
-        return ConfigReleaseOrigin(**self.__config_kwargs('scenario', 'release_path'))
+        return ConfigReleaseOrigin(self.__config_arg('scenario', 'release_path'))
 
     def __load_release_package_origin(self):
         return ConfigReleasePackageOrigin(self['release_path'])
@@ -197,46 +197,46 @@ class Config(Mapping):
         return cfg
 
     def __load_release(self):
-        return ConfigRelease(**self.__config_kwargs(
+        return ConfigRelease(self.__config_arg(
             'app', 'output', 'scenario', 'option', 'release_path', 'release_origin', 'attribute'))
 
     def __load_release_package(self):
-        return ConfigReleasePackage(**self.__config_kwargs(
+        return ConfigReleasePackage(self.__config_arg(
             'app', 'output', 'scenario', 'option', 'release_path',
             'release_origin', 'release_package_origin', 'attribute'))
 
     def __load_category(self):
-        return ConfigCategory(**self.__config_kwargs(
+        return ConfigCategory(self.__config_arg(
             'app', 'user', 'scenario', 'attribute', 'release'))
 
     def __load_category_priority(self):
-        return ConfigCategoryPriority(**self.__config_kwargs(
+        return ConfigCategoryPriority(self.__config_arg(
             'user', 'scenario', 'release', 'category'))
 
     def __load_release_install(self):
         return ConfigReleaseInstall(self['release'])
 
     def __load_package_runtime(self):
-        return ConfigPackageRuntime(**self.__config_kwargs(
+        return ConfigPackageRuntime(self.__config_arg(
             'entry', 'app', 'output', 'scenario', 'option', 'release_path', 'attribute',
             'release', 'release_package', 'release_install', 'category', 'category_priority'))
 
     def __load_package_install(self):
-        return ConfigPackageInstall(**self.__config_kwargs(
+        return ConfigPackageInstall(self.__config_arg(
             'entry', 'app', 'output', 'scenario', 'option', 'release_path', 'attribute',
             'release', 'release_package', 'release_install', 'category', 'category_priority'))
 
     def __load_package_check(self):
-        return ConfigPackageCheck(**self.__config_kwargs(
+        return ConfigPackageCheck(self.__config_arg(
             'app', 'output', 'scenario', 'option', 'release_path', 'attribute',
             'release', 'release_package', 'release_install', 'category', 'category_priority'))
 
     def __load_package_runtime_path(self):
-        return ConfigPackagePath(**self.__config_kwargs(
+        return ConfigPackagePath(self.__config_arg(
             'release_path', 'category_priority', 'package_runtime'))
 
     def __load_package_install_path(self):
-        return ConfigPackagePath(**self.__config_kwargs(
+        return ConfigPackagePath(self.__config_arg(
             'release_path', 'category_priority', 'package_install'))
 
 

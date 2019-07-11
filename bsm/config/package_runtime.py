@@ -13,7 +13,7 @@ _logger = get_logger()
 
 
 class PackageRuntime(PackageBase):
-    def _init_package(self, handler, **config):
+    def _init_package(self, handler, config):
         reinstall = config['entry'].get('reinstall', False)
 
         category_runtime = [
@@ -42,7 +42,7 @@ class PackageRuntime(PackageBase):
 
                 final_pkg_cfg = transform_package(
                     handler, 'runtime',
-                    category, subdir, package, version, pkg_cfg, pkg_path, **config)
+                    category, subdir, package, version, pkg_cfg, pkg_path, config)
 
                 if not version_dir:
                     if 'version' in final_pkg_cfg and final_pkg_cfg['version']:

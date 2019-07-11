@@ -8,7 +8,7 @@ _logger = get_logger()
 
 
 class ReleasePackage(CommonDict):
-    def __init__(self, **config):
+    def __init__(self, config):
         super(ReleasePackage, self).__init__()
 
         param = {}

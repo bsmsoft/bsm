@@ -19,15 +19,15 @@ class ConfigReleaseError(Exception):
 
 
 class Release(CommonDict):
-    def __init__(self, **config):
+    def __init__(self, config):
         super(Release, self).__init__()
 
-        self.__transform(**config)
+        self.__transform(config)
         self.__expand_env(config['scenario'], config['attribute'])
         self.__check_version_consistency(config['scenario'])
         self.__check_bsm_version()
 
-    def __transform(self, **config):
+    def __transform(self, config):
         param = {}
         for name in ['app', 'output', 'scenario', 'option', 'release_path', 'release_origin', 'attribute']:
             param['config_'+name] = config[name].data_copy()

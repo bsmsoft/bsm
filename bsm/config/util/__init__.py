@@ -38,20 +38,22 @@ class ConfigPackageParamError(Exception):
     pass
 
 
-def config_from_file(config_file):
+def config_from_file(config_file, config_type=dict):
     if not os.path.isfile(config_file):
         return {}
 
     try:
         loaded_data = load_config(config_file)
-        if isinstance(loaded_data, dict):
+        if isinstance(loaded_data, config_type):
             return loaded_data
         if loaded_data is not None:
-            _logger.warning('Config file is not a dict, use empty dict instead: {0}'.format(config_file))
-    except ConfigError as e:
-        _logger.warning('Load config file failed, use empty dict instead: {0}'.format(config_file))
+            _logger.warning(
+                'Config file is not a %s, use empty value instead: %s', config_type, config_file)
+    except ConfigError:
+        _logger.warning(
+            'Load config file failed, use empty %s instead: %s', config_type, config_file)
 
-    return {}
+    return config_type()
 
 
 def package_param_from_rel_dir(rel_dir, version_dir):
@@ -117,7 +119,7 @@ def package_param_from_identifier(identifier, pkg_cfg):
 
 
 def transform_package(handler, trans_type,
-                      ctg, subdir, name, version, pkg_cfg, pkg_path, **config):
+                      ctg, subdir, name, version, pkg_cfg, pkg_path, config):
     param = {}
     param['type'] = trans_type
 
