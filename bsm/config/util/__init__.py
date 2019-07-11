@@ -40,7 +40,7 @@ class ConfigPackageParamError(Exception):
 
 def config_from_file(config_file, config_type=dict):
     if not os.path.isfile(config_file):
-        return {}
+        return config_type()
 
     try:
         loaded_data = load_config(config_file)
@@ -48,10 +48,10 @@ def config_from_file(config_file, config_type=dict):
             return loaded_data
         if loaded_data is not None:
             _logger.warning(
-                'Config file is not a %s, use empty value instead: %s', config_type, config_file)
+                'Config file is not a %s, use empty value instead: %s', config_type.__name__, config_file)
     except ConfigError:
         _logger.warning(
-            'Load config file failed, use empty %s instead: %s', config_type, config_file)
+            'Load config file failed, use empty %s instead: %s', config_type.__name__, config_file)
 
     return config_type()
 
@@ -133,7 +133,7 @@ def transform_package(handler, trans_type,
 
     for n in [
             'app', 'output', 'scenario', 'option', 'release_path', 'attribute',
-            'release', 'release_package', 'release_install', 'category', 'category_priority']:
+            'release_setting', 'release_package', 'release_install', 'category', 'category_priority']:
         param['config_'+n] = config[n].data_copy()
 
     try:

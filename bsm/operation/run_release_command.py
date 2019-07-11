@@ -19,7 +19,9 @@ class RunReleaseCommand(Base):
         param['config_option'] = self._config['option'].data_copy()
         param['config_release_path'] = self._config['release_path'].data_copy()
         param['config_attribute'] = self._config['attribute'].data_copy()
-        param['config_release'] = self._config['release'].data_copy()
+        param['config_release_version'] = self._config['release_version'].data_copy()
+        param['config_release_setting'] = self._config['release_setting'].data_copy()
+        param['config_release_package'] = self._config['release_package'].data_copy()
         param['config_category'] = self._config['category'].data_copy()
         param['config_category_priority'] = self._config['category_priority'].data_copy()
         param['config_package_install'] = self._config['package_install'].data_copy()
@@ -31,6 +33,6 @@ class RunReleaseCommand(Base):
         with Handler(self._config['release_path']['handler_python_dir']) as h:
             try:
                 return h.run('command', param)
-            except HandlerNotFoundError as e:
-                _logger.error('Could not find out how to run command: {0}'.format(command))
+            except HandlerNotFoundError:
+                _logger.error('Could not find out how to run command: %s', command)
                 raise

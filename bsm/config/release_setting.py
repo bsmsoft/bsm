@@ -14,34 +14,34 @@ from bsm.logger import get_logger
 _logger = get_logger()
 
 
-class ConfigReleaseError(Exception):
+class ConfigReleaseSettingError(Exception):
     pass
 
 
-class Release(CommonDict):
+class ReleaseSetting(CommonDict):
     def __init__(self, config):
-        super(Release, self).__init__()
+        super(ReleaseSetting, self).__init__()
 
         self.__transform(config)
         self.__expand_env(config['scenario'], config['attribute'])
-        self.__check_version_consistency(config['scenario'])
         self.__check_bsm_version()
 
     def __transform(self, config):
         param = {}
-        for name in ['app', 'output', 'scenario', 'option', 'release_path', 'release_origin', 'attribute']:
+        for name in ['app', 'output', 'scenario', 'option',
+                     'release_path', 'release_setting_origin', 'attribute']:
             param['config_'+name] = config[name].data_copy()
 
         try:
             with Handler(config['release_path']['handler_python_dir']) as h:
-                result = h.run('transform.release', param)
+                result = h.run('transform.release_setting', param)
                 if isinstance(result, dict):
                     self.update(result)
         except HandlerNotFoundError as e:
-            _logger.debug('Transformer for release not found: {0}'.format(e))
-            self.update(config['release_origin'])
+            _logger.debug('Transformer for release_setting not found: %s', e)
+            self.update(config['release_setting_origin'])
         except Exception as e:
-            _logger.error('Transformer for release run error: {0}'.format(e))
+            _logger.error('Transformer for release_setting run error: %s', e)
             raise
 
     def __expand_env(self, config_scenario, config_attribute):
@@ -49,7 +49,7 @@ class Release(CommonDict):
         format_dict.update(config_attribute)
         format_dict.update(config_scenario)
 
-        release_env = self.get('setting', {}).get('env', {})
+        release_env = self.get('env', {})
         env_prepend_path = release_env.get('prepend_path', {})
         for k, v in env_prepend_path.items():
             result = []
@@ -72,18 +72,9 @@ class Release(CommonDict):
         for k, v in env_alias.items():
             env_alias[k] = v.format(**format_dict)
 
-    def __check_version_consistency(self, config_scenario):
-        if 'version' not in self:
-            raise ConfigReleaseError('"version" is not found in config release')
-
-        version = config_scenario.get('version')
-        version_in_release = self.get('version')
-        if version != version_in_release:
-            _logger.warning('Version inconsistency found. Request {0} but receive {1}'.format(version, version_in_release))
-
     def __check_bsm_version(self):
-        version_require = self.get('setting', {}).get('bsm', {}).get('require', '')
-        _logger.debug('Version require: "{0}"'.format(version_require))
+        version_require = self.get('bsm', {}).get('require', '')
+        _logger.debug('Version require: "%s"', version_require)
         if not version_require:
             return
 
@@ -93,4 +84,5 @@ class Release(CommonDict):
             raise ConfigReleaseError('Require statement not valid: {0}'.format(e))
 
         if BSM_VERSION not in spec:
-            raise ConfigReleaseError('BSM version "{0}" does not follow: {1}'.format(BSM_VERSION, version_require))
+            raise ConfigReleaseError(
+                'BSM version {0} does not follow: {1}'.format(BSM_VERSION, version_require))

@@ -1,5 +1,3 @@
-import os
-
 from collections import OrderedDict
 
 from bsm.config.common_list import CommonList
@@ -14,12 +12,14 @@ class CategoryPriority(CommonList):
     def __init__(self, config):
         super(CategoryPriority, self).__init__()
 
-        self.__update_priority(config['release'].get('setting', {}), config['category'])
+        self.__update_priority(config['release_setting'], config['category'])
 
         self.__update_priority(config['user'], config['category'])
 
         if config['scenario'].get('scenario'):
-            self.__update_priority(config['user'].get('scenario', {}).get(config['scenario']['scenario'], {}), config['category'])
+            self.__update_priority(
+                config['user'].get('scenario', {}).get(config['scenario']['scenario'], {}),
+                config['category'])
 
         self.__remove_duplicated_priority()
 

@@ -2,7 +2,6 @@ import datetime
 
 from bsm.paradag import Dag
 from bsm.paradag import dag_run
-from bsm.paradag.sequential_processor import SequentialProcessor
 from bsm.paradag.multi_thread_processor import MultiThreadProcessor
 
 from bsm.operation.util.install.selector import Selector as InstallSelector
@@ -97,22 +96,42 @@ class InstallReleasePackages(Base):
 
         end_time = datetime.datetime.utcnow()
 
-        self._config['release_status']['install'] = {}
-        self._config['release_status']['install']['start'] = start_time
-        self._config['release_status']['install']['end'] = end_time
-        self._config['release_status']['install']['finished'] = True
+        self.__save_release_status(start_time, end_time)
 
-        self._config['release_status']['option'] = {}
-        option_from_install = ensure_list(self._config['release'].get('setting', {}).get('option_from_install', []))
-        for opt in option_from_install:
-            if opt in self._config['option']:
-                self._config['release_status']['option'][opt] = self._config['option'][opt]
+    def __save_release_status(self, start_time, end_time):
+        current_attribute = {}
 
-        self._config['release_status']['attribute'] = {}
-        essential_attribute = ensure_list(self._config['release'].get('setting', {}).get('essential_attribute', []))
+        essential_attribute = ensure_list(
+            self._config['release_setting'].get('essential_attribute', []))
         for att in essential_attribute:
             if att in self._config['attribute']:
-                self._config['release_status']['attribute'][att] = self._config['attribute'][att]
+                current_attribute[att] = self._config['attribute'][att]
+
+        status = {}
+
+        status['install'] = {}
+        status['install']['start'] = start_time
+        status['install']['end'] = end_time
+        status['install']['finished'] = True
+
+        status['option'] = {}
+        option_from_install = ensure_list(
+            self._config['release_setting'].get('option_from_install', []))
+        for opt in option_from_install:
+            if opt in self._config['option']:
+                status['option'][opt] = self._config['option'][opt]
+
+        status['attribute'] = current_attribute
+
+        index = -1
+        for i, install_status in enumerate(self._config['release_status']):
+            if install_status.get('attribute', {}) == current_attribute:
+                index = i
+                break
+        if index < 0:
+            self._config['release_status'].append(status)
+        else:
+            self._config['release_status'][index] = status
 
         safe_mkdir(self._config['release_path']['status_dir'])
         self._config['release_status'].save_to_file(self._config['release_path']['status_file'])

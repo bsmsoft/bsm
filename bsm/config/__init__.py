@@ -8,6 +8,10 @@ except ImportError:
 
 from bsm.util import expand_path
 
+from bsm.util.config import load_config, ConfigError
+
+from bsm.handler import Handler
+from bsm.handler import HandlerNotFoundError
 
 from bsm.config.common_dict import CommonDict as ConfigCommonDict
 from bsm.config.common_list import CommonList as ConfigCommonList
@@ -16,9 +20,10 @@ from bsm.config.env import Env as ConfigEnv
 from bsm.config.scenario import Scenario as ConfigScenario
 from bsm.config.option import Option as ConfigOption
 from bsm.config.release_path import ReleasePath as ConfigReleasePath
-from bsm.config.release_origin import ReleaseOrigin as ConfigReleaseOrigin
+from bsm.config.release_version import ReleaseVersion as ConfigReleaseVersion
+from bsm.config.release_setting_origin import ReleaseSettingOrigin as ConfigReleaseSettingOrigin
 from bsm.config.release_package_origin import ReleasePackageOrigin as ConfigReleasePackageOrigin
-from bsm.config.release import Release as ConfigRelease
+from bsm.config.release_setting import ReleaseSetting as ConfigReleaseSetting
 from bsm.config.release_package import ReleasePackage as ConfigReleasePackage
 from bsm.config.category import Category as ConfigCategory
 from bsm.config.category_priority import CategoryPriority as ConfigCategoryPriority
@@ -27,9 +32,6 @@ from bsm.config.package_runtime import PackageRuntime as ConfigPackageRuntime
 from bsm.config.package_install import PackageInstall as ConfigPackageInstall
 from bsm.config.package_check import PackageCheck as ConfigPackageCheck
 from bsm.config.package_path import PackagePath as ConfigPackagePath
-
-from bsm.handler import Handler
-from bsm.handler import HandlerNotFoundError
 
 from bsm.logger import get_logger
 _logger = get_logger()
@@ -64,6 +66,7 @@ class Config(Mapping):
 
         if key not in self.__config:
             load_method = getattr(self, '_Config__load_' + key, method_not_found)
+            _logger.debug('Load config: %s', key)
             self.__config[key] = load_method()
 
         return self.__config[key]
@@ -140,9 +143,12 @@ class Config(Mapping):
         return ConfigReleasePath(self.__config_arg('scenario', 'release_dir'))
 
     def __load_release_status(self):
-        cfg = ConfigCommonDict()
+        cfg = ConfigCommonList()
         cfg.load_from_file(self['release_path']['status_file'])
         return cfg
+
+    def __load_release_version(self):
+        return ConfigReleaseVersion(self.__config_arg('scenario', 'release_path'))
 
     # Release defined options, for display purpose
     def __load_option_list(self):
@@ -167,8 +173,8 @@ class Config(Mapping):
         return ConfigOption(self.__config_arg(
             'entry', 'info', 'env', 'user', 'scenario', 'release_status', 'option_list'))
 
-    def __load_release_origin(self):
-        return ConfigReleaseOrigin(self.__config_arg('scenario', 'release_path'))
+    def __load_release_setting_origin(self):
+        return ConfigReleaseSettingOrigin(self['release_path'])
 
     def __load_release_package_origin(self):
         return ConfigReleasePackageOrigin(self['release_path'])
@@ -183,7 +189,7 @@ class Config(Mapping):
         param = {}
         for name in [
                 'app', 'output', 'scenario', 'option',
-                'release_path', 'release_origin', 'release_package_origin']:
+                'release_path', 'release_setting_origin', 'release_package_origin']:
             param['config_'+name] = self[name].data_copy()
         try:
             with Handler(self['release_path']['handler_python_dir']) as h:
@@ -196,47 +202,51 @@ class Config(Mapping):
 
         return cfg
 
-    def __load_release(self):
-        return ConfigRelease(self.__config_arg(
-            'app', 'output', 'scenario', 'option', 'release_path', 'release_origin', 'attribute'))
+    def __load_release_setting(self):
+        return ConfigReleaseSetting(self.__config_arg(
+            'app', 'output', 'scenario', 'option', 'release_path',
+            'release_setting_origin', 'attribute'))
 
     def __load_release_package(self):
         return ConfigReleasePackage(self.__config_arg(
             'app', 'output', 'scenario', 'option', 'release_path',
-            'release_origin', 'release_package_origin', 'attribute'))
+            'release_setting_origin', 'release_package_origin', 'attribute'))
 
     def __load_category(self):
         return ConfigCategory(self.__config_arg(
-            'app', 'user', 'scenario', 'attribute', 'release'))
+            'app', 'user', 'scenario', 'attribute', 'release_setting'))
 
     def __load_category_priority(self):
         return ConfigCategoryPriority(self.__config_arg(
-            'user', 'scenario', 'release', 'category'))
+            'user', 'scenario', 'release_setting', 'category'))
 
     def __load_release_install(self):
-        return ConfigReleaseInstall(self['release'])
+        return ConfigReleaseInstall(self['release_setting'])
 
     def __load_package_runtime(self):
         return ConfigPackageRuntime(self.__config_arg(
             'entry', 'app', 'output', 'scenario', 'option', 'release_path', 'attribute',
-            'release', 'release_package', 'release_install', 'category', 'category_priority'))
+            'release_setting', 'release_package', 'release_install',
+            'category', 'category_priority'))
 
     def __load_package_install(self):
         return ConfigPackageInstall(self.__config_arg(
             'entry', 'app', 'output', 'scenario', 'option', 'release_path', 'attribute',
-            'release', 'release_package', 'release_install', 'category', 'category_priority'))
+            'release_setting', 'release_package', 'release_install',
+            'category', 'category_priority'))
 
     def __load_package_check(self):
         return ConfigPackageCheck(self.__config_arg(
             'app', 'output', 'scenario', 'option', 'release_path', 'attribute',
-            'release', 'release_package', 'release_install', 'category', 'category_priority'))
+            'release_setting', 'release_package', 'release_install',
+            'category', 'category_priority'))
 
     def __load_package_runtime_path(self):
-        return ConfigPackagePath(self.__config_arg(
+        return ConfigPackagePath(self['package_runtime'], self.__config_arg(
             'release_path', 'category_priority', 'package_runtime'))
 
     def __load_package_install_path(self):
-        return ConfigPackagePath(self.__config_arg(
+        return ConfigPackagePath(self['package_install'], self.__config_arg(
             'release_path', 'category_priority', 'package_install'))
 
 

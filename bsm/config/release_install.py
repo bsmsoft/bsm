@@ -11,10 +11,10 @@ class ConfigReleaseInstallError(Exception):
 
 
 class ReleaseInstall(CommonDict):
-    def __init__(self, config_release):
+    def __init__(self, config_release_setting):
         super(ReleaseInstall, self).__init__()
 
-        install_cfg = config_release.get('setting', {}).get('install', {})
+        install_cfg = config_release_setting.get('install', {})
 
         self['steps'] = ensure_list(install_cfg.get('steps', []))
 

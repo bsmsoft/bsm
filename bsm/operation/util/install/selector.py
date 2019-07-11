@@ -18,7 +18,8 @@ class Selector(object):
         param['config_option'] = self.__config['option'].data_copy()
         param['config_release_path'] = self.__config['release_path'].data_copy()
         param['config_attribute'] = self.__config['attribute'].data_copy()
-        param['config_release'] = self.__config['release'].data_copy()
+        param['config_release_setting'] = self.__config['release_setting'].data_copy()
+        param['config_release_package'] = self.__config['release_package'].data_copy()
         param['config_category'] = self.__config['category'].data_copy()
         param['config_category_priority'] = self.__config['category_priority'].data_copy()
 

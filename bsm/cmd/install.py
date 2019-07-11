@@ -2,7 +2,7 @@ import click
 
 from bsm.cmd import Base
 
-from bsm.config.release import ConfigReleaseError
+from bsm.config.release_version import ConfigReleaseVersionError
 
 from bsm.logger import get_logger
 _logger = get_logger()
@@ -78,8 +78,8 @@ class Install(Base):
 
     def __release_exist(self):
         try:
-            self._bsm.config('release')
-        except ConfigReleaseError as e:
+            self._bsm.config('release_version')
+        except ConfigVersionError as e:
             _logger.debug('Release can not be loaded and should be installed: {0}'.format(e))
             return False
         return True

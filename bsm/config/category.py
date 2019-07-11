@@ -16,7 +16,7 @@ class Category(CommonDict):
     def __init__(self, config):
         super(Category, self).__init__()
 
-        self.__update_category(config['release'].get('setting', {}), config['app'], config['scenario'], config['attribute'])
+        self.__update_category(config['release_setting'], config['app'], config['scenario'], config['attribute'])
 
         self.__update_category(config['user'], config['app'], config['scenario'], config['attribute'])
 

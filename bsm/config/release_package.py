@@ -14,7 +14,7 @@ class ReleasePackage(CommonDict):
         param = {}
         for name in [
                 'app', 'output', 'scenario', 'option', 'release_path',
-                'release_origin', 'release_package_origin', 'attribute']:
+                'release_setting_origin', 'release_package_origin', 'attribute']:
             param['config_'+name] = config[name].data_copy()
 
         try:

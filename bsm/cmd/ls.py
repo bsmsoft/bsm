@@ -4,8 +4,8 @@ from bsm.logger import get_logger
 _logger = get_logger()
 
 class Ls(Base):
-    def execute(self):
-        local_versions = self._bsm.ls_release_version()
+    def execute(self, list_all):
+        local_versions = self._bsm.ls_release_version(list_all)
 
         if self._output_format != 'plain':
             return local_versions

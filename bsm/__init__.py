@@ -92,8 +92,8 @@ class Bsm(object):
     def install_release_packages(self):
         return self.__operation.execute('install-release-packages')
 
-    def ls_release_version(self):
-        return self.__operation.execute('ls-release-version')
+    def ls_release_version(self, list_all=False):
+        return self.__operation.execute('ls-release-version', list_all)
 
     def load_release(self):
         return self.__operation.execute('load-release')

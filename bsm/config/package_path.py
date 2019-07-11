@@ -8,12 +8,12 @@ from bsm.logger import get_logger
 _logger = get_logger()
 
 class PackagePath(CommonDict):
-    def __init__(self, config):
+    def __init__(self, config_package, config):
         super(PackagePath, self).__init__()
 
         with Handler(config['release_path']['handler_python_dir']) as h:
             for package, value in load_packages(
-                    h, config['category_priority'], config['package']).items():
+                    h, config['category_priority'], config_package).items():
                 category, subdir, version = value
-                pkg_cfg = config['package'].package_config(category, subdir, package, version)
+                pkg_cfg = config_package.package_config(category, subdir, package, version)
                 self[package] = pkg_cfg['config'].get('path', {}).copy()

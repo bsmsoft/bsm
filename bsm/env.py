@@ -157,7 +157,7 @@ class Env(object):
             del self.__env[self.__env_name['app_info']]
 
 
-    def load_release(self, config_scenario, config_option, config_release):
+    def load_release(self, config_scenario, config_option, config_release_setting):
         self.unload_release()
 
         self.__env[self.__env_name['software_root']] = config_scenario.get('software_root')
@@ -166,7 +166,7 @@ class Env(object):
         self.__env[self.__env_name['option']] = _emit_info(config_option.data())
 
         info = {}
-        info['env'] = self.__load_env(config_release.get('setting', {}).get('env', {}))
+        info['env'] = self.__load_env(config_release_setting.get('env', {}))
         self.__env[self.__env_name['release_info']] = _emit_info(info)
 
     def unload_release(self):

@@ -30,7 +30,8 @@ class BuildPackage(Base):
         param['config_option'] = self._config['option'].data_copy()
         param['config_release_path'] = self._config['release_path'].data_copy()
         param['config_attribute'] = self._config['attribute'].data_copy()
-        param['config_release'] = self._config['release'].data_copy()
+        param['config_release_setting'] = self._config['release_setting'].data_copy()
+        param['config_release_package'] = self._config['release_package'].data_copy()
         param['config_category'] = self._config['category'].data_copy()
         param['config_category_priority'] = self._config['category_priority'].data_copy()
         param['config_package_runtime'] = self._config['package_runtime'].data_copy()
@@ -39,6 +40,9 @@ class BuildPackage(Base):
         with Handler(self._config['release_path']['handler_python_dir']) as h:
             try:
                 return h.run('build_package', param)
-            except HandlerNotFoundError as e:
-                _logger.error('Could not find out how to build package "{0}", category "{1}", subdir "{2}", version "{3}"'.format(package, category, subdir, version))
+            except HandlerNotFoundError:
+                _logger.error(
+                    'Could not find out how to build '
+                    'package "%s", category "%s", subdir "%s", version "%s"',
+                    package, category, subdir, version)
                 raise

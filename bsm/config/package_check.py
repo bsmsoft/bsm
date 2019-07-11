@@ -22,7 +22,7 @@ def _transform_package(handler, ctg, name, pkg_cfg, config):
 
     for n in [
             'app', 'output', 'scenario', 'option', 'release_path', 'attribute',
-            'release', 'release_package', 'category', 'category_priority']:
+            'release_setting', 'release_package', 'category', 'category_priority']:
         param['config_'+n] = config[n].data_copy()
 
     try:

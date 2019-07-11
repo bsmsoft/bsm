@@ -109,17 +109,20 @@ def config(ctx, scenario, option, config_type, item_list):
 @click.pass_context
 def ls_remote(ctx, release_repo, list_all, tag):
     '''List all available release versions'''
-    ctx.obj['release_repo'] = release_repo
+    ctx.obj['config_entry']['release_repo'] = release_repo
     Cmd.execute('ls-remote', ctx.obj, list_all, tag)
 
 
 @cli.command()
 @click.option('--software-root', '-r', type=str, help='Local installed software root directory')
+@click.option('--option', '-o', type=str, multiple=True, help='Options for release')
+@click.option('--all', '-a', 'list_all', is_flag=True, help='List all versions')
 @click.pass_context
-def ls(ctx, software_root):
+def ls(ctx, software_root, option, list_all):
     '''List installed release versions'''
-    ctx.obj['software_root'] = software_root
-    Cmd.execute('ls', ctx.obj)
+    ctx.obj['config_entry']['software_root'] = software_root
+    ctx.obj['config_entry']['option'] = parse_lines(option)
+    Cmd.execute('ls', ctx.obj, list_all)
 
 
 @cli.command(name='default')

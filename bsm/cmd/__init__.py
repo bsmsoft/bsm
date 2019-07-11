@@ -6,7 +6,6 @@ import click
 
 from bsm import Bsm
 from bsm.loader import load_common
-from bsm.config.release import ConfigReleaseError
 from bsm.shell import Shell
 from bsm.cmd.output import Output
 from bsm.util import ensure_list
@@ -140,8 +139,8 @@ class Cmd(object):
                     cmd_result.commands, env_changes, cmd_result.script_types)
 
             if final_output:
-                nl = not final_output.endswith('\n')
-                click.echo(final_output, nl=nl)
+                new_line = not final_output.endswith('\n')
+                click.echo(final_output, nl=new_line)
 
             if not obj['output']['shell']:
                 _run_commands(cmd_result.commands)
