@@ -19,7 +19,9 @@ def list_versions(release_repo, version_pattern, git):
             continue
         version = groups[0]
         if version in versions:
-            _logger.warning('Duplicated version "{0}" found for tag "{1}", please check the version pattern "{2}"'.format(version, tag, version_pattern))
+            _logger.warning(
+                'Duplicated version "%s" found for tag "%s", please check the version pattern "%s"',
+                version, tag, version_pattern)
             continue
         versions[version] = tag
 

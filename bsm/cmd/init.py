@@ -10,8 +10,8 @@ class Init(Base):
     def execute(self, no_default, show_script, shell):
         output = ''
         if show_script and shell:
-            cmd_name = self._bsm.config('app')['cmd_name']
-            app_root = self._bsm.config('app').get('app_root', '')
+            cmd_name = self._bsm.prop('app')['cmd_name']
+            app_root = self._bsm.prop('app').get('app_root', '')
 
             shell = Shell(shell, cmd_name, app_root)
             shell.add_script('init')
@@ -19,10 +19,10 @@ class Init(Base):
 
         self._bsm.clean()
 
-        if not no_default and 'version' in self._bsm.config('scenario'):
+        if not no_default and 'version' in self._bsm.prop('scenario'):
             self._bsm.load_release()
             self._bsm.load_release_packages()
-            _logger.info('software_root : {0}'.format(self._bsm.config('scenario').get('software_root', '')))
-            _logger.info('version       : {0}'.format(self._bsm.config('scenario').get('version', '')))
+            _logger.info('software_root : %s', self._bsm.prop('scenario').get('software_root', ''))
+            _logger.info('version       : %s', self._bsm.prop('scenario').get('version', ''))
 
         return CmdResult(output=output, script_types='init')

@@ -9,4 +9,4 @@ class Exit(Base):
         self._env.unload_release()
         self._env.unload_app()
 
-        self._config.reset(initial_env=self._env.env_final())
+        self._prop.reset(initial_env=self._env.env_final())

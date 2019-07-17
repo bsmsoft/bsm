@@ -4,21 +4,13 @@ import subprocess
 from bsm.util import safe_rmdir
 from bsm.util import expand_path
 
+from bsm.error import GitError
+from bsm.error import GitNotFoundError
+from bsm.error import GitUnknownCommandError
+from bsm.error import GitEmptyUrlError
+
 from bsm.logger import get_logger
 _logger = get_logger()
-
-
-class GitError(Exception):
-    pass
-
-class GitNotFoundError(GitError):
-    pass
-
-class GitUnknownCommandError(GitError):
-    pass
-
-class GitEmptyUrlError(GitError):
-    pass
 
 
 COMMAND_MAP = {

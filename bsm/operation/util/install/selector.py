@@ -6,22 +6,16 @@ _logger = get_logger()
 
 
 class Selector(object):
-    def __init__(self, config):
-        self.__config = config
+    def __init__(self, prop):
+        self.__prop = prop
 
     def select(self, running, idle):
         param = {}
 
-        param['config_app'] = self.__config['app'].data_copy()
-        param['config_output'] = self.__config['output'].data_copy()
-        param['config_scenario'] = self.__config['scenario'].data_copy()
-        param['config_option'] = self.__config['option'].data_copy()
-        param['config_release_path'] = self.__config['release_path'].data_copy()
-        param['config_attribute'] = self.__config['attribute'].data_copy()
-        param['config_release_setting'] = self.__config['release_setting'].data_copy()
-        param['config_release_package'] = self.__config['release_package'].data_copy()
-        param['config_category'] = self.__config['category'].data_copy()
-        param['config_category_priority'] = self.__config['category_priority'].data_copy()
+        for n in [
+                'app', 'output', 'scenario', 'option_release', 'release_path', 'attribute',
+                'release_setting', 'release_package', 'category', 'category_priority']:
+            param['prop_'+n] = self.__prop[n].data_copy()
 
         param['running'] = running
         param['idle'] = idle
@@ -33,5 +27,5 @@ class Selector(object):
             _logger.debug('Select handler not found, will randomly select one step')
             return [next(iter(idle))]
         except Exception as e:
-            _logger.error('Select handler run error: {0}'.format(e))
+            _logger.error('Select handler run error: %s', e)
             raise

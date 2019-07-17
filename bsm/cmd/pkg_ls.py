@@ -26,31 +26,32 @@ class PkgLs(PkgBase):
         max_subdir_length = 1
         max_version_length = 1
 
-        for pkg, cfgs in packages.items():
-            for cfg in cfgs:
+        for pkg, props in packages.items():
+            for prop in props:
                 package_length = len(pkg)
                 if max_package_length < package_length:
                     max_package_length = package_length
 
-                category_length = len(cfg['category'])
+                category_length = len(prop['category'])
                 if max_category_length < category_length:
                     max_category_length = category_length
 
-                subdir_length = len(cfg['subdir'])
+                subdir_length = len(prop['subdir'])
                 if max_subdir_length < subdir_length:
                     max_subdir_length = subdir_length
 
-                version_length = len(str(cfg['version']))
+                version_length = len(str(prop['version']))
                 if max_version_length < version_length:
                     max_version_length = version_length
 
         result_lines = []
-        for pkg, cfgs in packages.items():
-            for cfg in cfgs:
+        for pkg, props in packages.items():
+            for prop in props:
                 line = '| {0:{pkg_width}} | {1:{ctg_width}} | {2:{sd_width}} | {3:{ver_width}} |'\
-                        .format(pkg, cfg['category'], cfg['subdir'], cfg['version'], \
-                        pkg_width=max_package_length, ctg_width=max_category_length, sd_width=max_subdir_length, ver_width=max_version_length)
-                if cfg.get('active'):
+                        .format(pkg, prop['category'], prop['subdir'], prop['version'],
+                                pkg_width=max_package_length, ctg_width=max_category_length,
+                                sd_width=max_subdir_length, ver_width=max_version_length)
+                if prop.get('active'):
                     line = '* ' + line
                 else:
                     line = '  ' + line

@@ -12,19 +12,20 @@ _logger = get_logger()
 
 class CheckMissing(Base):
     def execute(self, check_type):
-        env = Env(initial_env=self._env.env_final(), env_prefix=self._config['app']['env_prefix'])
+        env = Env(initial_env=self._env.env_final(), env_prefix=self._prop['app']['env_prefix'])
         env.unload_packages()
         env.unload_release()
         env.unload_app()
-        env.load_app(self._config['app'])
-        env.load_release(self._config['scenario'], self._config['option'], self._config['release'])
+        env.load_app(self._prop['app'])
+        env.load_release(self._prop['scenario'],
+                         self._prop['option_release'], self._prop['release_setting'])
 
         missing = {}
 
-        with Handler(self._config['release_path']['handler_python_dir']) as h:
-            for category in self._config['package_check']:
-                for package, value in self._config['package_check'][category].items():
-                    if not self.__check_package(h, env.env_final(), value['config'], check_type):
+        with Handler(self._prop['release_path']['handler_python_dir']) as h:
+            for category in self._prop['packages_check']:
+                for package, value in self._prop['packages_check'][category].items():
+                    if not self.__check_package(h, env.env_final(), value['prop'], check_type):
                         missing.setdefault(package, [])
                         missing[package].append(category)
 
@@ -32,25 +33,19 @@ class CheckMissing(Base):
 
         return missing
 
-    def __check_package(self, handler, env, config_package, check_type):
+    def __check_package(self, handler, env, pkg_prop, check_type):
         param = {}
 
         param['env'] = env.copy()
         param['type'] = check_type
 
-        param['config_package'] = copy.deepcopy(config_package)
+        param['prop'] = copy.deepcopy(pkg_prop)
 
-        param['config_app'] = self._config['app'].data_copy()
-        param['config_output'] = self._config['output'].data_copy()
-        param['config_scenario'] = self._config['scenario'].data_copy()
-        param['config_option'] = self._config['option'].data_copy()
-        param['config_release_path'] = self._config['release_path'].data_copy()
-        param['config_attribute'] = self._config['attribute'].data_copy()
-        param['config_release_setting'] = self._config['release_setting'].data_copy()
-        param['config_release_package'] = self._config['release_package'].data_copy()
-        param['config_category'] = self._config['category'].data_copy()
-        param['config_category_priority'] = self._config['category_priority'].data_copy()
-        param['config_package_check'] = self._config['package_check'].data_copy()
+        for n in [
+                'app', 'output', 'scenario', 'option_release', 'release_path', 'attribute',
+                'release_setting', 'release_package', 'category', 'category_priority',
+                'packages_check']:
+            param['prop_'+n] = self._prop[n].data_copy()
 
         try:
             return handler.run('check.package', param)
@@ -65,17 +60,11 @@ class CheckMissing(Base):
         param['type'] = check_type
         param['missing_package'] = missing
 
-        param['config_app'] = self._config['app'].data_copy()
-        param['config_output'] = self._config['output'].data_copy()
-        param['config_scenario'] = self._config['scenario'].data_copy()
-        param['config_option'] = self._config['option'].data_copy()
-        param['config_release_path'] = self._config['release_path'].data_copy()
-        param['config_attribute'] = self._config['attribute'].data_copy()
-        param['config_release_setting'] = self._config['release_setting'].data_copy()
-        param['config_release_package'] = self._config['release_package'].data_copy()
-        param['config_category'] = self._config['category'].data_copy()
-        param['config_category_priority'] = self._config['category_priority'].data_copy()
-        param['config_package_check'] = self._config['package_check'].data_copy()
+        for n in [
+                'app', 'output', 'scenario', 'option_release', 'release_path', 'attribute',
+                'release_setting', 'release_package', 'category', 'category_priority',
+                'packages_check']:
+            param['prop_'+n] = self._prop[n].data_copy()
 
         try:
             return handler.run('check.summary', param)

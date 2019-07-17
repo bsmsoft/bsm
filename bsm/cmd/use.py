@@ -5,12 +5,13 @@ _logger = get_logger()
 
 class Use(Base):
     def execute(self, default=False, without_package=False):
-        if not self._bsm.config('release_status').get('install', {}).get('finished'):
-            _logger.warning('Release version {0} is not fully installed'.format(self._bsm.config('scenario')['version']))
+        if not self._bsm.prop('release_status').get('install', {}).get('finished'):
+            _logger.warning('Release version "%s" is not fully installed',
+                            self._bsm.prop('scenario')['version'])
 
         missing_pkg = self._bsm.check_missing_runtime()
         if missing_pkg:
-            _logger.warning('Missing package found for runtime: {0}'.format(', '.join(missing_pkg.keys())))
+            _logger.warning('Missing package found for runtime: %s', ', '.join(missing_pkg.keys()))
 
         self._bsm.load_release()
         if not without_package:
@@ -20,6 +21,6 @@ class Use(Base):
             self._bsm.save_as_default()
 
         result = {}
-        result['software_root'] = self._bsm.config('scenario').get('software_root', '')
-        result['version'] = self._bsm.config('scenario').get('version', '')
+        result['software_root'] = self._bsm.prop('scenario').get('software_root', '')
+        result['version'] = self._bsm.prop('scenario').get('version', '')
         return result

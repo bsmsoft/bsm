@@ -21,12 +21,12 @@ class InstallPackage(Base):
     def __build_dag(self, package, category, subdir, version):
         dag = Dag()
 
-        steps = self._config['release_install']['steps']
-        pkg_cfg = self._config['package_runtime'].package_config(category, subdir, package, version)
+        steps = self._prop['release_install']['steps']
+        pkg_props = self._prop['packages_runtime'].package_props(category, subdir, package, version)
 
         previous_vertex = None
         for step in steps:
-            for sub_step in range(len(pkg_cfg['step'][step])):
+            for sub_step in range(len(pkg_props['step'][step])):
                 vertex_pkg = (category, subdir, package, version, step, sub_step)
                 dag.add_vertex(vertex_pkg)
                 if previous_vertex is not None:
@@ -38,9 +38,9 @@ class InstallPackage(Base):
         return dag
 
     def __dag_run(self, dag):
-        selector = InstallSelector(self._config)
+        selector = InstallSelector(self._prop)
         processor = MultiThreadProcessor()
-        executor = InstallExecutor(self._config, self._env.env_final(), 'runtime')
+        executor = InstallExecutor(self._prop, self._env.env_final(), 'runtime')
 
-        with Handler(self._config['release_path']['handler_python_dir']):
+        with Handler(self._prop['release_path']['handler_python_dir']):
             dag_run(dag, selector=selector, processor=processor, executor=executor)

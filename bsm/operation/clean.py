@@ -5,4 +5,4 @@ class Clean(Base):
         self._env.unload_packages()
         self._env.unload_release()
 
-        self._config.reset(initial_env=self._env.env_final())
+        self._prop.reset(initial_env=self._env.env_final())

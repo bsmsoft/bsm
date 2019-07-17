@@ -18,19 +18,19 @@ from bsm.util.option import parse_lines
 @click.pass_context
 def cli(ctx, verbose, quiet, app_root, shell, config_user, output_format, output_env):
     if verbose:
-        ctx.obj['config_entry']['verbose'] = verbose
+        ctx.obj['prop_entry']['verbose'] = verbose
     if quiet:
-        ctx.obj['config_entry']['quiet'] = quiet
+        ctx.obj['prop_entry']['quiet'] = quiet
 
     if config_user is not None:
-        ctx.obj['config_entry']['config_user_file'] = config_user
+        ctx.obj['prop_entry']['config_user_file'] = config_user
 
     ctx.obj['output']['format'] = output_format
     ctx.obj['output']['env'] = output_env
 
     # app_root and shell could not be changed by arguments under shell command
-    if 'app_root' not in ctx.obj['config_entry'] or ctx.obj['config_entry']['app_root'] is None:
-        ctx.obj['config_entry']['app_root'] = app_root
+    if 'app_root' not in ctx.obj['prop_entry'] or ctx.obj['prop_entry']['app_root'] is None:
+        ctx.obj['prop_entry']['app_root'] = app_root
     if 'shell' not in ctx.obj['output'] or ctx.obj['output']['shell'] is None:
         ctx.obj['output']['shell'] = shell
 
@@ -70,7 +70,7 @@ def setup(ctx, shell):
 @click.pass_context
 def init(ctx, no_default, show_script):
     '''Initialize bsm environment'''
-    ctx.obj['config_entry']['default_scenario'] = not no_default
+    ctx.obj['prop_entry']['default_scenario'] = not no_default
     Cmd.execute('init', ctx.obj, no_default, show_script, ctx.obj['output']['shell'])
 
 
@@ -92,14 +92,14 @@ def upgrade(ctx):
 @cli.command()
 @click.option('--version', '-n', 'scenario', type=str, help='Release version')
 @click.option('--option', '-o', type=str, multiple=True, help='Options for release')
-@click.argument('config-type', type=str, required=False)
+@click.argument('prop-type', type=str, required=False)
 @click.argument('item-list', nargs=-1, type=str, required=False)
 @click.pass_context
-def config(ctx, scenario, option, config_type, item_list):
-    '''Display configuration, mostly for debug purpose'''
-    ctx.obj['config_entry']['scenario'] = scenario
-    ctx.obj['config_entry']['option'] = parse_lines(option)
-    Cmd.execute('config', ctx.obj, config_type, item_list)
+def prop(ctx, scenario, option, prop_type, item_list):
+    '''Display prop, mostly for debug purpose'''
+    ctx.obj['prop_entry']['scenario'] = scenario
+    ctx.obj['prop_entry']['option'] = parse_lines(option)
+    Cmd.execute('prop', ctx.obj, prop_type, item_list)
 
 
 @cli.command()
@@ -109,20 +109,20 @@ def config(ctx, scenario, option, config_type, item_list):
 @click.pass_context
 def ls_remote(ctx, release_repo, list_all, tag):
     '''List all available release versions'''
-    ctx.obj['config_entry']['release_repo'] = release_repo
+    ctx.obj['prop_entry']['release_repo'] = release_repo
     Cmd.execute('ls-remote', ctx.obj, list_all, tag)
 
 
 @cli.command()
 @click.option('--software-root', '-r', type=str, help='Local installed software root directory')
 @click.option('--option', '-o', type=str, multiple=True, help='Options for release')
-@click.option('--all', '-a', 'list_all', is_flag=True, help='List all versions')
+@click.option('--installed', '-i', is_flag=True, help='List only versions installed successfully')
 @click.pass_context
-def ls(ctx, software_root, option, list_all):
+def ls(ctx, software_root, option, installed):
     '''List installed release versions'''
-    ctx.obj['config_entry']['software_root'] = software_root
-    ctx.obj['config_entry']['option'] = parse_lines(option)
-    Cmd.execute('ls', ctx.obj, list_all)
+    ctx.obj['prop_entry']['software_root'] = software_root
+    ctx.obj['prop_entry']['option'] = parse_lines(option)
+    Cmd.execute('ls', ctx.obj, installed)
 
 
 @cli.command(name='default')
@@ -157,12 +157,12 @@ def current(ctx):
 def install(ctx, software_root, release_repo, release_source,
             option, reinstall, update, without_package, force, yes, version):
     '''Install specified release version'''
-    ctx.obj['config_entry']['software_root'] = software_root
-    ctx.obj['config_entry']['release_repo'] = release_repo
-    ctx.obj['config_entry']['release_source'] = release_source
-    ctx.obj['config_entry']['option'] = parse_lines(option)
-    ctx.obj['config_entry']['scenario'] = version
-    ctx.obj['config_entry']['reinstall'] = reinstall
+    ctx.obj['prop_entry']['software_root'] = software_root
+    ctx.obj['prop_entry']['release_repo'] = release_repo
+    ctx.obj['prop_entry']['release_source'] = release_source
+    ctx.obj['prop_entry']['option'] = parse_lines(option)
+    ctx.obj['prop_entry']['scenario'] = version
+    ctx.obj['prop_entry']['reinstall'] = reinstall
     Cmd.execute('install', ctx.obj, update, without_package, force, yes)
 
 
@@ -175,9 +175,9 @@ def install(ctx, software_root, release_repo, release_source,
 @click.pass_context
 def use(ctx, software_root, default, option, without_package, version):
     '''Switch environment to given release version'''
-    ctx.obj['config_entry']['software_root'] = software_root
-    ctx.obj['config_entry']['option'] = parse_lines(option)
-    ctx.obj['config_entry']['scenario'] = version
+    ctx.obj['prop_entry']['software_root'] = software_root
+    ctx.obj['prop_entry']['option'] = parse_lines(option)
+    ctx.obj['prop_entry']['scenario'] = version
     Cmd.execute('use', ctx.obj, default, without_package)
 
 
@@ -186,7 +186,7 @@ def use(ctx, software_root, default, option, without_package, version):
 @click.pass_context
 def refresh(ctx, option):
     '''Refresh the current release version environment'''
-    ctx.obj['config_entry']['option'] = parse_lines(option)
+    ctx.obj['prop_entry']['option'] = parse_lines(option)
     Cmd.execute('refresh', ctx.obj)
 
 
@@ -196,7 +196,7 @@ def refresh(ctx, option):
 @click.pass_context
 def run(ctx, option, command):
     '''Run release command'''
-    ctx.obj['config_entry']['option'] = parse_lines(option)
+    ctx.obj['prop_entry']['option'] = parse_lines(option)
     Cmd.execute('run', ctx.obj, command)
 
 
@@ -214,7 +214,7 @@ def clean(ctx):
 @click.pass_context
 def pkg_ls(ctx, list_all, option, package):
     '''List all packages of the current release versions'''
-    ctx.obj['config_entry']['option'] = parse_lines(option)
+    ctx.obj['prop_entry']['option'] = parse_lines(option)
     Cmd.execute('pkg-ls', ctx.obj, list_all, package)
 
 
@@ -226,7 +226,7 @@ def pkg_ls(ctx, list_all, option, package):
 @click.pass_context
 def pkg_init(ctx, package_root, option, yes):
     '''Initialize a new package from directory'''
-    ctx.obj['config_entry']['option'] = parse_lines(option)
+    ctx.obj['prop_entry']['option'] = parse_lines(option)
     Cmd.execute('pkg-init', ctx.obj, package_root, yes)
 
 
@@ -246,8 +246,8 @@ def pkg_install(ctx, category, subdir, version,
                 category_origin, subdir_origin, version_origin,
                 option, reinstall, yes, package):
     '''Install specified package'''
-    ctx.obj['config_entry']['option'] = parse_lines(option)
-    ctx.obj['config_entry']['reinstall'] = reinstall
+    ctx.obj['prop_entry']['option'] = parse_lines(option)
+    ctx.obj['prop_entry']['reinstall'] = reinstall
     Cmd.execute('pkg-install', ctx.obj,
                 category, subdir, version,
                 category_origin, subdir_origin, version_origin,
@@ -263,7 +263,7 @@ def pkg_install(ctx, category, subdir, version,
 @click.pass_context
 def pkg_use(ctx, category, subdir, version, option, package):
     '''Load a package'''
-    ctx.obj['config_entry']['option'] = parse_lines(option)
+    ctx.obj['prop_entry']['option'] = parse_lines(option)
     Cmd.execute('pkg-use', ctx.obj, category, subdir, version, package)
 
 
@@ -277,7 +277,7 @@ def pkg_use(ctx, category, subdir, version, option, package):
 @click.pass_context
 def pkg_build(ctx, category, subdir, version, option, rebuild, package):
     '''Build a package'''
-    ctx.obj['config_entry']['option'] = parse_lines(option)
+    ctx.obj['prop_entry']['option'] = parse_lines(option)
     Cmd.execute('pkg-build', ctx.obj, category, subdir, version, rebuild, package)
 
 
@@ -291,7 +291,7 @@ def pkg_build(ctx, category, subdir, version, option, rebuild, package):
 @click.pass_context
 def pkg_remove(ctx, category, subdir, version, option, force, package):
     '''Remove a package'''
-    ctx.obj['config_entry']['option'] = parse_lines(option)
+    ctx.obj['prop_entry']['option'] = parse_lines(option)
     Cmd.execute('pkg-remove', ctx.obj, category, subdir, version, force, package)
 
 
@@ -302,10 +302,10 @@ def pkg_remove(ctx, category, subdir, version, option, force, package):
 @click.option('--option', '-o', type=str, multiple=True, help='Options for release')
 @click.argument('package', type=str, required=False)
 @click.pass_context
-def pkg_config(ctx, category, subdir, version, option, package):
-    '''List package config'''
-    ctx.obj['config_entry']['option'] = parse_lines(option)
-    Cmd.execute('pkg-config', ctx.obj, category, subdir, version, package)
+def pkg_prop(ctx, category, subdir, version, option, package):
+    '''List package prop'''
+    ctx.obj['prop_entry']['option'] = parse_lines(option)
+    Cmd.execute('pkg-prop', ctx.obj, category, subdir, version, package)
 
 
 @cli.command()
@@ -318,7 +318,7 @@ def pkg_config(ctx, category, subdir, version, option, package):
 @click.pass_context
 def pkg_path(ctx, category, subdir, version, option, list_all, package):
     '''List package path'''
-    ctx.obj['config_entry']['option'] = parse_lines(option)
+    ctx.obj['prop_entry']['option'] = parse_lines(option)
     Cmd.execute('pkg-path', ctx.obj, category, subdir, version, list_all, package)
 
 
@@ -338,15 +338,15 @@ def pkg_clean(ctx, package):
 @click.argument('package', type=str, required=False)
 @click.pass_context
 def pkg_edit(ctx, category, subdir, version, option, package):
-    '''Edit package configuration'''
-    ctx.obj['config_entry']['option'] = parse_lines(option)
+    '''Edit package prop'''
+    ctx.obj['prop_entry']['option'] = parse_lines(option)
     Cmd.execute('pkg-edit', ctx.obj, category, subdir, version, package)
 
 
 def main(cmd_name=None, app_root=None, output_shell=None, check_cli=False):
     '''The app_root and output_shell here take precedence over cli arguments'''
     args = {}
-    args['config_entry'] = {'app_root': app_root}
+    args['prop_entry'] = {'app_root': app_root}
     args['output'] = {'shell': output_shell}
     args['check_cli'] = check_cli
 

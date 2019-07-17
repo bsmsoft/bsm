@@ -3,28 +3,13 @@ import inspect
 
 from bsm.util import snake_to_camel
 
-
-class LoadError(Exception):
-    pass
-
-class LoadModuleError(LoadError):
-    pass
-
-class AttributeNotFoundError(LoadError):
-    pass
-
-class FunctionNotFoundError(AttributeNotFoundError):
-    pass
-
-class NotCallableError(LoadError):
-    pass
-
-class ClassNotFoundError(AttributeNotFoundError):
-    pass
-
-class NotAClassError(LoadError):
-    pass
-
+from bsm.error import LoadError
+from bsm.error import LoadModuleError
+from bsm.error import AttributeNotFoundError
+from bsm.error import FunctionNotFoundError
+from bsm.error import NotCallableError
+from bsm.error import ClassNotFoundError
+from bsm.error import NotAClassError
 
 def load_module(module_name):
     try:

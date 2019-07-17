@@ -1,5 +1,7 @@
 import os
 
+from bsm.error import OperationInstallReleaseError
+
 from bsm.git import Git
 
 from bsm.util import safe_cpdir
@@ -10,10 +12,6 @@ from bsm.operation.util import list_versions
 
 from bsm.logger import get_logger
 _logger = get_logger()
-
-
-class ReleaseVersionError(Exception):
-    pass
 
 
 def _install_from_dir(src_dir, dst_dir):
@@ -27,7 +25,8 @@ def _install_from_git_repo(src_repo, release_version, version_pattern, dst_dir, 
     versions = list_versions(src_repo, version_pattern, git)
 
     if release_version not in versions:
-        raise ReleaseVersionError('Release version "{0}" does not exist in repo {1}'.format(release_version, src_repo))
+        raise OperationInstallReleaseError(
+            'Release version "{0}" does not exist in repo {1}'.format(release_version, src_repo))
 
     release_tag = versions[release_version]
 
@@ -40,31 +39,32 @@ def _install_from_git_repo(src_repo, release_version, version_pattern, dst_dir, 
 
 class InstallRelease(Base):
     def execute(self):
-        if 'version' not in self._config['scenario']:
-            raise ReleaseVersionError('No release version specified')
+        if 'version' not in self._prop['scenario']:
+            raise OperationInstallReleaseError('No release version specified')
 
         self.__install_definition()
         self.__install_handler()
 
-        self._config.reset()
+        self._prop.reset()
 
-        return self._config['scenario']['version']
+        return self._prop['scenario']['version']
 
     def __install_definition(self):
-        conf = self._config['scenario']
-        content_dir = self._config['release_path']['content_dir']
-        version_pattern = self._config['app']['version_pattern']
-        git_temp = self._config['app'].get('git_temp')
+        conf = self._prop['scenario']
+        content_dir = self._prop['release_path']['content_dir']
+        version_pattern = self._prop['app']['version_pattern']
+        git_temp = self._prop['app'].get('git_temp')
 
         if 'release_source' in conf and conf['release_source']:
             _install_from_dir(conf['release_source'], content_dir)
         elif 'version' in conf and conf['version']:
-            _install_from_git_repo(conf['release_repo'], conf['version'], version_pattern, content_dir, git_temp)
+            _install_from_git_repo(conf['release_repo'], conf['version'],
+                                   version_pattern, content_dir, git_temp)
         else:
             _logger.warning('No release specified, nothing to do')
 
     def __install_handler(self):
-        conf = self._config['release_path']
+        conf = self._prop['release_path']
         handler_dir = conf['handler_dir']
         handler_module_dir = conf['handler_module_dir']
 

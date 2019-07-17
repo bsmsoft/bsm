@@ -3,6 +3,8 @@ import copy
 import datetime
 import traceback
 
+from bsm.error import OperationInstallExecutorError
+
 from bsm.env import Env
 
 from bsm.handler import Handler
@@ -19,16 +21,16 @@ class InstallExecutorError(Exception):
 
 
 class Executor(object):
-    def __init__(self, config, initial_env, run_type='install'):
-        self.__config = config
-        self.__env = Env(initial_env=initial_env, env_prefix=self.__config['app']['env_prefix'])
+    def __init__(self, prop, initial_env, run_type='install'):
+        self.__prop = prop
+        self.__env = Env(initial_env=initial_env, env_prefix=self.__prop['app']['env_prefix'])
         self.__current_running = set()
 
         self.__run_type = run_type
         if run_type == 'runtime':
-            self.__config_package_name = 'package_runtime'
+            self.__prop_packages_name = 'packages_runtime'
         else:
-            self.__config_package_name = 'package_install'
+            self.__prop_packages_name = 'packages_install'
 
     def param(self, vertex):
         ctg, subdir, pkg, version, step, sub_step = vertex
@@ -42,34 +44,27 @@ class Executor(object):
         par['step'] = step
         par['sub_step'] = sub_step
 
-        pkg_cfg = self.__config[self.__config_package_name].package_config(ctg, subdir, pkg, version)
+        pkg_props = self.__prop[self.__prop_packages_name].package_props(ctg, subdir, pkg, version)
 
-        step_info = pkg_cfg['step'][step][sub_step]
+        step_info = pkg_props['step'][step][sub_step]
         par['action'] = step_info.get('handler')
         par['action_param'] = step_info.get('param')
         par['action_install'] = step_info.get('install', False)
 
-        pkg_path = pkg_cfg['package_path']
+        pkg_path = pkg_props['package_path']
         par['package_path'] = copy.deepcopy(pkg_path)
         par['log_file'] = os.path.join(pkg_path['log_dir'], '{0}_{1}_{2}.log'.format(pkg, step, sub_step))
         par['env'] = copy.deepcopy(self.__env.env_final())
 
-        par['config_package'] = copy.deepcopy(pkg_cfg['config'])
+        par['prop'] = copy.deepcopy(pkg_props['prop'])
 
-        par['config_app'] = self.__config['app'].data_copy()
-        par['config_output'] = self.__config['output'].data_copy()
-        par['config_scenario'] = self.__config['scenario'].data_copy()
-        par['config_option'] = self.__config['option'].data_copy()
-        par['config_release_path'] = self.__config['release_path'].data_copy()
-        par['config_attribute'] = self.__config['attribute'].data_copy()
-        par['config_release_setting'] = self.__config['release_setting'].data_copy()
-        par['config_release_package'] = self.__config['release_package'].data_copy()
-        par['config_release_version'] = self.__config['release_version'].data_copy()
-        par['config_category'] = self.__config['category'].data_copy()
-        par['config_category_priority'] = self.__config['category_priority'].data_copy()
+        for n in [
+                'app', 'output', 'scenario', 'option_release', 'release_path', 'attribute',
+                'release_setting', 'release_package', 'category', 'category_priority']:
+            par['prop_'+n] = self.__prop[n].data_copy()
 
-        par['config_package_all'] = self.__config[self.__config_package_name].data_copy()
-        par['config_package_all_path'] = self.__config[self.__config_package_name+'_path'].data_copy()
+        par['prop_packages'] = self.__prop[self.__prop_packages_name].data_copy()
+        par['prop_packages_path'] = self.__prop[self.__prop_packages_name+'_path'].data_copy()
 
         return par
 
@@ -104,7 +99,7 @@ class Executor(object):
             raise
         except Exception as e:
             _logger.error('Install handler "{0}" error for {1}: {2}'.format(param['action'], step_full_name, e))
-            if param['config_output']['verbose']:
+            if param['prop_output']['verbose']:
                 _logger.error('\n{0}'.format(traceback.format_exc()))
             raise
 
@@ -119,7 +114,7 @@ class Executor(object):
             if isinstance(result_action, dict) and 'message' in result_action:
                 _logger.error('"{0}" execution error: {1}'.format(step_full_name, result_action['message']))
             _logger.error('"{0}" execution error. Find log in "{1}"'.format(step_full_name, param['log_file']))
-            raise InstallExecutorError('"{0}" execution error'.format(step_full_name))
+            raise OperationInstallExecutorError('"{0}" execution error'.format(step_full_name))
 
         result['action'] = result_action
         result['end'] = datetime.datetime.utcnow()
@@ -130,37 +125,37 @@ class Executor(object):
         pass
 
     def report_finish(self, vertice_result):
-        steps = self.__config['release_install']['steps']
-        atomic_start = self.__config['release_install']['atomic_start']
-        atomic_end = self.__config['release_install']['atomic_end']
+        steps = self.__prop['release_install']['steps']
+        atomic_start = self.__prop['release_install']['atomic_start']
+        atomic_end = self.__prop['release_install']['atomic_end']
 
         for vertex, result in vertice_result:
             ctg, subdir, pkg, version, step, sub_step = vertex
 
-            pkg_cfg = self.__config[self.__config_package_name].package_config(ctg, subdir, pkg, version)
+            pkg_props = self.__prop[self.__prop_packages_name].package_props(ctg, subdir, pkg, version)
 
-            if step == atomic_end and sub_step == (len(pkg_cfg['step'][step]) - 1):
+            if step == atomic_end and sub_step == (len(pkg_props['step'][step]) - 1):
                 _logger.debug('Load package env for {0}'.format(pkg))
-                self.__env.load_package(pkg_cfg['config'])
+                self.__env.load_package(pkg_props['prop'])
 
             if result['success']:
                 if not result.get('skip'):
                     _logger.info(' > {0} {1} {2} finished'.format(pkg, step, sub_step))
-                    if sub_step == (len(pkg_cfg['step'][step]) - 1):
+                    if sub_step == (len(pkg_props['step'][step]) - 1):
                         _logger.debug('Save install status for {0} - {1}'.format(pkg, step))
-                        pkg_cfg['install_status'].setdefault('steps', {})
-                        pkg_cfg['install_status']['steps'][step] = {}
-                        pkg_cfg['install_status']['steps'][step]['finished'] = True
-                        pkg_cfg['install_status']['steps'][step]['start'] = result['start']
-                        pkg_cfg['install_status']['steps'][step]['end'] = result['end']
-                        self.__config[self.__config_package_name].save_install_status(ctg, subdir, pkg, version)
-                if step == steps[-1] and sub_step == (len(pkg_cfg['step'][step]) - 1):
-                    if not pkg_cfg['install_status'].get('finished'):
-                        pkg_cfg['install_status']['finished'] = True
-                        self.__config[self.__config_package_name].save_install_status(ctg, subdir, pkg, version)
+                        pkg_props['install_status'].setdefault('steps', {})
+                        pkg_props['install_status']['steps'][step] = {}
+                        pkg_props['install_status']['steps'][step]['finished'] = True
+                        pkg_props['install_status']['steps'][step]['start'] = result['start']
+                        pkg_props['install_status']['steps'][step]['end'] = result['end']
+                        self.__prop[self.__prop_packages_name].save_install_status(ctg, subdir, pkg, version)
+                if step == steps[-1] and sub_step == (len(pkg_props['step'][step]) - 1):
+                    if not pkg_props['install_status'].get('finished'):
+                        pkg_props['install_status']['finished'] = True
+                        self.__prop[self.__prop_packages_name].save_install_status(ctg, subdir, pkg, version)
                         if self.__run_type == 'install':
-                            _logger.debug('Save package config for {0}'.format(pkg))
-                            self.__config[self.__config_package_name].save_package_config(ctg, subdir, pkg, version)
+                            _logger.debug('Save package prop for {0}'.format(pkg))
+                            self.__prop[self.__prop_packages_name].save_package_prop(ctg, subdir, pkg, version)
 
     def report_running(self, vertice):
         if not vertice:
@@ -169,8 +164,8 @@ class Executor(object):
         new_running = set()
         for v in vertice:
             ctg, subdir, pkg, version, step, sub_step = v
-            pkg_cfg = self.__config[self.__config_package_name].package_config(ctg, subdir, pkg, version)
-            if not pkg_cfg['step'][step][sub_step].get('install'):
+            pkg_props = self.__prop[self.__prop_packages_name].package_props(ctg, subdir, pkg, version)
+            if not pkg_props['step'][step][sub_step].get('install'):
                 continue
             new_running.add(v)
 

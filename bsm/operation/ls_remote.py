@@ -8,13 +8,13 @@ _logger = get_logger()
 
 class LsRemote(Base):
     def execute(self, list_all):
-        release_repo = self._config['scenario']['release_repo']
+        release_repo = self._prop['scenario']['release_repo']
 
         if list_all:
-            version_pattern = self._config['app']['version_pattern']
+            version_pattern = self._prop['app']['version_pattern']
         else:
-            version_pattern = self._config['app']['version_stable_pattern']
+            version_pattern = self._prop['app']['version_stable_pattern']
 
-        git = Git(git_temp=self._config['app'].get('git_temp'))
+        git = Git(git_temp=self._prop['app'].get('git_temp'))
 
         return list_versions(release_repo, version_pattern, git)

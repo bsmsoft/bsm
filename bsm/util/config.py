@@ -1,8 +1,7 @@
 import yaml
 
-
-class ConfigError(Exception):
-    pass
+from bsm.error import ConfigLoadError
+from bsm.error import ConfigDumpError
 
 
 class ExplicitDumper(yaml.SafeDumper):
@@ -10,28 +9,28 @@ class ExplicitDumper(yaml.SafeDumper):
         return True
 
 
-def load_config(fn):
+def load_config(filename):
     try:
-        with open(fn, 'r') as f:
+        with open(filename, 'r') as f:
             return yaml.safe_load(f)
-    except Exception as e:
-        raise ConfigError('Load config error: {0}'.format(e))
+    except (IOError, yaml.YAMLError) as e:
+        raise ConfigLoadError('Load config error: {0}'.format(e))
 
-def dump_config(data, fn):
+def dump_config(data, filename):
     try:
-        with open(fn, 'w') as f:
+        with open(filename, 'w') as f:
             yaml.dump(data, f, default_flow_style=False, Dumper=ExplicitDumper)
-    except Exception as e:
-        raise ConfigError('Dump config error: {0}'.format(e))
+    except (IOError, yaml.YAMLError) as e:
+        raise ConfigDumpError('Dump config error: {0}'.format(e))
 
 def load_config_str(config_str):
     try:
         return yaml.safe_load(config_str)
-    except Exception as e:
-        raise ConfigError('Load config from string error: {0}'.format(e))
+    except yaml.YAMLError as e:
+        raise ConfigLoadError('Load config from string error: {0}'.format(e))
 
 def dump_config_str(data):
     try:
         return yaml.dump(data, default_flow_style=False, Dumper=ExplicitDumper)
-    except Exception as e:
-        raise ConfigError('Dump config error: {0}'.format(e))
+    except yaml.YAMLError as e:
+        raise ConfigDumpError('Dump config error: {0}'.format(e))

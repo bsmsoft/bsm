@@ -1,11 +1,15 @@
-import click
+import sys
 
-from pip import main
+from bsm.cmd import CmdResult
+from bsm.cmd import Base
 
-class Upgrade(object):
-    def execute(self):
-        def pip_install(package):
-            main(['install', '--upgrade', package])
+class Upgrade(Base):
+    def execute(self):      # pylint: disable=no-self-use
+        def pip_install_cmd(package):
+            return [sys.executable, '-m', 'pip', 'install', '--upgrade', package]
 
-        pip_install('pip')
-        pip_install('bsm')
+        commands = []
+        commands.append({'cmd': pip_install_cmd('pip')})
+        commands.append({'cmd': pip_install_cmd('bsm')})
+
+        return CmdResult(commands=commands)

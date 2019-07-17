@@ -75,48 +75,48 @@ class Env(object):
             self.__env[env_name] = _emit_path(final_path_list)
 
 
-    def __load_env(self, config_env):
+    def __load_env(self, prop_env):   # pylint: disable=too-many-branches
         env_info = {}
         env_info['set_env'] = []
         env_info['path'] = {}
         env_info['alias'] = []
 
-        if 'unset_env' in config_env:
-            unset_env = ensure_list(config_env['unset_env'])
+        if 'unset_env' in prop_env:
+            unset_env = ensure_list(prop_env['unset_env'])
             for e in unset_env:
                 if e in self.__env:
                     del self.__env[e]
 
-        if 'set_env' in config_env:
-            for e, v in config_env['set_env'].items():
+        if 'set_env' in prop_env:
+            for e, v in prop_env['set_env'].items():
                 self.__env[e] = v
                 env_info['set_env'].append(e)
 
-        if 'prepend_path' in config_env:
-            for e, v in config_env['prepend_path'].items():
+        if 'prepend_path' in prop_env:
+            for e, v in prop_env['prepend_path'].items():
                 path_list = ensure_list(v)
                 self.__merge_path(e, path_list)
                 env_info['path'].setdefault(e, [])
                 env_info['path'][e] += path_list
 
-        if 'append_path' in config_env:
-            for e, v in config_env['append_path'].items():
+        if 'append_path' in prop_env:
+            for e, v in prop_env['append_path'].items():
                 path_list = ensure_list(v)
                 self.__merge_path(e, path_list, True)
                 env_info['path'].setdefault(e, [])
                 env_info['path'][e] += path_list
 
-        if 'unalias' in config_env:
-            unalias_list = ensure_list(config_env['unalias'])
+        if 'unalias' in prop_env:
+            unalias_list = ensure_list(prop_env['unalias'])
             for e in unalias_list:
                 if e in self.__alias:
                     del self.__alias[e]
                 else:
                     self.__unalias.append(e)
 
-        if 'alias' in config_env:
-            self.__alias.update(config_env['alias'])
-            env_info['alias'] += list(config_env['alias'].keys())
+        if 'alias' in prop_env:
+            self.__alias.update(prop_env['alias'])
+            env_info['alias'] += list(prop_env['alias'].keys())
 
         return env_info
 
@@ -138,13 +138,13 @@ class Env(object):
                     self.__unalias.append(e)
 
 
-    def load_app(self, config_app):
+    def load_app(self, prop_app):
         self.unload_app()
 
         self.__env[self.__env_name['bsmcli_bin']] = BSMCLI_BIN
 
         info = {}
-        info['env'] = self.__load_env(config_app.get('env', {}))
+        info['env'] = self.__load_env(prop_app.get('env', {}))
         self.__env[self.__env_name['app_info']] = _emit_info(info)
 
     def unload_app(self):
@@ -157,16 +157,16 @@ class Env(object):
             del self.__env[self.__env_name['app_info']]
 
 
-    def load_release(self, config_scenario, config_option, config_release_setting):
+    def load_release(self, prop_scenario, prop_option, prop_release_setting):
         self.unload_release()
 
-        self.__env[self.__env_name['software_root']] = config_scenario.get('software_root')
-        self.__env[self.__env_name['release_version']] = config_scenario.get('version')
-        self.__env[self.__env_name['scenario']] = config_scenario.get('scenario')
-        self.__env[self.__env_name['option']] = _emit_info(config_option.data())
+        self.__env[self.__env_name['software_root']] = prop_scenario.get('software_root')
+        self.__env[self.__env_name['release_version']] = prop_scenario.get('version')
+        self.__env[self.__env_name['scenario']] = prop_scenario.get('scenario')
+        self.__env[self.__env_name['option']] = _emit_info(prop_option.data())
 
         info = {}
-        info['env'] = self.__load_env(config_release_setting.get('env', {}))
+        info['env'] = self.__load_env(prop_release_setting.get('env', {}))
         self.__env[self.__env_name['release_info']] = _emit_info(info)
 
     def unload_release(self):
@@ -189,16 +189,16 @@ class Env(object):
         return result
 
 
-    def load_package(self, config_package):
-        name = config_package['name']
+    def load_package(self, prop_package):
+        name = prop_package['name']
 
         self.unload_package(name)
 
         info = {}
-        info['category'] = config_package['category']
-        info['subdir'] = config_package['subdir']
-        info['version'] = config_package['version']
-        info['env'] = self.__load_env(config_package.get('env', {}))
+        info['category'] = prop_package['category']
+        info['subdir'] = prop_package['subdir']
+        info['version'] = prop_package['version']
+        info['env'] = self.__load_env(prop_package.get('env', {}))
 
         packages_info = {}
         if self.__env_name['packages_info'] in self.__env:

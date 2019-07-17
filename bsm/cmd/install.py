@@ -1,14 +1,14 @@
 import click
 
-from bsm.cmd import Base
+from bsm.error import PropReleaseVersionError
 
-from bsm.config.release_version import ConfigReleaseVersionError
+from bsm.cmd import Base
 
 from bsm.logger import get_logger
 _logger = get_logger()
 
 
-def _output_preview_lines(config_package_install):
+def _output_preview_lines(prop_packages_install):
     max_package_length = 1
     max_category_length = 1
     max_subdir_length = 1
@@ -16,12 +16,13 @@ def _output_preview_lines(config_package_install):
 
     packages = {}
 
-    for category in config_package_install:
-        for subdir in config_package_install[category]:
-            for package in config_package_install[category][subdir]:
-                for version, value in config_package_install[category][subdir][package].items():
+    for category in prop_packages_install:
+        for subdir in prop_packages_install[category]:
+            for package in prop_packages_install[category][subdir]:
+                for version, value in prop_packages_install[category][subdir][package].items():
                     packages.setdefault(package, [])
-                    packages[package].append((category, subdir, version, value['package_path']['main_dir']))
+                    packages[package].append(
+                        (category, subdir, version, value['package_path']['main_dir']))
 
                     package_length = len(package)
                     if max_package_length < package_length:
@@ -39,19 +40,21 @@ def _output_preview_lines(config_package_install):
                     if max_version_length < version_length:
                         max_version_length = version_length
 
-    for package, value in packages.items():
-        for l in value:
+    for package, pkg_param in packages.items():
+        for param in pkg_param:
             line = ' - {0:{pkg_width}} | {1:{ctg_width}} | {2:{sd_width}} | {3:{ver_width}} | {4}'\
-                    .format(package, *l, pkg_width=max_package_length, ctg_width=max_category_length, sd_width=max_subdir_length, ver_width=max_version_length)
+                    .format(package, *param,
+                            pkg_width=max_package_length, ctg_width=max_category_length,
+                            sd_width=max_subdir_length, ver_width=max_version_length)
             click.echo(line, err=True)
     click.echo('', err=True)
 
 
 class Install(Base):
-    def execute(self, update, without_package, force, yes):
+    def execute(self, update, without_package, force, yes):     # pylint: disable=inconsistent-return-statements
         result = {}
-        result['software_root'] = self._bsm.config('scenario').get('software_root', '')
-        result['version'] = self._bsm.config('scenario').get('version', '')
+        result['software_root'] = self._bsm.prop('scenario').get('software_root', '')
+        result['version'] = self._bsm.prop('scenario').get('version', '')
 
         if update or not self.__release_exist():
             self._bsm.install_release()
@@ -62,10 +65,11 @@ class Install(Base):
         if not force:
             missing_pkg = self._bsm.check_missing_install()
             if missing_pkg:
-                _logger.warning('Missing package found for installation: {0}'.format(', '.join(missing_pkg.keys())))
+                _logger.warning('Missing package found for installation: %s',
+                                ', '.join(missing_pkg.keys()))
 
         _logger.info('The following packages will be installed:\n')
-        _output_preview_lines(self._bsm.config('package_install'))
+        _output_preview_lines(self._bsm.prop('packages_install'))
 
         if not yes and not click.confirm('Proceed with installation?', default=True, err=True):
             return
@@ -78,8 +82,8 @@ class Install(Base):
 
     def __release_exist(self):
         try:
-            self._bsm.config('release_version')
-        except ConfigVersionError as e:
-            _logger.debug('Release can not be loaded and should be installed: {0}'.format(e))
+            self._bsm.prop('release_version')
+        except PropReleaseVersionError as e:
+            _logger.debug('Release can not be loaded and should be installed: %s', e)
             return False
         return True

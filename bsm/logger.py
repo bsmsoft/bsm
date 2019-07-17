@@ -1,3 +1,5 @@
+# pylint: disable=invalid-name
+
 import time
 import logging
 
@@ -20,7 +22,7 @@ def _time_zone(t):
     return (tz_offset, tz_name)
 
 
-class JsubFormatter(logging.Formatter):
+class BSMFormatter(logging.Formatter):
     # Add this method in order to display time zone offset correctly under python 2.x
     def formatTime(self, record, datefmt=None):
         ct = time.localtime(record.created)
@@ -32,12 +34,13 @@ class JsubFormatter(logging.Formatter):
             ms = '%03d' % record.msecs
 
             tz_offset, tz_name = _time_zone(ct)
-            s = '%s.%03d %s %s' % (t, record.msecs, tz_offset, tz_name)
+            s = '%s.%03d %s %s' % (t, ms, tz_offset, tz_name)
         return s
 
 
-_FORMATTER = JsubFormatter('[%(asctime)s][%(name)s|%(levelname)-4.4s] %(message)s')
-#_FORMATTER = logging.Formatter('[%(asctime)s](%(name)s:%(levelname)s) %(message)s', '%Y-%m-%d %H:%M:%S')
+_FORMATTER = BSMFormatter('[%(asctime)s][%(name)s|%(levelname)-4.4s] %(message)s')
+#_FORMATTER = logging.Formatter('[%(asctime)s](%(name)s:%(levelname)s) %(message)s',
+#                               '%Y-%m-%d %H:%M:%S')
 
 _FORMATTER_SIMPLE = logging.Formatter('[%(levelname)s] %(message)s')
 

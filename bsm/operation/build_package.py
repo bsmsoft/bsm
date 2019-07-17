@@ -11,7 +11,7 @@ _logger = get_logger()
 
 class BuildPackage(Base):
     def execute(self, package, category, subdir, version, rebuild=False):
-        pkg_cfg = self._config['package_runtime'].package_config(category, subdir, package, version)
+        pkg_props = self._prop['packages_runtime'].package_props(category, subdir, package, version)
 
         param = {}
         param['type'] = 'rebuild' if rebuild else 'build'
@@ -21,23 +21,16 @@ class BuildPackage(Base):
         param['subdir'] = subdir
         param['version'] = version
 
-        param['config_package'] = copy.deepcopy(pkg_cfg['config'])
-        param['package_path'] = copy.deepcopy(pkg_cfg['package_path'])
+        param['prop_package'] = copy.deepcopy(pkg_props['prop'])
+        param['package_path'] = copy.deepcopy(pkg_props['package_path'])
 
-        param['config_app'] = self._config['app'].data_copy()
-        param['config_output'] = self._config['output'].data_copy()
-        param['config_scenario'] = self._config['scenario'].data_copy()
-        param['config_option'] = self._config['option'].data_copy()
-        param['config_release_path'] = self._config['release_path'].data_copy()
-        param['config_attribute'] = self._config['attribute'].data_copy()
-        param['config_release_setting'] = self._config['release_setting'].data_copy()
-        param['config_release_package'] = self._config['release_package'].data_copy()
-        param['config_category'] = self._config['category'].data_copy()
-        param['config_category_priority'] = self._config['category_priority'].data_copy()
-        param['config_package_runtime'] = self._config['package_runtime'].data_copy()
-        param['config_package_runtime_path'] = self._config['package_runtime_path'].data_copy()
+        for n in [
+                'app', 'output', 'scenario', 'option_release', 'release_path', 'attribute',
+                'release_setting', 'release_package', 'category', 'category_priority',
+                'packages_runtime', 'packages_runtime_path']:
+            param['prop_'+n] = self._prop[n].data_copy()
 
-        with Handler(self._config['release_path']['handler_python_dir']) as h:
+        with Handler(self._prop['release_path']['handler_python_dir']) as h:
             try:
                 return h.run('build_package', param)
             except HandlerNotFoundError:

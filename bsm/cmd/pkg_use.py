@@ -10,7 +10,7 @@ class PkgUse(PkgBase):
         category, subdir, package, version = self._process_param(package, category, subdir, version)
 
         self._bsm.load_package(package, category, subdir, version)
-        _logger.info('Load package "{0}" successfully'.format(package))
+        _logger.info('Load package "%s" successfully', package)
 
         pkg_path = self._bsm.package_path(package, category, subdir, version)
 

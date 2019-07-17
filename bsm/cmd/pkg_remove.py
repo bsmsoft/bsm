@@ -18,4 +18,4 @@ class PkgRemove(PkgBase):
         _logger.info('Package removed successfully')
 
         pkg_path = self._bsm.package_path(package, category, subdir, version)
-        _logger.info('The main directory could be removed manually: {0}'.format(pkg_path['main_dir']))
+        _logger.info('The main directory could be removed manually: %s', pkg_path['main_dir'])

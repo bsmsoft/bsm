@@ -9,6 +9,11 @@ class LsActivePackage(Base):
 
         for package, value in self._env.current_packages().items():
             packages.setdefault(package, [])
-            packages[package].append({'category': value['category'], 'subdir': value['subdir'], 'version': value['version'], 'active': True})
+            packages[package].append({
+                'category': value['category'],
+                'subdir': value['subdir'],
+                'version': value['version'],
+                'active': True,
+            })
 
         return packages

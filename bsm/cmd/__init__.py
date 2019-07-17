@@ -4,7 +4,8 @@ import traceback
 
 import click
 
-from bsm import Bsm
+from bsm import BSM
+from bsm.error import BSMError
 from bsm.loader import load_common
 from bsm.shell import Shell
 from bsm.cmd.output import Output
@@ -105,7 +106,7 @@ class Cmd(object):
             click.echo('BSM:COMMAND_LINE_INTERFACE_OK')
             return
 
-        bsm = Bsm(obj['config_entry'])
+        bsm = BSM(obj['prop_entry'])
 
         output_format = obj['output']['format']
 
@@ -134,7 +135,7 @@ class Cmd(object):
 
             if obj['output']['shell']:
                 final_output = _generate_script(
-                    bsm.config('app')['cmd_name'], bsm.config('app').get('app_root', ''),
+                    bsm.prop('app')['cmd_name'], bsm.prop('app').get('app_root', ''),
                     obj['output']['shell'], final_output,
                     cmd_result.commands, env_changes, cmd_result.script_types)
 
@@ -144,8 +145,8 @@ class Cmd(object):
 
             if not obj['output']['shell']:
                 _run_commands(cmd_result.commands)
-        except Exception as e:
+        except BSMError as e:
             _logger.critical('Fatal error (%s): %s', type(e).__name__, e)
-            if bsm.config('output')['verbose']:
+            if bsm.prop('output')['verbose']:
                 _logger.critical('\n%s', traceback.format_exc())
-            sys.exit(1)
+            sys.exit(2)

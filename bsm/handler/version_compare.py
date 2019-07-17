@@ -1,10 +1,10 @@
 from packaging import version
 
-def run(ver1, ver2):
-    v1 = version.parse(ver1)
-    v2 = version.parse(ver2)
-    if v1 > v2:
+def run(version1, version2):
+    ver1 = version.parse(version1)
+    ver2 = version.parse(version2)
+    if ver1 > ver2:
         return 1
-    if v1 < v2:
+    if ver1 < ver2:
         return -1
     return 0
