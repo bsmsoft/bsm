@@ -12,9 +12,9 @@ from bsm.util.option import parse_lines
 @click.option('--app-root', type=str, hidden=True, help='Application configuration directory')
 @click.option('--shell', type=str, hidden=True, help='Type of shell script')
 @click.option('--config-user', type=str, help='User configuration file path')
-@click.option('--output-format', type=str, default='plain',
+@click.option('--format', 'output_format', type=str, default='plain',
               help='Output format (json, yaml, python, plain)')
-@click.option('--output-env', is_flag=True, help='Also output environment')
+@click.option('--env', 'output_env', is_flag=True, help='Also output environment')
 @click.pass_context
 def cli(ctx, verbose, quiet, app_root, shell, config_user, output_format, output_env):
     if verbose:

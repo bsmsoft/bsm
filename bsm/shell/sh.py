@@ -9,6 +9,7 @@ def _convert_sh_string(s):
     for i in s:
         # "\" will be converted into four chars "'\\'"
         if i == '\\':
+            #res += '\\\\'
             res += '\'\\\\\''
         # "'" will be converted into four chars "'\''"
         elif i == '\'':
@@ -26,11 +27,11 @@ class Sh(Base):
 
     def output(self, content):
         lines = content.split('\n')
-        newlines = ['echo ' + _convert_sh_string(l) for l in lines]
+        newlines = ['printf "%s\\n" ' + _convert_sh_string(l) for l in lines]
         return '\n'.join(newlines) + '\n'
 
     def output_env(self, env_name):
-        return 'echo "${0}"'.format(env_name)
+        return 'printf "%s\\n" "${0}"'.format(env_name)
 
     def set_env(self, env_name, env_value):
         return 'export {0}={1}\n'.format(env_name, _convert_sh_string(env_value))

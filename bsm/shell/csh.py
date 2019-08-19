@@ -33,11 +33,11 @@ class Csh(Base):
 
     def output(self, content):
         lines = content.split('\n')
-        newlines = ['echo ' + _convert_csh_string(l) for l in lines]
+        newlines = ['printf "%s\\n" ' + _convert_csh_string(l) for l in lines]
         return ';\n'.join(newlines) + ';\n'
 
     def output_env(self, env_name):
-        return 'sh -c \'echo "${0}"\';\n'.format(env_name)
+        return 'sh -c \'printf "%s\\n" "${0}"\';\n'.format(env_name)
 
     def set_env(self, env_name, env_value):
         return 'setenv {0} {1};\n'.format(env_name, _convert_csh_string(env_value))

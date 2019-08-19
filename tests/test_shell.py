@@ -1,3 +1,5 @@
+# pylint: disable=redefined-outer-name
+
 import subprocess
 
 import pytest
@@ -15,10 +17,13 @@ INPUT_STRINGS = [
     '\\',
     '\'',
     '\t',
+    '\\\\',
+    '\\n',
     '!',
 
     'String with  space   ',
     '\nString with \nline break\n',
+    'String with (\\n, \\t, \\\\, \\r, \\a, \\3, \\|) escaped characters',
     'String with  empty \t  \n ',
 
     'String with special `~!@#$%^&*()-_=+[{]};:\'"\\|,<.>/?\n\t abc ABC 0123',
@@ -77,7 +82,7 @@ def shell_with_cmd(request):
 
 
 def _execute_shell(cmd, script):
-    ret, out, err = call(cmd, stderr=subprocess.PIPE, input=script.encode())
+    _, out, _ = call(cmd, stderr=subprocess.PIPE, input_str=script.encode())
     return out.decode()
 
 
@@ -85,7 +90,7 @@ def test_comment(shell_with_cmd):
     shell, cmd = shell_with_cmd
 
     shell.comment('  This should not do anything\n  Including this line')
-    assert '' == _execute_shell(cmd, shell.script)
+    assert _execute_shell(cmd, shell.script) == ''
 
 def test_output(shell_with_cmd):
     shell, cmd = shell_with_cmd
@@ -113,7 +118,7 @@ def test_env(shell_with_cmd):
     shell.set_env(env_name, 'Just a string')
     shell.unset_env(env_name)
     shell.output_env(env_name)
-    assert '\n' == _execute_shell(cmd, shell.script)
+    assert _execute_shell(cmd, shell.script) == '\n'
 
 def test_alias(shell_with_cmd):
     shell, cmd = shell_with_cmd
@@ -127,4 +132,4 @@ def test_alias(shell_with_cmd):
     shell.clear_script()
     shell.alias(alias_name, 'Just a string')
     shell.unalias(alias_name)
-    assert '' == _execute_shell(cmd, shell.script + '\n' + alias_name + '\n')
+    assert _execute_shell(cmd, shell.script + '\n' + alias_name + '\n') == ''
