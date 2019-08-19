@@ -6,13 +6,16 @@ def _parse_chunk(chunk):
     value = chunk[pos+1:].strip()
     return {key: value}
 
-# Do NOT use this, because "," may be in value
+
 def parse_line(line):
+    ''' Do NOT use this function, because "," may be in value
+    '''
     chunks = line.split(',')
     result = {}
     for chunk in chunks:
         result.update(_parse_chunk(chunk))
     return result
+
 
 def parse_lines(lines):
     result = {}

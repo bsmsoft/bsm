@@ -55,9 +55,9 @@ class Prop(Mapping):
             if v is not None:
                 self['entry'][k] = v
 
-
     # This method implements the lazy load of props
     # Props are only loaded when accessed
+
     def __getitem__(self, key):
         def method_not_found():
             raise PropNotFoundError('No such prop: {0}'.format(key))
@@ -75,10 +75,8 @@ class Prop(Mapping):
     def __len__(self):
         return len(self.__prop)
 
-
     def __prop_arg(self, *args):
-        return {name:self[name] for name in args}
-
+        return {name: self[name] for name in args}
 
     def __load_app(self):
         return PropApp(self['entry'].get('app_root', ''))
@@ -249,7 +247,6 @@ class Prop(Mapping):
     def __load_packages_install_path(self):
         return PropPackagesPath(self['packages_install'],
                                 self.__prop_arg('release_path', 'category_priority'))
-
 
     def prop(self, prop_type):
         if isinstance(self[prop_type],

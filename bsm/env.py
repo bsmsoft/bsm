@@ -9,14 +9,17 @@ from bsm.util import ensure_list
 def _parse_path(path_str):
     return path_str.split(os.pathsep)
 
+
 def _emit_path(path_list):
     return os.pathsep.join(path_list)
+
 
 def _parse_info(info_str):
     try:
         return json.loads(info_str)
     except ValueError:
         return {}
+
 
 def _emit_info(info):
     return json.dumps(info, separators=(',', ':'))
@@ -48,7 +51,6 @@ class Env(object):
         self.__env_name['release_info'] = env_prefix + '_RELEASE_INFO'
         self.__env_name['packages_info'] = env_prefix + '_PACKAGES_INFO'
 
-
     def __merge_path(self, env_name, path_list, append=False):
         original_path_list = []
         if env_name in self.__env:
@@ -73,7 +75,6 @@ class Env(object):
             del self.__env[env_name]
         else:
             self.__env[env_name] = _emit_path(final_path_list)
-
 
     def __load_env(self, prop_env):   # pylint: disable=too-many-branches
         env_info = {}
@@ -137,7 +138,6 @@ class Env(object):
                 else:
                     self.__unalias.append(e)
 
-
     def load_app(self, prop_app):
         self.unload_app()
 
@@ -156,12 +156,13 @@ class Env(object):
             self.__unload_env(info.get('env', {}))
             del self.__env[self.__env_name['app_info']]
 
-
     def load_release(self, prop_scenario, prop_option, prop_release_setting):
         self.unload_release()
 
-        self.__env[self.__env_name['software_root']] = prop_scenario.get('software_root')
-        self.__env[self.__env_name['release_version']] = prop_scenario.get('version')
+        self.__env[self.__env_name['software_root']
+                   ] = prop_scenario.get('software_root')
+        self.__env[self.__env_name['release_version']
+                   ] = prop_scenario.get('version')
         self.__env[self.__env_name['scenario']] = prop_scenario.get('scenario')
         self.__env[self.__env_name['option']] = _emit_info(prop_option.data())
 
@@ -185,9 +186,9 @@ class Env(object):
             if self.__env_name[k] in self.__env:
                 result[k] = self.__env[self.__env_name[k]]
         if self.__env_name['option'] in self.__env:
-            result['option'] = _parse_info(self.__env[self.__env_name['option']])
+            result['option'] = _parse_info(
+                self.__env[self.__env_name['option']])
         return result
-
 
     def load_package(self, prop_package):
         name = prop_package['name']
@@ -202,25 +203,30 @@ class Env(object):
 
         packages_info = {}
         if self.__env_name['packages_info'] in self.__env:
-            packages_info = _parse_info(self.__env[self.__env_name['packages_info']])
+            packages_info = _parse_info(
+                self.__env[self.__env_name['packages_info']])
         packages_info[name] = info
 
-        self.__env[self.__env_name['packages_info']] = _emit_info(packages_info)
+        self.__env[self.__env_name['packages_info']
+                   ] = _emit_info(packages_info)
 
     def unload_package(self, package):
         if self.__env_name['packages_info'] in self.__env:
-            packages_info = _parse_info(self.__env[self.__env_name['packages_info']])
+            packages_info = _parse_info(
+                self.__env[self.__env_name['packages_info']])
             if package in packages_info:
                 self.__unload_env(packages_info[package].get('env', {}))
                 del packages_info[package]
             if packages_info:
-                self.__env[self.__env_name['packages_info']] = _emit_info(packages_info)
+                self.__env[self.__env_name['packages_info']
+                           ] = _emit_info(packages_info)
             else:
                 del self.__env[self.__env_name['packages_info']]
 
     def unload_packages(self):
         if self.__env_name['packages_info'] in self.__env:
-            packages_info = _parse_info(self.__env[self.__env_name['packages_info']])
+            packages_info = _parse_info(
+                self.__env[self.__env_name['packages_info']])
             for _, info in packages_info.items():
                 self.__unload_env(info.get('env', {}))
             del self.__env[self.__env_name['packages_info']]
@@ -228,14 +234,14 @@ class Env(object):
     def current_packages(self):
         result = {}
         if self.__env_name['packages_info'] in self.__env:
-            packages_info = _parse_info(self.__env[self.__env_name['packages_info']])
+            packages_info = _parse_info(
+                self.__env[self.__env_name['packages_info']])
             for package, info in packages_info.items():
                 result[package] = {}
                 result[package]['category'] = info['category']
                 result[package]['subdir'] = info['subdir']
                 result[package]['version'] = info['version']
         return result
-
 
     def env_final(self):
         return self.__env.copy()

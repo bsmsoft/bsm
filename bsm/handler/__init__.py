@@ -36,7 +36,8 @@ class Handler(object):
             try:
                 f = load_func(mod+'.'+handler_name, 'run')
             except LoadError as e:
-                _logger.debug('Not able to load handler "%s:%s"', mod, handler_name)
+                _logger.debug('Not able to load handler "%s:%s"',
+                              mod, handler_name)
                 continue
 
             try:
@@ -44,7 +45,9 @@ class Handler(object):
                 _logger.debug('Run handler "%s:%s"', mod, handler_name)
                 return result
             except HandlerNotAvailableError as e:
-                _logger.debug('Handler not available for "%s:%s"', mod, handler_name)
+                _logger.debug('Handler not available for "%s:%s"',
+                              mod, handler_name)
                 continue
 
-        raise HandlerNotFoundError('Could not find handler for "%s"', handler_name)
+        raise HandlerNotFoundError(
+            'Could not find handler for "%s"', handler_name)

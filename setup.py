@@ -3,29 +3,29 @@ import os
 from setuptools import setup, find_packages
 
 
-here = os.path.abspath(os.path.dirname(__file__))
+HERE = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(here, 'bsm', 'VERSION')) as version_file:
-    version = version_file.read().strip()
+with open(os.path.join(HERE, 'bsm', 'VERSION')) as version_file:
+    VERSION = version_file.read().strip()
 
-with open(os.path.join(here, 'bsm', 'BSMCLI_CMD')) as bsmcli_cmd_file:
-    bsmcli_cmd = bsmcli_cmd_file.read().strip()
+with open(os.path.join(HERE, 'bsm', 'BSMCLI_CMD')) as bsmcli_cmd_file:
+    BSMCLI_CMD = bsmcli_cmd_file.read().strip()
 
-with open(os.path.join(here, 'README.rst')) as f:
-    long_description = f.read()
+with open(os.path.join(HERE, 'README.rst')) as f:
+    LONG_DESCRIPTION = f.read()
 
 
 setup(
-    name = 'bsm',
-    version = version,
-    description = 'Bundled software manager',
-    long_description = long_description,
-    url = 'https://github.com/bsmhep/bsm',
-    author = 'Xianghu Zhao',
-    author_email = 'xianghuzhao@gmail.com',
-    license = 'MIT',
+    name='bsm',
+    version=VERSION,
+    description='Bundled software manager',
+    long_description=LONG_DESCRIPTION,
+    url='https://github.com/bsmhep/bsm',
+    author='Xianghu Zhao',
+    author_email='xianghuzhao@gmail.com',
+    license='MIT',
 
-    classifiers = [
+    classifiers=[
         'Development Status :: 5 - Production/Stable',
 
         'Intended Audience :: Science/Research',
@@ -46,20 +46,20 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
 
-    keywords = 'bsm',
-    packages = find_packages(exclude=[]),
-    install_requires = [
+    keywords='bsm',
+    packages=find_packages(exclude=[]),
+    install_requires=[
         'click',
         'PyYAML',
         'packaging',
     ],
-    include_package_data = True,
-    tests_require = [
+    include_package_data=True,
+    tests_require=[
         'pytest',
     ],
-    entry_points = {
+    entry_points={
         'console_scripts': [
-            bsmcli_cmd+' = bsm.cli:main',
+            BSMCLI_CMD+' = bsm.cli:main',
         ],
     },
 )

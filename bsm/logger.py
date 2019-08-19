@@ -5,6 +5,7 @@ import logging
 
 _MAIN_LOGGER_NAME = 'BSM'
 
+
 def _time_zone(t):
     if t.tm_isdst == 1 and time.daylight == 1:
         tz_sec = time.altzone
@@ -18,7 +19,8 @@ def _time_zone(t):
     else:
         tz_sign = '+'
 
-    tz_offset = '%s%02d%02d' % (tz_sign, abs(tz_sec)//3600, abs(tz_sec//60)%60)
+    tz_offset = '%s%02d%02d' % (
+        tz_sign, abs(tz_sec)//3600, abs(tz_sec//60) % 60)
     return (tz_offset, tz_name)
 
 
@@ -38,8 +40,9 @@ class BSMFormatter(logging.Formatter):
         return s
 
 
-_FORMATTER = BSMFormatter('[%(asctime)s][%(name)s|%(levelname)-4.4s] %(message)s')
-#_FORMATTER = logging.Formatter('[%(asctime)s](%(name)s:%(levelname)s) %(message)s',
+_FORMATTER = BSMFormatter(
+    '[%(asctime)s][%(name)s|%(levelname)-4.4s] %(message)s')
+# _FORMATTER = logging.Formatter('[%(asctime)s](%(name)s:%(levelname)s) %(message)s',
 #                               '%Y-%m-%d %H:%M:%S')
 
 _FORMATTER_SIMPLE = logging.Formatter('[%(levelname)s] %(message)s')
@@ -63,6 +66,7 @@ def create_stream_logger(verbose=False, quiet=False):
 
     logger.handlers = []
     logger.addHandler(ch)
+
 
 def get_logger():
     return logging.getLogger(_MAIN_LOGGER_NAME)

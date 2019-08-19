@@ -27,7 +27,8 @@ class ReleaseStatus(CommonDict):
     def __init__(self, prop):
         super(ReleaseStatus, self).__init__()
 
-        all_release_status = prop_from_file(prop['release_path']['status_file'], list)
+        all_release_status = prop_from_file(
+            prop['release_path']['status_file'], list)
         current_attribute = _current_essential_attribute(
             prop['release_setting'], prop['attribute'])
 
@@ -37,7 +38,8 @@ class ReleaseStatus(CommonDict):
                 break
 
     def save_release_status(self, prop_release_path, prop_attribute, prop_release_setting):
-        all_release_status = prop_from_file(prop_release_path['status_file'], list)
+        all_release_status = prop_from_file(
+            prop_release_path['status_file'], list)
         current_attribute = _current_essential_attribute(
             prop_release_setting, prop_attribute)
 

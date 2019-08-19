@@ -22,7 +22,6 @@ class BSM(object):  # pylint: disable=too-many-public-methods
 
         self.reload(prop_entry=prop_entry, initial_env=initial_env)
 
-
     def reload(self, **kwargs):
         if 'prop_entry' in kwargs:
             self.__prop_entry = kwargs['prop_entry']
@@ -37,13 +36,14 @@ class BSM(object):  # pylint: disable=too-many-public-methods
 
         self.__prop = Prop(self.__prop_entry, initial_env)
 
-        create_stream_logger(self.__prop['output']['verbose'], self.__prop['output']['quiet'])
+        create_stream_logger(
+            self.__prop['output']['verbose'], self.__prop['output']['quiet'])
 
-        self.__env = Env(initial_env=initial_env, env_prefix=self.__prop['app']['env_prefix'])
+        self.__env = Env(initial_env=initial_env,
+                         env_prefix=self.__prop['app']['env_prefix'])
         self.__env.load_app(self.__prop['app'])
 
         self.__operation = Operation(self.__prop, self.__env)
-
 
     def version(self):
         return self.__bsm_version
@@ -54,7 +54,6 @@ class BSM(object):  # pylint: disable=too-many-public-methods
     def cli(self):
         return self.__bsm_cli_bin
 
-
     def app(self):
         return self.__prop['app']['id']
 
@@ -64,13 +63,11 @@ class BSM(object):  # pylint: disable=too-many-public-methods
     def prop(self, prop_type):
         return self.__prop.prop(prop_type)
 
-
     def apply_env_changes(self):
         return self.__env.apply_changes()
 
     def env_final(self):
         return self.__env.env_final()
-
 
     def default(self):
         return self.__prop['info'].get('default', {})
@@ -116,7 +113,6 @@ class BSM(object):  # pylint: disable=too-many-public-methods
 
     def run_release_command(self, command):
         return self.__operation.execute('run-release-command', command)
-
 
     def find_package(self, package, category=None, subdir=None, version=None, from_install=False):
         return self.__operation.execute(

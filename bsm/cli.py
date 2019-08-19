@@ -71,7 +71,8 @@ def setup(ctx, shell):
 def init(ctx, no_default, show_script):
     '''Initialize bsm environment'''
     ctx.obj['prop_entry']['default_scenario'] = not no_default
-    Cmd.execute('init', ctx.obj, no_default, show_script, ctx.obj['output']['shell'])
+    Cmd.execute('init', ctx.obj, no_default,
+                show_script, ctx.obj['output']['shell'])
 
 
 @cli.command(name='exit')
@@ -278,7 +279,8 @@ def pkg_use(ctx, category, subdir, version, option, package):
 def pkg_build(ctx, category, subdir, version, option, rebuild, package):
     '''Build a package'''
     ctx.obj['prop_entry']['option'] = parse_lines(option)
-    Cmd.execute('pkg-build', ctx.obj, category, subdir, version, rebuild, package)
+    Cmd.execute('pkg-build', ctx.obj, category,
+                subdir, version, rebuild, package)
 
 
 @cli.command()
@@ -292,7 +294,8 @@ def pkg_build(ctx, category, subdir, version, option, rebuild, package):
 def pkg_remove(ctx, category, subdir, version, option, force, package):
     '''Remove a package'''
     ctx.obj['prop_entry']['option'] = parse_lines(option)
-    Cmd.execute('pkg-remove', ctx.obj, category, subdir, version, force, package)
+    Cmd.execute('pkg-remove', ctx.obj, category,
+                subdir, version, force, package)
 
 
 @cli.command()
@@ -319,7 +322,8 @@ def pkg_prop(ctx, category, subdir, version, option, package):
 def pkg_path(ctx, category, subdir, version, option, list_all, package):
     '''List package path'''
     ctx.obj['prop_entry']['option'] = parse_lines(option)
-    Cmd.execute('pkg-path', ctx.obj, category, subdir, version, list_all, package)
+    Cmd.execute('pkg-path', ctx.obj, category,
+                subdir, version, list_all, package)
 
 
 @cli.command()

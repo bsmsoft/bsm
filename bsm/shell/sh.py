@@ -4,6 +4,7 @@ from bsm.const import BSMCLI_BIN
 
 from bsm.shell.base import Base
 
+
 def _convert_sh_string(s):
     res = '\''
     for i in s:
@@ -18,6 +19,7 @@ def _convert_sh_string(s):
             res += i
     res += '\''
     return res
+
 
 class Sh(Base):
     def comment(self, content):

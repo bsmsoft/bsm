@@ -28,17 +28,20 @@ def _git_cmd(cwd, exe, *args):
     _logger.debug('Run git command: %s', full_cmd)
 
     try:
-        p = subprocess.Popen(full_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd)
+        p = subprocess.Popen(full_cmd, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE, cwd=cwd)
         out, err = p.communicate()
         ret = p.returncode
     except Exception as e:
-        raise GitError('Exception while running git command "{0}": {1}'.format(full_cmd, e))
+        raise GitError(
+            'Exception while running git command "{0}": {1}'.format(full_cmd, e))
 
     if ret != 0:
         raise GitError(
             'Git command "{0}" failed with exit code {1}: {2}'.format(' '.join(full_cmd), ret, err))
 
     return out.decode()
+
 
 def _find_git(git_temp=None):
     try:
@@ -59,8 +62,10 @@ def _find_git(git_temp=None):
     _logger.error('Git command not found')
     raise GitNotFoundError('Can not find git command')
 
+
 def _parse_ref_list(out):
     return [i.strip() for i in out.splitlines()]
+
 
 def _parse_remote_list(out):
     refs = []
@@ -79,7 +84,8 @@ class Git(object):
     def __run_cmd(self, command, **kwargs):
         if command not in COMMAND_MAP:
             _logger.error('Do not known how to run: %s', command)
-            raise GitUnknownCommandError('Do not known how to run: {0}'.format(command))
+            raise GitUnknownCommandError(
+                'Do not known how to run: {0}'.format(command))
 
         params = kwargs.copy()
         if self.__path is not None:
@@ -101,7 +107,6 @@ class Git(object):
         if self.__path is not None:
             safe_rmdir(os.path.join(self.__path, '.git'))
 
-
     def ls_branches(self):
         out = self.__run_cmd('ls-branches')
         return _parse_ref_list(out)
@@ -109,7 +114,6 @@ class Git(object):
     def ls_tags(self):
         out = self.__run_cmd('ls-tags')
         return _parse_ref_list(out)
-
 
     def __ls_remote(self, url, ls_type):
         if not url:

@@ -1,5 +1,6 @@
 from bsm.util import call_and_log
 
+
 def run(param):
     format_dict = {}
     format_dict.update(param['package_path'])

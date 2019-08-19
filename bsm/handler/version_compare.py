@@ -1,5 +1,6 @@
 from packaging import version
 
+
 def run(version1, version2):
     ver1 = version.parse(version1)
     ver2 = version.parse(version2)
