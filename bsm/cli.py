@@ -108,10 +108,10 @@ def prop(ctx, scenario, option, prop_type, item_list):
 @click.option('--all', '-a', 'list_all', is_flag=True, help='List all versions')
 @click.option('--tag', '-g', is_flag=True, help='List tags')
 @click.pass_context
-def ls_remote(ctx, release_repo, list_all, tag):
+def ls_avail(ctx, release_repo, list_all, tag):
     '''List all available release versions'''
     ctx.obj['prop_entry']['release_repo'] = release_repo
-    Cmd.execute('ls-remote', ctx.obj, list_all, tag)
+    Cmd.execute('ls-avail', ctx.obj, list_all, tag)
 
 
 @cli.command()

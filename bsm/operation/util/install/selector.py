@@ -24,7 +24,8 @@ class Selector(object):
             with Handler() as h:
                 return h.run('select', param)
         except HandlerNotFoundError as e:
-            _logger.debug('Select handler not found, will randomly select one step')
+            _logger.debug(
+                'Select handler not found, will randomly select one step')
             return [next(iter(idle))]
         except Exception as e:
             _logger.error('Select handler run error: %s', e)

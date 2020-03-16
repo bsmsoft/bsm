@@ -1,3 +1,5 @@
+from bsm.util import is_str
+
 from bsm.prop.common_dict import CommonDict
 
 from bsm.logger import get_logger
@@ -10,9 +12,6 @@ class Option(CommonDict):
 
         self.__option_type = option_type
         self.__option_list = prop['option_list']
-
-        if 'release_status' in prop:
-            self.__update_option(prop['release_status'])
 
         self.__update_option(prop['user'])
 
@@ -41,12 +40,14 @@ class Option(CommonDict):
     def __option_value(self, key, value):
         var_type = self.__option_list[self.__option_type][key][0]
 
-        if var_type == bool:
-            if value.lower() in ['false', 'no', '0']:
-                return False
-            return True
+        if var_type.lower() in ['bool', 'boolean']:
+            if is_str(value):
+                if value.lower() in ['false', 'f', 'no', 'n', '0', '']:
+                    return False
+                return True
+            return bool(value)
 
-        if var_type == int:
+        if var_type.lower() in ['int', 'integer']:
             try:
                 return int(value)
             except ValueError:

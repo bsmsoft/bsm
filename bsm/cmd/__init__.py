@@ -65,18 +65,18 @@ def _generate_script(cmd_name, app_root, shell_name, output, commands, env_chang
         cmd = command.get('cmd', [])
         cwd = command.get('cwd', None)
         if cmd:
-            shell.output('='*80)
-            shell.output('= Start to run: {0}'.format(cmd))
+            shell.echo('='*80)
+            shell.echo('= Start to run: {0}'.format(cmd))
             if cwd is not None:
-                shell.output('= Cwd: {0}'.format(cwd))
+                shell.echo('= Cwd: {0}'.format(cwd))
             shell.run(cmd, cwd)
-            shell.output('- End command')
-            shell.output('-'*80)
+            shell.echo('- End command')
+            shell.echo('-'*80)
 
     shell.newline()
     shell.comment('Final output')
     if output:
-        shell.output(output)
+        shell.echo(output)
 
     shell.newline()
     shell.comment('Shell script finished')

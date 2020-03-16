@@ -16,6 +16,7 @@ from bsm.util.config import load_config
 from bsm.logger import get_logger
 _logger = get_logger()
 
+
 def _step_param(prop_action):
     if not prop_action:
         return None, {}
@@ -146,6 +147,7 @@ def transform_package(handler, trans_type,
 
     return copy.deepcopy(pkg_prop)
 
+
 def package_path(prop_app, prop_category, category, subdir, name, version):
     if category not in prop_category:
         raise PropPackageError('Category not found: {0}'.format(category))
@@ -153,30 +155,38 @@ def package_path(prop_app, prop_category, category, subdir, name, version):
     ctg_prop = prop_category[category]
 
     if not ctg_prop.get('root'):
-        raise PropPackageError('Category root is not properly set for: {0}'.format(category))
+        raise PropPackageError(
+            'Category root is not properly set for: {0}'.format(category))
 
     result = {}
     if ctg_prop['version_dir']:
-        result['main_dir'] = os.path.join(ctg_prop['root'], subdir, name, version)
+        result['main_dir'] = os.path.join(
+            ctg_prop['root'], subdir, name, version)
         result['work_dir'] = os.path.join(ctg_prop['ctrl_install_dir'],
                                           subdir, name, 'versions', version)
         result['prop_dir'] = os.path.join(ctg_prop['ctrl_package_dir'],
                                           subdir, name, 'versions', version)
     else:
         result['main_dir'] = os.path.join(ctg_prop['root'], subdir, name)
-        result['work_dir'] = os.path.join(ctg_prop['ctrl_install_dir'], subdir, name, 'head')
-        result['prop_dir'] = os.path.join(ctg_prop['ctrl_package_dir'], subdir, name, 'head')
+        result['work_dir'] = os.path.join(
+            ctg_prop['ctrl_install_dir'], subdir, name, 'head')
+        result['prop_dir'] = os.path.join(
+            ctg_prop['ctrl_package_dir'], subdir, name, 'head')
     result['misc_dir'] = os.path.join(result['work_dir'], 'misc')
     result['status_dir'] = os.path.join(result['work_dir'], 'status')
-    result['status_install_file'] = os.path.join(result['status_dir'], 'install.yml')
+    result['status_install_file'] = os.path.join(
+        result['status_dir'], 'install.yml')
     result['log_dir'] = os.path.join(result['work_dir'], 'log')
-    result['prop_file'] = os.path.join(result['prop_dir'], prop_app['package_prop_file'])
+    result['prop_file'] = os.path.join(
+        result['prop_dir'], prop_app['package_prop_file'])
     return result
+
 
 def expand_package_path(package_main_dir, pkg_prop):
     pkg_path = pkg_prop.get('path', {})
     for k, v in pkg_path.items():
         pkg_path[k] = os.path.join(package_main_dir, v).rstrip(os.sep)
+
 
 def expand_package_env(pkg_prop):
     format_dict = {}
@@ -208,14 +218,17 @@ def expand_package_env(pkg_prop):
     for k, v in env_alias.items():
         env_alias[k] = v.format(**format_dict)
 
+
 def install_status(status_install_file):
     return prop_from_file(status_install_file)
+
 
 def install_step(prop_release_install, pkg_prop, inst_status, reinstall):
     result = {}
 
     for step in prop_release_install['steps']:
-        finished = inst_status.get('steps', {}).get(step, {}).get('finished', False)
+        finished = inst_status.get('steps', {}).get(
+            step, {}).get('finished', False)
         install = reinstall or not finished
 
         prop_actions = ensure_list(pkg_prop.get('install', {}).get(step, []))
@@ -225,7 +238,8 @@ def install_step(prop_release_install, pkg_prop, inst_status, reinstall):
             handler, param = _step_param(prop_action)
             if handler:
                 result.setdefault(step, [])
-                result[step].append({'handler': handler, 'param': param, 'install': install})
+                result[step].append(
+                    {'handler': handler, 'param': param, 'install': install})
                 sub_index += 1
 
         if sub_index == 0:
@@ -234,6 +248,7 @@ def install_step(prop_release_install, pkg_prop, inst_status, reinstall):
             sub_index += 1
 
     return result
+
 
 def find_top_priority(handler, category_priority, packages):
     if not packages:
@@ -267,7 +282,9 @@ def find_top_priority(handler, category_priority, packages):
 
     return top_category, top_subdir, top_version
 
-def find_package(handler, category_priority, prop_packages, name, category=None, subdir=None, version=None):
+
+def find_package(handler, category_priority, prop_packages,
+                 name, category=None, subdir=None, version=None):
     ''' Find the package with top priority matching the provided (category, subdir, version)
     '''
     packages = []
@@ -289,6 +306,7 @@ def find_package(handler, category_priority, prop_packages, name, category=None,
 
     return find_top_priority(handler, category_priority, packages)
 
+
 def load_packages(handler, category_priority, prop_packages):
     packages = {}
 
@@ -307,6 +325,7 @@ def load_packages(handler, category_priority, prop_packages):
 
     return result
 
+
 def detect_category(prop_category, directory):
     dir_expand = expand_path(directory)
 
@@ -324,6 +343,7 @@ def detect_category(prop_category, directory):
     rest_dir = dir_expand[len(root_found):].strip(os.sep)
     return category_found, rest_dir
 
+
 def detect_package(directory, prop_packages):
     for category in prop_packages:
         for subdir in prop_packages[category]:
@@ -333,11 +353,13 @@ def detect_package(directory, prop_packages):
                         return category, subdir, package, version
     return None, None, None, None
 
+
 def check_conflict_package(directory, prop_packages):
     for category in prop_packages:
         for subdir in prop_packages[category]:
             for package in prop_packages[category][subdir]:
                 for version, value in prop_packages[category][subdir][package].items():
-                    if directory.startswith(value['package_path']['main_dir']) or value['package_path']['main_dir'].startswith(directory):
+                    if directory.startswith(value['package_path']['main_dir']) or \
+                            value['package_path']['main_dir'].startswith(directory):
                         return category, subdir, package, version
     return None, None, None, None

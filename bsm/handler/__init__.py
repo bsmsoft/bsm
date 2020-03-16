@@ -50,4 +50,4 @@ class Handler(object):
                 continue
 
         raise HandlerNotFoundError(
-            'Could not find handler for "%s"', handler_name)
+            'Could not find handler for {0}'.format(handler_name))

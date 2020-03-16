@@ -39,6 +39,19 @@ from bsm.logger import get_logger
 _logger = get_logger()
 
 
+_PROP_DEPS = {
+    'entry': [],
+    'app': ['entry'],
+    'example': ['app'],
+    'user': ['entry', 'app'],
+    'output': ['entry', 'user'],
+}
+
+
+def _load_from_function(prop_type):
+    return None
+
+
 class Prop(Mapping):
     def __init__(self, prop_entry=None, initial_env=None):
         self.reset(prop_entry, initial_env)
@@ -55,10 +68,10 @@ class Prop(Mapping):
             if v is not None:
                 self['entry'][k] = v
 
-    # This method implements the lazy load of props
-    # Props are only loaded when accessed
-
     def __getitem__(self, key):
+        ''' This method implements the lazy load of props
+            Props are only loaded when accessed
+        '''
         def method_not_found():
             raise PropNotFoundError('No such prop: {0}'.format(key))
 
@@ -160,13 +173,17 @@ class Prop(Mapping):
 
         return p
 
+    def __load_release_option(self):
+        return PropOption('attribute', self.__prop_arg(
+            'entry', 'info', 'env', 'user', 'scenario', 'option_list'))
+
     def __load_option_attribute(self):
         return PropOption('attribute', self.__prop_arg(
             'entry', 'info', 'env', 'user', 'scenario', 'option_list'))
 
     def __load_option_release(self):
-        return PropOption('runtime', self.__prop_arg(
-            'entry', 'info', 'env', 'user', 'scenario', 'release_status', 'option_list'))
+        return PropOption('release', self.__prop_arg(
+            'entry', 'info', 'env', 'user', 'scenario', 'option_list'))
 
     def __load_release_setting_origin(self):
         return PropReleaseSettingOrigin(self['release_path'])
@@ -240,10 +257,12 @@ class Prop(Mapping):
             'release_setting', 'release_package', 'release_install',
             'category', 'category_priority'))
 
+    # NEED this?
     def __load_packages_runtime_path(self):
         return PropPackagesPath(self['packages_runtime'],
                                 self.__prop_arg('release_path', 'category_priority'))
 
+    # NEED this?
     def __load_packages_install_path(self):
         return PropPackagesPath(self['packages_install'],
                                 self.__prop_arg('release_path', 'category_priority'))

@@ -72,8 +72,8 @@ class BSM(object):  # pylint: disable=too-many-public-methods
     def default(self):
         return self.__prop['info'].get('default', {})
 
-    def ls_remote(self, list_all=False):
-        return self.__operation.execute('ls-remote', list_all)
+    def ls_avail(self, list_all=False):
+        return self.__operation.execute('ls-avail', list_all)
 
     def check_missing_install(self):
         return self.__operation.execute('check-missing', 'install')

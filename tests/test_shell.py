@@ -92,12 +92,12 @@ def test_comment(shell_with_cmd):
     shell.comment('  This should not do anything\n  Including this line')
     assert _execute_shell(cmd, shell.script) == ''
 
-def test_output(shell_with_cmd):
+def test_echo(shell_with_cmd):
     shell, cmd = shell_with_cmd
 
     for s in INPUT_STRINGS:
         shell.clear_script()
-        shell.output(s)
+        shell.echo(s)
         assert (s + '\n') == _execute_shell(cmd, shell.script)
 
 def test_env(shell_with_cmd):
@@ -111,13 +111,13 @@ def test_env(shell_with_cmd):
 
         shell.clear_script()
         shell.set_env(env_name, new_s)
-        shell.output_env(env_name)
+        shell.echo_env(env_name)
         assert (new_s + '\n') == _execute_shell(cmd, shell.script)
 
     shell.clear_script()
     shell.set_env(env_name, 'Just a string')
     shell.unset_env(env_name)
-    shell.output_env(env_name)
+    shell.echo_env(env_name)
     assert _execute_shell(cmd, shell.script) == '\n'
 
 def test_alias(shell_with_cmd):

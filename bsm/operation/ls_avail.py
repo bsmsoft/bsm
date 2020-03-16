@@ -6,7 +6,8 @@ from bsm.git import Git
 from bsm.logger import get_logger
 _logger = get_logger()
 
-class LsRemote(Base):
+
+class LsAvail(Base):
     def execute(self, list_all):
         release_repo = self._prop['scenario']['release_repo']
 
